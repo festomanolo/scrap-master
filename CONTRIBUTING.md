@@ -1,6 +1,6 @@
-# Contributing to Agent Reach
+# Contributing to Scrap Master
 
-Thank you for your interest in contributing to Agent Reach! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to Scrap Master! This document provides guidelines and instructions for contributing.
 
 ## Getting Started
 
@@ -15,8 +15,8 @@ Thank you for your interest in contributing to Agent Reach! This document provid
 
 ```bash
 # Clone your fork
-git clone https://github.com/YOUR_USERNAME/Agent-Reach.git
-cd Agent-Reach
+git clone https://github.com/YOUR_USERNAME/Scrap-Master.git
+cd Scrap-Master
 
 # Install in development mode
 pip install -e ".[dev]"
@@ -37,11 +37,11 @@ Run all checks before submitting a PR:
 
 ```bash
 # Linting
-ruff check agent_reach tests
-ruff format agent_reach tests
+ruff check scrap_master tests
+ruff format scrap_master tests
 
 # Type checking
-mypy agent_reach
+mypy scrap_master
 
 # Tests
 pytest
@@ -49,12 +49,12 @@ pytest
 
 ## Adding New Channels
 
-Agent Reach uses a unified channel interface. To add a new platform:
+Scrap Master uses a unified channel interface. To add a new platform:
 
-1. Create a new file in `agent_reach/channels/`
+1. Create a new file in `scrap_master/channels/`
 2. Implement the channel contract (see existing channels for examples)
 3. Add tests in `tests/test_channels.py`
-4. Update `agent_reach/doctor.py` to include the new channel
+4. Update `scrap_master/doctor.py` to include the new channel
 5. Update documentation
 
 ## Pull Request Guidelines
@@ -81,4 +81,4 @@ Feel free to open an issue for questions or join discussions.
 
 ---
 
-Thank you for contributing to Agent Reach! See the guidelines above.
+Thank you for contributing to Scrap Master! See the guidelines above.
