@@ -18,23 +18,23 @@ Here's how to export cookies from your local computer — **fastest method first
 
 That's it! Your Agent will run:
 ```bash
-agent-reach configure twitter-cookies
-agent-reach configure xhs-cookies
+scrap-master configure twitter-cookies
+scrap-master configure xhs-cookies
 ```
 
 Both commands use a hidden prompt. For non-interactive automation, send the
 same exported value through stdin and add `--stdin`; never place cookies in
 the process arguments.
 
-Twitter values saved by Agent Reach are used by `agent-reach doctor` only to
+Twitter values saved by Scrap Master are used by `scrap-master doctor` only to
 check whether explicit credentials are present. Doctor does not run
 `twitter status`. Direct `twitter` commands still require
 `TWITTER_AUTH_TOKEN` and `TWITTER_CT0` in their process environment.
 
 This XiaoHongShu export is for xiaohongshu-mcp or a legacy tool.
-`agent-reach configure xhs-cookies` does not inject cookies into OpenCLI or
+`scrap-master configure xhs-cookies` does not inject cookies into OpenCLI or
 Chrome. OpenCLI may use only an existing Chrome session explicitly controlled
-by the user. Agent Reach never logs the user in or reads XiaoHongShu browser
+by the user. Scrap Master never logs the user in or reads XiaoHongShu browser
 cookies.
 
 ### Sites to export:
