@@ -20,8 +20,8 @@ from urllib.parse import parse_qs, urlsplit
 
 import pytest
 
-from agent_reach.channels import v2ex as v2
-from agent_reach.channels.v2ex import V2EXChannel
+from scrap_master.channels import v2ex as v2
+from scrap_master.channels.v2ex import V2EXChannel
 
 # --- can_handle ---
 
@@ -49,7 +49,7 @@ def test_check_warn_on_exception_clears_backend():
     with patch.object(v2, "_get_json", side_effect=OSError("no proxy")):
         status, message = ch.check()
     assert status == "warn"
-    assert "连接失败" in message
+    assert "connection failed" in message
     assert ch.active_backend is None
 
 
@@ -189,6 +189,7 @@ def test_get_node_topics_falls_back_to_requested_node_name():
 
 @pytest.mark.parametrize(
     "node_name",
+    # "Python 开发" is intentionally non-ASCII to exercise URL encoding.
     ["python&page=99", "foo#bar", "c++", "Python 开发"],
 )
 def test_get_node_topics_percent_encodes_node_name(node_name):

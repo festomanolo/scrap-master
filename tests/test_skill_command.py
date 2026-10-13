@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Tests for 'agent-reach skill' command and _install_skill / _uninstall_skill."""
+"""Tests for 'scrap-master skill' command and _install_skill / _uninstall_skill."""
 
 import importlib.resources
 import os
@@ -10,26 +10,22 @@ from argparse import Namespace
 from pathlib import Path
 from unittest.mock import patch
 
-from agent_reach.cli import _cmd_skill, _install_skill, _uninstall_skill
+from scrap_master.cli import _cmd_skill, _install_skill, _uninstall_skill
 
 
 class TestSkillCommand(unittest.TestCase):
     """Test skill install and uninstall via CLI helpers."""
 
-    def test_skill_resources_include_both_locales(self):
-        """Package resources should expose both default and English skill markdown files."""
-        skill_dir = importlib.resources.files("agent_reach").joinpath("skill")
+    def test_skill_resource_is_packaged(self):
+        """Package resources should expose the skill markdown file."""
+        skill_dir = importlib.resources.files("scrap_master").joinpath("skill")
 
-        default_skill = skill_dir.joinpath("SKILL.md").read_text(encoding="utf-8")
-        english_skill = skill_dir.joinpath("SKILL_en.md").read_text(encoding="utf-8")
-
-        self.assertTrue(default_skill.strip())
-        self.assertTrue(english_skill.strip())
+        self.assertTrue(skill_dir.joinpath("SKILL.md").read_text(encoding="utf-8").strip())
 
     def test_exa_reference_uses_default_registered_tools_only(self):
         """Agent instructions must not call Exa tools disabled by default."""
         search_reference = (
-            importlib.resources.files("agent_reach")
+            importlib.resources.files("scrap_master")
             .joinpath("skill", "references", "search.md")
             .read_text(encoding="utf-8")
         )
@@ -42,8 +38,8 @@ class TestSkillCommand(unittest.TestCase):
         """Packaged commands must survive PowerShell and POSIX parsing."""
         root = Path(__file__).resolve().parents[1]
         markdown_files = [
-            *(root / "agent_reach" / "skill").rglob("*.md"),
-            *(root / "agent_reach" / "guides").rglob("*.md"),
+            *(root / "scrap_master" / "skill").rglob("*.md"),
+            *(root / "scrap_master" / "guides").rglob("*.md"),
             root / "docs" / "install.md",
             root / "docs" / "troubleshooting.md",
         ]
@@ -57,7 +53,7 @@ class TestSkillCommand(unittest.TestCase):
     def test_linkedin_reference_uses_current_tool_contract(self):
         """LinkedIn examples should use the current server and parameters."""
         career_reference = (
-            importlib.resources.files("agent_reach")
+            importlib.resources.files("scrap_master")
             .joinpath("skill", "references", "career.md")
             .read_text(encoding="utf-8")
         )
@@ -112,20 +108,20 @@ class TestSkillCommand(unittest.TestCase):
     def test_boss_setup_is_agent_driven_and_reproducible(self):
         root = Path(__file__).resolve().parents[1]
         install_doc = (root / "docs" / "install.md").read_text(encoding="utf-8")
-        skill = (root / "agent_reach" / "skill" / "SKILL.md").read_text(
+        skill = (root / "scrap_master" / "skill" / "SKILL.md").read_text(
             encoding="utf-8"
         )
         career = (
-            root / "agent_reach" / "skill" / "references" / "career.md"
+            root / "scrap_master" / "skill" / "references" / "career.md"
         ).read_text(encoding="utf-8")
         readme = (root / "README.md").read_text(encoding="utf-8")
 
         for content in (install_doc, skill, readme):
-            self.assertIn("帮我配 Boss直聘", content)
-        self.assertIn("agent-reach install --env=local --system --channels=boss", install_doc)
+            self.assertIn("help me configure Boss Zhipin", content)
+        self.assertIn("scrap-master install --env=local --system --channels=boss", install_doc)
         self.assertIn("--remote-debugging-address=127.0.0.1", install_doc)
-        self.assertIn("用户手动登录", install_doc)
-        self.assertIn("完全控制", install_doc)
+        self.assertIn("user logs in manually", install_doc)
+        self.assertIn("full control", install_doc)
 
         self.assertIn(
             'auth = AuthManager(Path.home() / ".boss-agent")', career
@@ -135,19 +131,18 @@ class TestSkillCommand(unittest.TestCase):
         self.assertIn("4c991b77086a203173bf08a4cb64a23af6514fe6", career)
         self.assertIn("ENVIRONMENT_RISK", career)
         self.assertIn("--browser-source existing-browser", career)
-        self.assertIn("长期复用", career)
-        self.assertNotIn("code 37（TOKEN_REFRESH_FAILED）→ 重新登录", career)
+        self.assertIn("long-term", career)
+        self.assertNotIn("code 37 (TOKEN_REFRESH_FAILED) → re-login", career)
         self.assertNotIn("client = BossClient(auth", career)
 
-    def test_localized_readmes_use_current_linkedin_server_name(self):
+    def test_readme_uses_current_linkedin_server_name(self):
         root = Path(__file__).resolve().parents[1]
-        for name in ("README_ja.md", "README_ko.md"):
-            content = (root / "docs" / name).read_text(encoding="utf-8")
-            self.assertIn("mcp-server-linkedin", content)
-            self.assertNotIn("linkedin-scraper-mcp", content)
+        content = (root / "README.md").read_text(encoding="utf-8")
+        self.assertIn("mcp-server-linkedin", content)
+        self.assertNotIn("linkedin-scraper-mcp", content)
 
     def test_skill_install_command_exits_nonzero_when_install_fails(self):
-        with patch("agent_reach.cli._install_skill", return_value=False):
+        with patch("scrap_master.cli._install_skill", return_value=False):
             with self.assertRaises(SystemExit) as raised:
                 _cmd_skill(Namespace(install=True, uninstall=False))
 
@@ -160,7 +155,7 @@ class TestSkillCommand(unittest.TestCase):
             os.makedirs(skill_dir)
 
             with patch(
-                "agent_reach.cli.os.path.expanduser",
+                "scrap_master.cli.os.path.expanduser",
                 side_effect=lambda p: p.replace("~", tmpdir),
             ), patch.dict(os.environ, {}, clear=False):
                 # Remove OPENCLAW_HOME to avoid interference
@@ -175,7 +170,7 @@ class TestSkillCommand(unittest.TestCase):
                     # Verify content is non-empty
                     with open(os.path.join(dirpath, "SKILL.md"), encoding="utf-8") as f:
                         content = f.read()
-                    self.assertIn("Agent Reach", content)
+                    self.assertIn("Scrap Master", content)
             # _install_skill may or may not find dirs depending on mock; just ensure no crash
             # The important test is that the function runs without error
 
@@ -183,7 +178,7 @@ class TestSkillCommand(unittest.TestCase):
         """_uninstall_skill should remove skill directories."""
         with tempfile.TemporaryDirectory() as tmpdir:
             # Create a fake skill installation
-            skill_path = os.path.join(tmpdir, ".openclaw", "skills", "agent-reach")
+            skill_path = os.path.join(tmpdir, ".openclaw", "skills", "scrap-master")
             os.makedirs(skill_path)
             with open(os.path.join(skill_path, "SKILL.md"), "w", encoding="utf-8") as f:
                 f.write("test")
@@ -191,7 +186,7 @@ class TestSkillCommand(unittest.TestCase):
             self.assertTrue(os.path.exists(skill_path))
 
             with patch(
-                "agent_reach.cli.os.path.expanduser",
+                "scrap_master.cli.os.path.expanduser",
                 side_effect=lambda p: p.replace("~", tmpdir),
             ), patch.dict(os.environ, {}, clear=False):
                 env = os.environ.copy()
@@ -202,14 +197,14 @@ class TestSkillCommand(unittest.TestCase):
             self.assertFalse(os.path.exists(skill_path))
 
     def test_install_creates_dir_if_parent_exists(self):
-        """_install_skill should create agent-reach dir inside existing skill dir."""
+        """_install_skill should create scrap-master dir inside existing skill dir."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            # Create the .openclaw/skills parent but not agent-reach subdir
+            # Create the .openclaw/skills parent but not scrap-master subdir
             skill_parent = os.path.join(tmpdir, ".openclaw", "skills")
             os.makedirs(skill_parent)
 
             with patch(
-                "agent_reach.cli.os.path.expanduser",
+                "scrap_master.cli.os.path.expanduser",
                 side_effect=lambda p: p.replace("~", tmpdir),
             ), patch.dict(os.environ, {}, clear=False):
                 env = os.environ.copy()
@@ -217,38 +212,11 @@ class TestSkillCommand(unittest.TestCase):
                 with patch.dict(os.environ, env, clear=True):
                     _install_skill()
 
-            target = os.path.join(skill_parent, "agent-reach", "SKILL.md")
+            target = os.path.join(skill_parent, "scrap-master", "SKILL.md")
             self.assertTrue(os.path.exists(target))
             with open(target, encoding="utf-8") as f:
                 content = f.read()
-            self.assertIn("Agent Reach", content)
-
-    def test_install_uses_english_skill_for_english_locale(self):
-        """_install_skill should install the English skill file for English locales."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            skill_parent = os.path.join(tmpdir, ".openclaw", "skills")
-            os.makedirs(skill_parent)
-
-            with patch(
-                "agent_reach.cli.os.path.expanduser",
-                side_effect=lambda p: p.replace("~", tmpdir),
-            ):
-                env = os.environ.copy()
-                env.pop("OPENCLAW_HOME", None)
-                env["LANG"] = "en_US.UTF-8"
-                with patch.dict(os.environ, env, clear=True):
-                    _install_skill()
-
-            target = os.path.join(skill_parent, "agent-reach", "SKILL.md")
-            self.assertTrue(os.path.exists(target))
-            with open(target, encoding="utf-8") as f:
-                content = f.read()
-            self.assertTrue(content.strip())
-            self.assertIn("Xiaoyuzhou Podcast, LinkedIn", content)
-            self.assertNotIn("搜推特", content)
-            self.assertTrue(
-                os.path.exists(os.path.join(skill_parent, "agent-reach", "references"))
-            )
+            self.assertIn("Scrap Master", content)
 
 
 if __name__ == "__main__":

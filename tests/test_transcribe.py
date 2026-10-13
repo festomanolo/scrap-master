@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Tests for agent_reach.transcribe — provider routing, fallback, and errors."""
+"""Tests for scrap_master.transcribe — provider routing, fallback, and errors."""
 
 import subprocess
 from pathlib import Path
@@ -7,8 +7,8 @@ from typing import List
 
 import pytest
 
-from agent_reach import transcribe as tr
-from agent_reach.config import Config
+from scrap_master import transcribe as tr
+from scrap_master.config import Config
 
 # --- Fixtures ----------------------------------------------------------- #
 
@@ -832,6 +832,7 @@ class TestMediaGenerationBudget:
 
 
 class TestSubprocessDecoding:
+    # Non-ASCII (CJK) bytes are used on purpose to exercise UTF-8 handling.
     CJK_BYTES = "中文标题".encode("utf-8")
 
     def _decoding_run(self, returncode: int):
@@ -864,7 +865,7 @@ class TestSubprocessDecoding:
 
 class TestYouTubeChannelTranscribe:
     def test_delegates_to_transcribe(self, monkeypatch, fake_config):
-        from agent_reach.channels.youtube import YouTubeChannel
+        from scrap_master.channels.youtube import YouTubeChannel
 
         captured = {}
 
