@@ -3,8 +3,8 @@
 
 import subprocess
 
-from agent_reach.channels import get_all_channels
-from agent_reach.config import Config
+from scrap_master.channels import get_all_channels
+from scrap_master.config import Config
 
 
 def _fake_run_ok(cmd, **kwargs):
@@ -57,7 +57,7 @@ def test_channel_active_backend_set_by_check(monkeypatch, tmp_path):
         raise URLError("offline")
 
     monkeypatch.setattr(urllib.request, "urlopen", _no_net)
-    import agent_reach.channels.xueqiu as xueqiu_mod
+    import scrap_master.channels.xueqiu as xueqiu_mod
     monkeypatch.setattr(xueqiu_mod, "_cookies_initialized", True)
     monkeypatch.setattr(xueqiu_mod._opener, "open", _no_net)
 
@@ -85,7 +85,7 @@ def test_ordered_backends_contract(tmp_path):
 
 def test_ordered_backends_override_moves_backend_to_front():
     """Config key <channel>_backend promotes the named backend to front."""
-    from agent_reach.channels.twitter import TwitterChannel
+    from scrap_master.channels.twitter import TwitterChannel
 
     ch = TwitterChannel()
     ordered = ch.ordered_backends({"twitter_backend": "bird"})
@@ -99,7 +99,7 @@ def test_ordered_backends_override_moves_backend_to_front():
 
 def test_youtube_warns_when_node_only_and_no_config(monkeypatch, tmp_path):
     """YouTube should warn when only Node.js is installed but no yt-dlp config exists."""
-    from agent_reach.channels.youtube import YouTubeChannel
+    from scrap_master.channels.youtube import YouTubeChannel
 
     def fake_which(cmd):
         if cmd == "yt-dlp":
@@ -117,12 +117,12 @@ def test_youtube_warns_when_node_only_and_no_config(monkeypatch, tmp_path):
     status, message = ch.check()
     assert status == "warn"
     assert "--js-runtimes" in message
-    assert ch.active_backend == "yt-dlp"  # 本体活着，warn 只关乎 JS runtime
+    assert ch.active_backend == "yt-dlp"  # the binary is alive; the warning only concerns the JS runtime
 
 
 def test_youtube_warns_with_windows_specific_fix_command(monkeypatch, tmp_path):
     """Windows guidance should use a PowerShell-style yt-dlp config command."""
-    from agent_reach.channels.youtube import YouTubeChannel
+    from scrap_master.channels.youtube import YouTubeChannel
 
     def fake_which(cmd):
         if cmd == "yt-dlp":
@@ -133,7 +133,7 @@ def test_youtube_warns_with_windows_specific_fix_command(monkeypatch, tmp_path):
 
     monkeypatch.setattr("shutil.which", fake_which)
     monkeypatch.setattr("subprocess.run", _fake_run_ok)  # yt-dlp probe really executes now
-    monkeypatch.setattr("agent_reach.utils.paths.sys.platform", "win32")
+    monkeypatch.setattr("scrap_master.utils.paths.sys.platform", "win32")
     monkeypatch.setenv("APPDATA", str(tmp_path / "AppData" / "Roaming"))
 
     ch = YouTubeChannel()
@@ -145,7 +145,7 @@ def test_youtube_warns_with_windows_specific_fix_command(monkeypatch, tmp_path):
 
 def test_youtube_ok_when_deno_installed(monkeypatch):
     """YouTube should return ok when Deno is installed (no config needed)."""
-    from agent_reach.channels.youtube import YouTubeChannel
+    from scrap_master.channels.youtube import YouTubeChannel
 
     def fake_which(cmd):
         if cmd == "yt-dlp":
@@ -165,7 +165,7 @@ def test_youtube_ok_when_deno_installed(monkeypatch):
 
 def test_channel_can_handle_contract():
     url_samples = {
-        "github": "https://github.com/panniantong/agent-reach",
+        "github": "https://github.com/festomanolo/scrap-master",
         "twitter": "https://x.com/user/status/1",
         "youtube": "https://youtube.com/watch?v=abc",
         "reddit": "https://reddit.com/r/python",

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Tests for Agent Reach config module."""
+"""Tests for Scrap Master config module."""
 
 import pytest
 
-from agent_reach.config import Config, ConfigReadOnlyError, ConfigSecurityError
+from scrap_master.config import Config, ConfigReadOnlyError, ConfigSecurityError
 
 
 @pytest.fixture
@@ -191,7 +191,7 @@ class TestConfig:
         except (OSError, NotImplementedError):
             pytest.skip("symlinks not supported on this platform")
 
-        with pytest.raises(ConfigSecurityError, match="符号链接"):
+        with pytest.raises(ConfigSecurityError, match="symbolic link"):
             Config(config_path=config_file)
         assert victim.read_text(encoding="utf-8") == "secret: victim-data\n"
 
@@ -205,7 +205,7 @@ class TestConfig:
         except (OSError, NotImplementedError):
             pytest.skip("symlinks not supported on this platform")
 
-        with pytest.raises(ConfigSecurityError, match="符号链接"):
+        with pytest.raises(ConfigSecurityError, match="symbolic link"):
             config.set("secret", "new-data")
 
         assert config_file.is_symlink()
@@ -220,7 +220,7 @@ class TestConfig:
         except (OSError, NotImplementedError):
             pytest.skip("symlinks not supported on this platform")
 
-        with pytest.raises(ConfigSecurityError, match="配置目录"):
+        with pytest.raises(ConfigSecurityError, match="config directory"):
             Config(config_path=linked_dir / "config.yaml")
         assert list(real_dir.iterdir()) == []
 
@@ -233,7 +233,7 @@ class TestConfig:
         except (OSError, NotImplementedError):
             pytest.skip("symlinks not supported on this platform")
 
-        with pytest.raises(ConfigSecurityError, match="符号链接"):
+        with pytest.raises(ConfigSecurityError, match="symbolic link"):
             Config(config_path=linked_root / "nested" / "config.yaml")
 
     def test_config_load_refuses_non_regular_file(self, tmp_path):
@@ -244,17 +244,17 @@ class TestConfig:
         config_file = tmp_path / "config.yaml"
         os.mkfifo(config_file)
 
-        with pytest.raises(ConfigSecurityError, match="常规文件"):
+        with pytest.raises(ConfigSecurityError, match="not a regular file"):
             Config(config_path=config_file)
 
     def test_config_load_is_bounded(self, tmp_path, monkeypatch):
-        import agent_reach.config as config_module
+        import scrap_master.config as config_module
 
         config_file = tmp_path / "config.yaml"
         config_file.write_text("secret: too-long\n", encoding="utf-8")
         monkeypatch.setattr(config_module, "_MAX_CONFIG_BYTES", 4)
 
-        with pytest.raises(ConfigSecurityError, match="大小上限"):
+        with pytest.raises(ConfigSecurityError, match="size limit"):
             Config(config_path=config_file)
 
     def test_save_preserves_previous_file_on_serialization_failure(
@@ -268,7 +268,7 @@ class TestConfig:
         def fail_dump(*args, **kwargs):
             raise RuntimeError("simulated write failure")
 
-        monkeypatch.setattr("agent_reach.config.yaml.safe_dump", fail_dump)
+        monkeypatch.setattr("scrap_master.config.yaml.safe_dump", fail_dump)
         with pytest.raises(RuntimeError, match="simulated"):
             config.set("new_key", "new_value")
 
@@ -290,7 +290,7 @@ class TestConfig:
             observed["dir"] = kwargs.get("dir")
             return real_mkstemp(*args, **kwargs)
 
-        monkeypatch.setattr("agent_reach.config.tempfile.mkstemp", spy_mkstemp)
+        monkeypatch.setattr("scrap_master.config.tempfile.mkstemp", spy_mkstemp)
         config.set("key", "value")
 
         assert observed["dir"] == str(config_file.parent)

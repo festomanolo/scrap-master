@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Tests for Agent Reach CLI."""
+"""Tests for Scrap Master CLI."""
 
 import shutil
 import subprocess
@@ -9,55 +9,55 @@ from unittest.mock import patch
 import pytest
 import requests
 
-import agent_reach.cli as cli
-from agent_reach.cli import main
-from agent_reach.config import Config
+import scrap_master.cli as cli
+from scrap_master.cli import main
+from scrap_master.config import Config
 
 
 class TestCLI:
     def test_version(self, capsys):
         with pytest.raises(SystemExit) as exc_info:
-            with patch("sys.argv", ["agent-reach", "version"]):
+            with patch("sys.argv", ["scrap-master", "version"]):
                 main()
         assert exc_info.value.code == 0
         captured = capsys.readouterr()
-        assert "Agent Reach v" in captured.out
+        assert "Scrap Master v" in captured.out
 
     def test_no_command_shows_help(self, capsys):
         with pytest.raises(SystemExit) as exc_info:
-            with patch("sys.argv", ["agent-reach"]):
+            with patch("sys.argv", ["scrap-master"]):
                 main()
         assert exc_info.value.code == 0
 
     def test_doctor_runs(self, capsys):
         with patch(
-            "agent_reach.doctor.check_all",
+            "scrap_master.doctor.check_all",
             return_value={
                 "web": {
                     "status": "ok",
-                    "name": "网页",
-                    "message": "可用",
+                    "name": "Web",
+                    "message": "available",
                     "tier": 0,
                     "backends": ["Jina Reader"],
                     "active_backend": "Jina Reader",
                 }
             },
         ), patch(
-            "agent_reach.doctor.format_report",
-            return_value="Agent Reach\n✅ 网页可用",
-        ), patch("sys.argv", ["agent-reach", "doctor"]):
+            "scrap_master.doctor.format_report",
+            return_value="Scrap Master\n✅ Web available",
+        ), patch("sys.argv", ["scrap-master", "doctor"]):
             main()
         captured = capsys.readouterr()
-        assert "Agent Reach" in captured.out
+        assert "Scrap Master" in captured.out
         assert "✅" in captured.out
 
     def test_doctor_is_read_only_and_never_installs_skill(
         self, monkeypatch, tmp_path, capsys
     ):
-        skill_dir = tmp_path / ".agents" / "skills" / "agent-reach"
+        skill_dir = tmp_path / ".agents" / "skills" / "scrap-master"
         skill_dir.mkdir(parents=True)
         skill_file = skill_dir / "SKILL.md"
-        custom_content = "# custom Agent Reach skill\n"
+        custom_content = "# custom Scrap Master skill\n"
         skill_file.write_text(custom_content, encoding="utf-8")
 
         monkeypatch.setattr(
@@ -65,11 +65,11 @@ class TestCLI:
             "expanduser",
             lambda p: p.replace("~", str(tmp_path)),
         )
-        config_dir = tmp_path / ".agent-reach"
+        config_dir = tmp_path / ".scrap-master"
         monkeypatch.setattr(Config, "CONFIG_DIR", config_dir)
         monkeypatch.setattr(Config, "CONFIG_FILE", config_dir / "config.yaml")
-        monkeypatch.setattr("agent_reach.doctor.check_all", lambda config: {})
-        monkeypatch.setattr("agent_reach.doctor.format_report", lambda results: "report")
+        monkeypatch.setattr("scrap_master.doctor.check_all", lambda config: {})
+        monkeypatch.setattr("scrap_master.doctor.format_report", lambda results: "report")
         install_calls = []
         monkeypatch.setattr(
             cli,
@@ -89,29 +89,29 @@ class TestCLI:
         assert f"Skill installed for Agent: {skill_dir}" not in out
 
     def test_transcribe_command_prints_text(self, capsys):
-        with patch("agent_reach.transcribe.transcribe", return_value="hello transcript"):
-            with patch("sys.argv", ["agent-reach", "transcribe", "audio.mp3"]):
+        with patch("scrap_master.transcribe.transcribe", return_value="hello transcript"):
+            with patch("sys.argv", ["scrap-master", "transcribe", "audio.mp3"]):
                 main()
         captured = capsys.readouterr()
         assert "hello transcript" in captured.out
 
     def test_transcribe_command_writes_output_file(self, capsys, tmp_path):
         out_file = tmp_path / "t.txt"
-        with patch("agent_reach.transcribe.transcribe", return_value="saved text"):
-            with patch("sys.argv", ["agent-reach", "transcribe", "audio.mp3", "-o", str(out_file)]):
+        with patch("scrap_master.transcribe.transcribe", return_value="saved text"):
+            with patch("sys.argv", ["scrap-master", "transcribe", "audio.mp3", "-o", str(out_file)]):
                 main()
         assert out_file.read_text(encoding="utf-8").strip() == "saved text"
         assert "Transcript written" in capsys.readouterr().out
 
     def test_transcribe_provider_fallback_requires_explicit_flag(self):
         with patch(
-            "agent_reach.transcribe.transcribe",
+            "scrap_master.transcribe.transcribe",
             return_value="hello transcript",
         ) as mock_transcribe:
             with patch(
                 "sys.argv",
                 [
-                    "agent-reach",
+                    "scrap-master",
                     "transcribe",
                     "audio.mp3",
                     "--allow-provider-fallback",
@@ -126,11 +126,11 @@ class TestCLI:
         )
 
     def test_transcribe_provider_fallback_rejects_explicit_provider(self, capsys):
-        with patch("agent_reach.transcribe.transcribe") as mock_transcribe:
+        with patch("scrap_master.transcribe.transcribe") as mock_transcribe:
             with patch(
                 "sys.argv",
                 [
-                    "agent-reach",
+                    "scrap-master",
                     "transcribe",
                     "audio.mp3",
                     "--provider",
@@ -181,8 +181,8 @@ class TestCLI:
         )
 
         output = capsys.readouterr().out
-        assert "未实时验证" in output
-        assert "不会执行 `twitter status`" in output
+        assert "not verified in real time" in output
+        assert "`twitter status` will not be run" in output
         assert cli.os.environ["TWITTER_AUTH_TOKEN"] == "shell-auth"
         assert cli.os.environ["TWITTER_CT0"] == "shell-ct0"
 
@@ -277,7 +277,7 @@ class TestCLI:
         ]
 
     def test_install_reddit_deps_routes_by_environment(self, monkeypatch):
-        """桌面 → OpenCLI;服务器 → rdt-cli(钉 git 源)。"""
+        """Desktop -> OpenCLI; server -> rdt-cli (pinned git source)."""
         calls = []
         monkeypatch.setattr(cli, "_install_opencli_deps", lambda: calls.append("opencli"))
         monkeypatch.setattr(cli, "_install_rdt_cli", lambda: calls.append("rdt"))
@@ -293,8 +293,8 @@ class TestCLI:
         assert calls == ["rdt"]
 
     def test_install_opencli_uses_resolved_windows_npm_path(self, monkeypatch):
-        import agent_reach.backends as backends
-        from agent_reach.backends import OpenCLIStatus
+        import scrap_master.backends as backends
+        from scrap_master.backends import OpenCLIStatus
 
         statuses = iter(
             [
@@ -330,7 +330,7 @@ class TestCLI:
         monkeypatch.setattr(cli, "_install_opencli_deps", lambda: calls.append("opencli"))
         monkeypatch.setattr(cli, "_install_skill", lambda: None)
         monkeypatch.setattr(
-            "agent_reach.doctor.check_all",
+            "scrap_master.doctor.check_all",
             lambda config: {
                 "facebook": {
                     "status": "ok",
@@ -342,7 +342,7 @@ class TestCLI:
                 }
             },
         )
-        monkeypatch.setattr("agent_reach.doctor.format_report", lambda results: "report")
+        monkeypatch.setattr("scrap_master.doctor.format_report", lambda results: "report")
 
         cli._cmd_install(
             Namespace(
@@ -373,7 +373,7 @@ class TestCLI:
         )
 
         out = capsys.readouterr().out
-        assert "服务器环境跳过：boss, facebook, instagram, opencli" in out
+        assert "skipped in server environments: boss, facebook, instagram, opencli" in out
         assert "[dry-run] Would install optional channels: bilibili" in out
         assert "boss, facebook, instagram, opencli, bilibili" not in out
 
@@ -452,13 +452,13 @@ class TestCheckUpdateRetry:
         assert cli._classify_github_response_error(R()) == "rate_limit"
 
     def test_check_update_reports_classified_error(self, capsys):
-        with patch("agent_reach.cli._github_get_with_retry", return_value=(None, "timeout", 3)):
+        with patch("scrap_master.cli._github_get_with_retry", return_value=(None, "timeout", 3)):
             result = cli._cmd_check_update()
 
         captured = capsys.readouterr()
         assert result == "error"
-        assert "网络超时" in captured.out
-        assert "已重试 3 次" in captured.out
+        assert "network timeout" in captured.out
+        assert "retried 3 times" in captured.out
 
 
 class TestVersionCompare:
@@ -469,7 +469,7 @@ class TestVersionCompare:
         assert cli._is_newer_version("1.5.0", "1.5.0") is False
 
     def test_local_ahead_of_release_no_downgrade_prompt(self):
-        """发版窗口期本地装了 main(更新)时,不能提示"有更新"诱导降级。"""
+        """When a newer main is installed locally during a release window, do not prompt an "update" that would downgrade."""
         assert cli._is_newer_version("1.4.2", "1.5.0") is False
 
     def test_unparseable_falls_back_to_inequality(self):
@@ -479,7 +479,7 @@ class TestVersionCompare:
 
 class TestWatchVersionCompare:
     def test_watch_does_not_prompt_downgrade(self, monkeypatch, capsys):
-        """watch 与 check-update 同语义:本地领先远端 release 时不提示更新。"""
+        """watch and check-update share semantics: no update prompt when the local version is ahead of the remote release."""
         class R:
             status_code = 200
             headers = {}
@@ -490,11 +490,11 @@ class TestWatchVersionCompare:
 
         monkeypatch.setattr(cli, "_github_get_with_retry", lambda *a, **k: (R(), None, 1))
         monkeypatch.setattr(
-            "agent_reach.doctor.check_all",
-            lambda config: {"web": {"status": "ok", "name": "任意网页", "message": "ok",
+            "scrap_master.doctor.check_all",
+            lambda config: {"web": {"status": "ok", "name": "Any web page", "message": "ok",
                             "tier": 0, "backends": ["Jina Reader"], "active_backend": "Jina Reader"}},
         )
         cli._cmd_watch()
         out = capsys.readouterr().out
-        assert "新版本可用" not in out
-        assert "全部正常" in out
+        assert "New version available" not in out
+        assert "all good" in out

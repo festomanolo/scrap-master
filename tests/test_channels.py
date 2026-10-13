@@ -8,14 +8,14 @@ from urllib.error import URLError
 
 import pytest
 
-from agent_reach.backends import OpenCLIStatus
-from agent_reach.channels import get_all_channels, get_channel
-from agent_reach.channels.bilibili import BilibiliChannel
-from agent_reach.channels.facebook import FacebookChannel
-from agent_reach.channels.instagram import InstagramChannel
-from agent_reach.channels.v2ex import V2EXChannel
-from agent_reach.channels.xiaohongshu import XiaoHongShuChannel
-from agent_reach.channels.xueqiu import XueqiuChannel
+from scrap_master.backends import OpenCLIStatus
+from scrap_master.channels import get_all_channels, get_channel
+from scrap_master.channels.bilibili import BilibiliChannel
+from scrap_master.channels.facebook import FacebookChannel
+from scrap_master.channels.instagram import InstagramChannel
+from scrap_master.channels.v2ex import V2EXChannel
+from scrap_master.channels.xiaohongshu import XiaoHongShuChannel
+from scrap_master.channels.xueqiu import XueqiuChannel
 
 
 class TestChannelRegistry:
@@ -58,7 +58,7 @@ class TestOpenCLISiteChannels:
         self, monkeypatch
     ):
         monkeypatch.setattr(
-            "agent_reach.backends.opencli_status",
+            "scrap_master.backends.opencli_status",
             lambda: OpenCLIStatus(
                 installed=True,
                 extension_connected=True,
@@ -69,42 +69,42 @@ class TestOpenCLISiteChannels:
         status, msg = ch.check()
         assert status == "warn"
         assert ch.active_backend is None
-        assert "桥接已连接" in msg
-        assert "登录态和实际命令未实时验证" in msg
+        assert "OpenCLI bridge connected" in msg
+        assert "login state and actual commands are not verified in real time" in msg
         assert "facebook.com" in msg
 
         instagram = InstagramChannel()
         status, msg = instagram.check()
         assert status == "warn"
         assert instagram.active_backend is None
-        assert "桥接已连接" in msg
+        assert "OpenCLI bridge connected" in msg
         assert "instagram.com" in msg
 
     def test_opencli_missing_reports_off(self, monkeypatch):
         monkeypatch.setattr(
-            "agent_reach.backends.opencli_status",
+            "scrap_master.backends.opencli_status",
             lambda: OpenCLIStatus(installed=False),
         )
         ch = InstagramChannel()
         status, msg = ch.check()
         assert status == "off"
         assert ch.active_backend is None
-        assert "agent-reach install --system --channels opencli" in msg
+        assert "scrap-master install --system --channels opencli" in msg
         assert "instagram.com" in msg
 
     def test_opencli_installed_without_extension_reports_warn(self, monkeypatch):
         monkeypatch.setattr(
-            "agent_reach.backends.opencli_status",
+            "scrap_master.backends.opencli_status",
             lambda: OpenCLIStatus(
                 installed=True,
-                hint="OpenCLI 已安装，但 Chrome 扩展未安装。",
+                hint="OpenCLI is installed, but the Chrome extension is not installed.",
             ),
         )
         ch = InstagramChannel()
         status, msg = ch.check()
         assert status == "warn"
         assert ch.active_backend is None
-        assert "Chrome 扩展" in msg
+        assert "Chrome extension" in msg
 
 
 class TestV2EXChannel:
@@ -137,7 +137,7 @@ class TestV2EXChannel:
         )
         status, msg = V2EXChannel().check()
         assert status == "ok"
-        assert "公开 API 可用" in msg
+        assert "Public API available" in msg
 
     def test_check_warn_when_api_unreachable(self, monkeypatch):
         import urllib.request
@@ -148,11 +148,11 @@ class TestV2EXChannel:
         monkeypatch.setattr(urllib.request, "urlopen", raise_error)
         status, msg = V2EXChannel().check()
         assert status == "warn"
-        assert "失败" in msg
+        assert "failed" in msg
 
     def test_check_passes_its_read_only_config_to_cookie_loading(self, monkeypatch):
         """Doctor's config object must flow through instead of reopening config."""
-        import agent_reach.channels.xueqiu as xueqiu_mod
+        import scrap_master.channels.xueqiu as xueqiu_mod
 
         supplied_config = object()
         observed = []
@@ -200,16 +200,16 @@ class TestV2EXChannel:
         fake_data = [
             {
                 "id": 111,
-                "title": "Python 3.13 发布了",
+                "title": "Python 3.13 released",
                 "url": "https://www.v2ex.com/t/111",
                 "replies": 42,
-                "content": "发布公告内容",
+                "content": "Release announcement content",
                 "created": 1700000000,
                 "node": {"name": "python", "title": "Python"},
             },
             {
                 "id": 222,
-                "title": "Rust 好学吗",
+                "title": "Is Rust easy to learn",
                 "url": "https://www.v2ex.com/t/222",
                 "replies": 10,
                 "content": "",
@@ -234,7 +234,7 @@ class TestV2EXChannel:
         topics = V2EXChannel().get_hot_topics(limit=5)
         assert len(topics) == 2
         assert topics[0]["id"] == 111
-        assert topics[0]["title"] == "Python 3.13 发布了"
+        assert topics[0]["title"] == "Python 3.13 released"
         assert topics[0]["replies"] == 42
         assert topics[0]["node_name"] == "python"
         assert topics[0]["node_title"] == "Python"
@@ -286,10 +286,10 @@ class TestV2EXChannel:
         fake_data = [
             {
                 "id": 333,
-                "title": "Flask 部署问题",
+                "title": "Flask deployment issue",
                 "url": "https://www.v2ex.com/t/333",
                 "replies": 5,
-                "content": "求帮助",
+                "content": "Need help",
                 "created": 1710000000,
                 "node": {"name": "python", "title": "Python"},
             }
@@ -305,7 +305,7 @@ class TestV2EXChannel:
         assert len(topics) == 1
         assert topics[0]["id"] == 333
         assert topics[0]["node_name"] == "python"
-        assert topics[0]["title"] == "Flask 部署问题"
+        assert topics[0]["title"] == "Flask deployment issue"
         assert topics[0]["created"] == 1710000000
 
     # ------------------------------------------------------------------ #
@@ -318,11 +318,11 @@ class TestV2EXChannel:
         topic_data = [
             {
                 "id": 999,
-                "title": "测试帖子",
+                "title": "Test post",
                 "url": "https://www.v2ex.com/t/999",
-                "content": "帖子正文",
+                "content": "Post body",
                 "replies": 2,
-                "node": {"name": "qna", "title": "问与答"},
+                "node": {"name": "qna", "title": "Q&A"},
                 "member": {"username": "alice"},
                 "created": 1700000000,
             }
@@ -330,12 +330,12 @@ class TestV2EXChannel:
         replies_data = [
             {
                 "member": {"username": "bob"},
-                "content": "第一条回复",
+                "content": "First reply",
                 "created": 1700000100,
             },
             {
                 "member": {"username": "carol"},
-                "content": "第二条回复",
+                "content": "Second reply",
                 "created": 1700000200,
             },
         ]
@@ -358,12 +358,12 @@ class TestV2EXChannel:
         result = V2EXChannel().get_topic(999)
 
         assert result["id"] == 999
-        assert result["title"] == "测试帖子"
+        assert result["title"] == "Test post"
         assert result["author"] == "alice"
         assert result["node_name"] == "qna"
         assert len(result["replies"]) == 2
         assert result["replies"][0]["author"] == "bob"
-        assert result["replies"][1]["content"] == "第二条回复"
+        assert result["replies"][1]["content"] == "Second reply"
 
     def test_get_topic_handles_empty_replies(self, monkeypatch):
         import urllib.request
@@ -371,11 +371,11 @@ class TestV2EXChannel:
         topic_data = [
             {
                 "id": 1,
-                "title": "孤独帖子",
+                "title": "Lonely post",
                 "url": "https://www.v2ex.com/t/1",
                 "content": "",
                 "replies": 0,
-                "node": {"name": "offtopic", "title": "水"},
+                "node": {"name": "offtopic", "title": "Water cooler"},
                 "member": {"username": "dave"},
                 "created": 0,
             }
@@ -453,7 +453,7 @@ class TestXueqiuChannel:
         assert not ch.can_handle("https://v2ex.com/t/123")
 
     def test_check_ok_when_api_reachable(self, monkeypatch):
-        import agent_reach.channels.xueqiu as xueqiu_mod
+        import scrap_master.channels.xueqiu as xueqiu_mod
 
         monkeypatch.setattr(xueqiu_mod, "_cookies_initialized", True)
 
@@ -461,7 +461,7 @@ class TestXueqiuChannel:
             "data": {
                 "quote": {
                     "symbol": "SH601138",
-                    "name": "工业富联",
+                    "name": "Foxconn Industrial Internet",
                     "current": 52.0,
                     "pe_ttm": 38.1,
                 }
@@ -481,10 +481,10 @@ class TestXueqiuChannel:
         monkeypatch.setattr(xueqiu_mod._opener, "open", lambda req, timeout=None: FakeResponse())
         status, msg = XueqiuChannel().check()
         assert status == "ok"
-        assert "公开 API 可用" in msg
+        assert "Public API available" in msg
 
     def test_check_warn_when_api_unreachable(self, monkeypatch):
-        import agent_reach.channels.xueqiu as xueqiu_mod
+        import scrap_master.channels.xueqiu as xueqiu_mod
 
         monkeypatch.setattr(xueqiu_mod, "_cookies_initialized", True)
 
@@ -494,14 +494,14 @@ class TestXueqiuChannel:
         monkeypatch.setattr(xueqiu_mod._opener, "open", raise_error)
         status, msg = XueqiuChannel().check()
         assert status == "warn"
-        assert "失败" in msg
+        assert "failed" in msg
 
     # ------------------------------------------------------------------ #
     # get_stock_quote
     # ------------------------------------------------------------------ #
 
     def test_get_stock_quote(self, monkeypatch):
-        import agent_reach.channels.xueqiu as xueqiu_mod
+        import scrap_master.channels.xueqiu as xueqiu_mod
 
         monkeypatch.setattr(xueqiu_mod, "_cookies_initialized", True)
 
@@ -509,7 +509,7 @@ class TestXueqiuChannel:
             "data": {
                 "quote": {
                     "symbol": "SH600519",
-                    "name": "贵州茅台",
+                    "name": "Kweichow Moutai",
                     "current": 1800.0,
                     "percent": 1.5,
                     "chg": 26.6,
@@ -543,7 +543,7 @@ class TestXueqiuChannel:
         monkeypatch.setattr(xueqiu_mod._opener, "open", lambda req, timeout=None: FakeResponse())
         quote = XueqiuChannel().get_stock_quote("SH600519")
         assert quote["symbol"] == "SH600519"
-        assert quote["name"] == "贵州茅台"
+        assert quote["name"] == "Kweichow Moutai"
         assert quote["current"] == 1800.0
         assert quote["percent"] == 1.5
         assert quote["volume"] == 12345678
@@ -553,14 +553,14 @@ class TestXueqiuChannel:
     # ------------------------------------------------------------------ #
 
     def test_search_stock(self, monkeypatch):
-        import agent_reach.channels.xueqiu as xueqiu_mod
+        import scrap_master.channels.xueqiu as xueqiu_mod
 
         monkeypatch.setattr(xueqiu_mod, "_cookies_initialized", True)
 
         fake_data = {
             "stocks": [
-                {"code": "SH600519", "name": "贵州茅台", "exchange": "SHA"},
-                {"code": "SZ000858", "name": "五粮液", "exchange": "SZA"},
+                {"code": "SH600519", "name": "Kweichow Moutai", "exchange": "SHA"},
+                {"code": "SZ000858", "name": "Wuliangye", "exchange": "SZA"},
             ]
         }
 
@@ -575,10 +575,10 @@ class TestXueqiuChannel:
                 return json.dumps(fake_data).encode()
 
         monkeypatch.setattr(xueqiu_mod._opener, "open", lambda req, timeout=None: FakeResponse())
-        results = XueqiuChannel().search_stock("茅台", limit=5)
+        results = XueqiuChannel().search_stock("Moutai", limit=5)
         assert len(results) == 2
         assert results[0]["symbol"] == "SH600519"
-        assert results[0]["name"] == "贵州茅台"
+        assert results[0]["name"] == "Kweichow Moutai"
         assert results[1]["exchange"] == "SZA"
 
     # ------------------------------------------------------------------ #
@@ -586,7 +586,7 @@ class TestXueqiuChannel:
     # ------------------------------------------------------------------ #
 
     def test_get_hot_posts_returns_list(self, monkeypatch):
-        import agent_reach.channels.xueqiu as xueqiu_mod
+        import scrap_master.channels.xueqiu as xueqiu_mod
 
         monkeypatch.setattr(xueqiu_mod, "_cookies_initialized", True)
 
@@ -604,8 +604,8 @@ class TestXueqiuChannel:
 
         fake_data = {
             "list": [
-                make_item(111, "市场分析", "<p>今天大盘走势&amp;分析</p>", "投资者A", 42, "/1234567890/111"),
-                make_item(222, "", "短评", "投资者B", 10, "/9876543210/222"),
+                make_item(111, "Market analysis", "<p>Today's market trend &amp; analysis</p>", "Investor A", 42, "/1234567890/111"),
+                make_item(222, "", "Short comment", "Investor B", 10, "/9876543210/222"),
             ]
         }
 
@@ -623,14 +623,14 @@ class TestXueqiuChannel:
         posts = XueqiuChannel().get_hot_posts(limit=10)
         assert len(posts) == 2
         assert posts[0]["id"] == 111
-        assert posts[0]["author"] == "投资者A"
+        assert posts[0]["author"] == "Investor A"
         assert posts[0]["likes"] == 42
-        assert "今天大盘走势&分析" in posts[0]["text"]  # HTML stripped
+        assert "Today's market trend & analysis" in posts[0]["text"]  # HTML stripped
         assert "<p>" not in posts[0]["text"]
         assert posts[0]["url"] == "https://xueqiu.com/1234567890/111"
 
     def test_get_hot_posts_respects_limit(self, monkeypatch):
-        import agent_reach.channels.xueqiu as xueqiu_mod
+        import scrap_master.channels.xueqiu as xueqiu_mod
 
         monkeypatch.setattr(xueqiu_mod, "_cookies_initialized", True)
 
@@ -670,16 +670,16 @@ class TestXueqiuChannel:
     # ------------------------------------------------------------------ #
 
     def test_get_hot_stocks(self, monkeypatch):
-        import agent_reach.channels.xueqiu as xueqiu_mod
+        import scrap_master.channels.xueqiu as xueqiu_mod
 
         monkeypatch.setattr(xueqiu_mod, "_cookies_initialized", True)
 
         fake_data = {
             "data": {
                 "items": [
-                    {"code": "SH600519", "name": "贵州茅台", "current": 1800.0, "percent": 1.5},
-                    {"code": "SZ000858", "name": "五粮液", "current": 160.0, "percent": -0.8},
-                    {"code": "SH601318", "name": "中国平安", "current": 45.0, "percent": 0.3},
+                    {"code": "SH600519", "name": "Kweichow Moutai", "current": 1800.0, "percent": 1.5},
+                    {"code": "SZ000858", "name": "Wuliangye", "current": 160.0, "percent": -0.8},
+                    {"code": "SH601318", "name": "Ping An Insurance", "current": 45.0, "percent": 0.3},
                 ]
             }
         }
@@ -708,7 +708,7 @@ class TestXueqiuChannel:
 
     def test_ensure_cookies_loads_from_config(self, monkeypatch, tmp_path):
         """_ensure_cookies() should inject cookies from the config file."""
-        import agent_reach.channels.xueqiu as xueqiu_mod
+        import scrap_master.channels.xueqiu as xueqiu_mod
 
         monkeypatch.setattr(xueqiu_mod, "_cookies_initialized", False)
 
@@ -719,7 +719,7 @@ class TestXueqiuChannel:
                     return "xq_a_token=TESTTOKEN; xq_is_login=1"
                 return default
 
-        import agent_reach.channels.xueqiu as xq_mod
+        import scrap_master.channels.xueqiu as xq_mod
         monkeypatch.setattr(
             xq_mod,
             "_load_cookies_from_config",
@@ -745,7 +745,7 @@ class TestXueqiuChannel:
         assert "xq_a_token" in cookie_names
 
     def test_ensure_cookies_uses_public_homepage_fallback(self, monkeypatch):
-        import agent_reach.channels.xueqiu as xueqiu_mod
+        import scrap_master.channels.xueqiu as xueqiu_mod
 
         monkeypatch.setattr(xueqiu_mod, "_cookies_initialized", False)
         monkeypatch.setattr(
@@ -770,7 +770,7 @@ class TestXueqiuChannel:
 
     def test_get_json_sends_referer_and_browser_ua(self, monkeypatch):
         """_get_json() must send Referer and a browser-like User-Agent."""
-        import agent_reach.channels.xueqiu as xueqiu_mod
+        import scrap_master.channels.xueqiu as xueqiu_mod
 
         monkeypatch.setattr(xueqiu_mod, "_cookies_initialized", True)
         captured = {}
@@ -790,33 +790,33 @@ class TestXueqiuChannel:
 
         assert captured["referer"] == "https://xueqiu.com/"
         assert "Mozilla" in captured["ua"]
-        assert "agent-reach" not in captured["ua"]
+        assert "scrap-master" not in captured["ua"]
 
 
 class TestRedditChannel:
-    """多后端：OpenCLI > rdt-cli，没有零配置路径。"""
+    """Multiple backends: OpenCLI > rdt-cli, with no zero-config path."""
 
     @staticmethod
     def _isolate(monkeypatch, opencli=None):
-        """隔离 OpenCLI 候选（None = 未安装），聚焦 rdt-cli 路径。"""
-        from agent_reach.channels.reddit import RedditChannel
+        """Isolate the OpenCLI candidate (None = not installed) to focus on the rdt-cli path."""
+        from scrap_master.channels.reddit import RedditChannel
         monkeypatch.setattr(RedditChannel, "_check_opencli", lambda self: opencli)
 
     def test_reports_off_when_nothing_installed(self, monkeypatch):
         self._isolate(monkeypatch)
         monkeypatch.setattr(shutil, "which", lambda _: None)
-        from agent_reach.channels.reddit import RedditChannel
+        from scrap_master.channels.reddit import RedditChannel
         status, msg = RedditChannel().check()
         assert status == "off"
-        # 诚实口径：明说没有零配置路径，推荐 OpenCLI + rdt git 源
-        assert "零配置" in msg
+        # Honest wording: state there is no zero-config path, recommend OpenCLI + the rdt git source
+        assert "no zero-config path" in msg
         assert "opencli" in msg
         assert "git+https://github.com/public-clis/rdt-cli.git" in msg
 
     def test_opencli_ready_wins(self, monkeypatch):
-        self._isolate(monkeypatch, opencli=("ok", "OpenCLI 可用（复用浏览器登录态）"))
+        self._isolate(monkeypatch, opencli=("ok", "OpenCLI available (reuses the browser login session)"))
         monkeypatch.setattr(shutil, "which", lambda _: None)
-        from agent_reach.channels.reddit import RedditChannel
+        from scrap_master.channels.reddit import RedditChannel
         ch = RedditChannel()
         status, msg = ch.check()
         assert status == "ok"
@@ -847,17 +847,17 @@ class TestRedditChannel:
                 "Doctor must not execute rdt status"
             ),
         )
-        from agent_reach.channels.reddit import RedditChannel
+        from scrap_master.channels.reddit import RedditChannel
         ch = RedditChannel()
         status, msg = ch.check()
         assert status == "warn"
-        assert "未实时验证" in msg
+        assert "not verified in real time" in msg
         assert ch.active_backend is None
 
     def test_reports_warn_when_cookie_is_missing(self, monkeypatch):
         self._isolate(monkeypatch)
         monkeypatch.setattr(shutil, "which", lambda _: "/usr/local/bin/rdt")
-        from agent_reach.channels.reddit import RedditChannel
+        from scrap_master.channels.reddit import RedditChannel
         ch = RedditChannel()
         status, msg = ch.check()
         assert status == "warn"
@@ -866,7 +866,7 @@ class TestRedditChannel:
         assert ch.active_backend is None
 
     def test_can_handle_reddit_urls(self):
-        from agent_reach.channels.reddit import RedditChannel
+        from scrap_master.channels.reddit import RedditChannel
         ch = RedditChannel()
         assert ch.can_handle("https://www.reddit.com/r/python/comments/abc123/")
         assert ch.can_handle("https://redd.it/abc123")
@@ -875,15 +875,15 @@ class TestRedditChannel:
 
 
 class TestXiaoHongShuChannel:
-    """多后端选择逻辑：OpenCLI > xiaohongshu-mcp > xhs-cli，第一个完整可用者获胜。"""
+    """Multi-backend selection: OpenCLI > xiaohongshu-mcp > xhs-cli; the first fully working one wins."""
 
     @staticmethod
     def _isolate(monkeypatch, opencli=None, mcp_reachable=False):
-        """隔离 OpenCLI / mcp 候选，让测试聚焦目标后端。
+        """Isolate the OpenCLI / mcp candidates so the test focuses on the target backend.
 
-        opencli: None 表示未安装；否则传入 (status, message) 二元组。
+        opencli: None means not installed; otherwise pass a (status, message) tuple.
         """
-        import agent_reach.channels.xiaohongshu as xhs_mod
+        import scrap_master.channels.xiaohongshu as xhs_mod
 
         monkeypatch.setattr(
             XiaoHongShuChannel, "_check_opencli", lambda self: opencli
@@ -894,7 +894,7 @@ class TestXiaoHongShuChannel:
 
     def test_opencli_bridge_ready_is_unverified(self, monkeypatch):
         monkeypatch.setattr(
-            "agent_reach.backends.opencli_status",
+            "scrap_master.backends.opencli_status",
             lambda: OpenCLIStatus(
                 installed=True,
                 extension_connected=True,
@@ -905,8 +905,8 @@ class TestXiaoHongShuChannel:
         status, message = XiaoHongShuChannel()._check_opencli()
 
         assert status == "warn"
-        assert "桥接已连接" in message
-        assert "登录态和实际命令未实时验证" in message
+        assert "OpenCLI bridge connected" in message
+        assert "login state and actual commands are not verified in real time" in message
 
     def test_saved_cli_cookie_is_unverified_not_active(
         self, monkeypatch, isolated_home
@@ -932,7 +932,7 @@ class TestXiaoHongShuChannel:
         ch = XiaoHongShuChannel()
         status, msg = ch.check()
         assert status == "warn"
-        assert "未实时验证" in msg
+        assert "not verified in real time" in msg
         assert ch.active_backend is None
 
     def test_saved_cli_cookie_refuses_ancestor_symlink(
@@ -954,7 +954,7 @@ class TestXiaoHongShuChannel:
         status, message = XiaoHongShuChannel()._check_xhs_cli()
 
         assert status == "warn"
-        assert "符号链接" in message
+        assert "symbolic link" in message
 
     def test_reports_warn_when_not_authenticated(self, monkeypatch):
         self._isolate(monkeypatch)
@@ -978,14 +978,14 @@ class TestXiaoHongShuChannel:
         ch = XiaoHongShuChannel()
         status, msg = ch.check()
         assert status == "off"
-        # off 指引推荐当代后端，而非停更的 xhs-cli
+        # the 'off' guidance recommends current backends, not the unmaintained xhs-cli
         assert "opencli" in msg
         assert "xiaohongshu-mcp" in msg
         assert ch.active_backend is None
 
     def test_opencli_ready_wins_over_cli(self, monkeypatch):
-        """OpenCLI 完整可用时按序获胜，即使 xhs-cli 也完整可用。"""
-        self._isolate(monkeypatch, opencli=("ok", "OpenCLI 可用（复用浏览器登录态）"))
+        """OpenCLI wins by order when fully working, even if xhs-cli is also fully working."""
+        self._isolate(monkeypatch, opencli=("ok", "OpenCLI available (reuses the browser login session)"))
         monkeypatch.setattr(shutil, "which", lambda _: "/usr/local/bin/xhs")
 
         def fake_run(cmd, **kwargs):
@@ -1001,7 +1001,7 @@ class TestXiaoHongShuChannel:
     def test_opencli_warn_remains_first_when_cli_is_only_unverified(
         self, monkeypatch
     ):
-        self._isolate(monkeypatch, opencli=("warn", "扩展未连接"))
+        self._isolate(monkeypatch, opencli=("warn", "extension not connected"))
         monkeypatch.setattr(shutil, "which", lambda _: "/usr/local/bin/xhs")
 
         def fake_run(cmd, **kwargs):
@@ -1012,13 +1012,13 @@ class TestXiaoHongShuChannel:
         ch = XiaoHongShuChannel()
         status, msg = ch.check()
         assert status == "warn"
-        assert msg == "扩展未连接"
+        assert msg == "extension not connected"
         assert ch.active_backend is None
 
     def test_mcp_service_wins_when_opencli_absent(
         self, monkeypatch, tmp_path
     ):
-        """服务器场景：OpenCLI 未装、mcp 服务可达且 mcporter 已接入 → mcp 获胜。"""
+        """Server scenario: OpenCLI not installed, mcp service reachable and wired through mcporter -> mcp wins."""
         self._isolate(monkeypatch, mcp_reachable=True)
         monkeypatch.chdir(tmp_path)
         config_path = tmp_path / "config" / "mcporter.json"
@@ -1049,7 +1049,7 @@ class TestXiaoHongShuChannel:
         status, msg = ch.check()
         assert status == "warn"
         assert ch.active_backend is None
-        assert "未验证登录态" in msg
+        assert "has not verified login state" in msg
 
     def test_mcp_reachable_but_mcporter_unconfigured_warns(
         self, monkeypatch, tmp_path
@@ -1127,7 +1127,7 @@ class TestXiaoHongShuChannel:
         status, message = ch.check()
 
         assert status == "warn"
-        assert "未接入" in message
+        assert "not connected via mcporter" in message
         assert ch.active_backend is None
 
     def test_all_xhs_auth_hints_exclude_qr_and_automatic_cookie_read(
@@ -1149,13 +1149,13 @@ class TestXiaoHongShuChannel:
         assert status == "warn"
         assert "Cookie-Editor" in message
         assert "configure xhs-cookies" in message
-        assert "扫码" not in message
-        assert "自动从浏览器" not in message
+        assert "QR" not in message and "scan" not in message.lower()
+        assert "automatically extract" not in message.lower()
 
     def test_unverified_cli_override_cannot_hide_working_opencli(
         self, monkeypatch
     ):
-        self._isolate(monkeypatch, opencli=("ok", "OpenCLI 可用"))
+        self._isolate(monkeypatch, opencli=("ok", "OpenCLI available"))
         monkeypatch.setattr(shutil, "which", lambda _: "/usr/local/bin/xhs")
 
         def fake_run(cmd, **kwargs):
@@ -1174,11 +1174,11 @@ class TestXiaoHongShuChannel:
 
 
 class TestBilibiliChannel:
-    """多后端：bili-cli > OpenCLI > 搜索 API。yt-dlp 已退出 B站（412 实锤）。"""
+    """Multiple backends: bili-cli > OpenCLI > search API. yt-dlp has been retired from Bilibili (confirmed 412 blocks)."""
 
     @staticmethod
     def _isolate(monkeypatch, opencli=None, api_ok=False):
-        import agent_reach.channels.bilibili as bilibili_mod
+        import scrap_master.channels.bilibili as bilibili_mod
         monkeypatch.setattr(
             bilibili_mod.BilibiliChannel, "_check_opencli", lambda self: opencli
         )
@@ -1195,16 +1195,16 @@ class TestBilibiliChannel:
             return subprocess.CompletedProcess(cmd, 0, "bili, version 0.6.2", "")
 
         monkeypatch.setattr(subprocess, "run", fake_run)
-        from agent_reach.channels.bilibili import BilibiliChannel
+        from scrap_master.channels.bilibili import BilibiliChannel
         ch = BilibiliChannel()
         status, msg = ch.check()
         assert status == "ok"
-        assert "bili-cli 可用" in msg
+        assert "bili-cli available" in msg
         assert ch.active_backend == "bili-cli"
 
     def test_opencli_bridge_ready_is_unverified(self, monkeypatch):
         monkeypatch.setattr(
-            "agent_reach.backends.opencli_status",
+            "scrap_master.backends.opencli_status",
             lambda: OpenCLIStatus(
                 installed=True,
                 extension_connected=True,
@@ -1215,11 +1215,11 @@ class TestBilibiliChannel:
         status, message = BilibiliChannel()._check_opencli()
 
         assert status == "warn"
-        assert "桥接已连接" in message
-        assert "实际命令未实时验证" in message
+        assert "OpenCLI bridge connected" in message
+        assert "actual commands are not verified in real time" in message
 
     def test_bili_broken_falls_back_to_api_with_hint_kept(self, monkeypatch):
-        """bili 断链 → API 兜底获胜，但重装处方必须保留在消息里。"""
+        """Broken bili -> the API fallback wins, but the reinstall prescription must stay in the message."""
         self._isolate(monkeypatch, api_ok=True)
         monkeypatch.setattr(
             shutil, "which",
@@ -1230,12 +1230,12 @@ class TestBilibiliChannel:
             raise FileNotFoundError(cmd[0])
 
         monkeypatch.setattr(subprocess, "run", fake_run)
-        from agent_reach.channels.bilibili import BilibiliChannel
+        from scrap_master.channels.bilibili import BilibiliChannel
         ch = BilibiliChannel()
         status, msg = ch.check()
-        assert status == "ok"  # 搜索 API 兜底
-        assert ch.active_backend == "B站搜索 API"
-        assert "备选后端异常" in msg
+        assert status == "ok"  # search API fallback
+        assert ch.active_backend == "Bilibili Search API"
+        assert "Reinstall to fix" in msg
         assert "pipx reinstall bilibili-cli" in msg
 
     def test_bili_broken_and_no_fallback_reports_error(self, monkeypatch):
@@ -1249,7 +1249,7 @@ class TestBilibiliChannel:
             raise FileNotFoundError(cmd[0])
 
         monkeypatch.setattr(subprocess, "run", fake_run)
-        from agent_reach.channels.bilibili import BilibiliChannel
+        from scrap_master.channels.bilibili import BilibiliChannel
         ch = BilibiliChannel()
         status, msg = ch.check()
         assert status == "error"
@@ -1259,20 +1259,20 @@ class TestBilibiliChannel:
     def test_unverified_opencli_falls_back_to_verified_api(self, monkeypatch):
         self._isolate(
             monkeypatch,
-            opencli=("warn", "OpenCLI 桥接已连接但未验证"),
+            opencli=("warn", "OpenCLI bridge connected but not verified"),
             api_ok=True,
         )
         monkeypatch.setattr(shutil, "which", lambda _: None)
-        from agent_reach.channels.bilibili import BilibiliChannel
+        from scrap_master.channels.bilibili import BilibiliChannel
         ch = BilibiliChannel()
         status, msg = ch.check()
         assert status == "ok"
-        assert ch.active_backend == "B站搜索 API"
+        assert ch.active_backend == "Bilibili Search API"
 
     def test_unverified_opencli_alone_has_no_active_backend(self, monkeypatch):
         self._isolate(
             monkeypatch,
-            opencli=("warn", "OpenCLI 桥接已连接但未验证"),
+            opencli=("warn", "OpenCLI bridge connected but not verified"),
             api_ok=False,
         )
         monkeypatch.setattr(shutil, "which", lambda _: None)
@@ -1286,17 +1286,17 @@ class TestBilibiliChannel:
     def test_api_only_still_ok_with_install_nudge(self, monkeypatch):
         self._isolate(monkeypatch, api_ok=True)
         monkeypatch.setattr(shutil, "which", lambda _: None)
-        from agent_reach.channels.bilibili import BilibiliChannel
+        from scrap_master.channels.bilibili import BilibiliChannel
         ch = BilibiliChannel()
         status, msg = ch.check()
         assert status == "ok"
-        assert ch.active_backend == "B站搜索 API"
+        assert ch.active_backend == "Bilibili Search API"
         assert "bilibili-cli" in msg
 
     def test_off_when_everything_unreachable(self, monkeypatch):
         self._isolate(monkeypatch, api_ok=False)
         monkeypatch.setattr(shutil, "which", lambda _: None)
-        from agent_reach.channels.bilibili import BilibiliChannel
+        from scrap_master.channels.bilibili import BilibiliChannel
         ch = BilibiliChannel()
         status, msg = ch.check()
         assert status == "off"
@@ -1305,25 +1305,25 @@ class TestBilibiliChannel:
 
 class TestYouTubeChannel:
     def test_reports_error_with_reinstall_hint_when_broken(self, monkeypatch):
-        """yt-dlp which 命中但 exec 抛 FileNotFoundError → error + 重装处方。"""
+        """yt-dlp found by which but exec raises FileNotFoundError -> error + reinstall prescription."""
         monkeypatch.setattr(shutil, "which", lambda _: "/usr/local/bin/yt-dlp")
 
         def fake_run(cmd, **kwargs):
             raise FileNotFoundError(cmd[0])
 
         monkeypatch.setattr(subprocess, "run", fake_run)
-        from agent_reach.channels.youtube import YouTubeChannel
+        from scrap_master.channels.youtube import YouTubeChannel
         ch = YouTubeChannel()
         status, msg = ch.check()
         assert status == "error"
-        assert "无法执行" in msg
+        assert "cannot execute" in msg
         assert "uv tool install --force yt-dlp" in msg
         assert ch.active_backend is None
 
 
 class TestGitHubChannel:
     def test_reports_error_with_reinstall_hint_when_broken(self, monkeypatch):
-        """gh --version 断链时给出二进制重装处方。"""
+        """When gh --version is broken, give a binary reinstall prescription."""
         monkeypatch.setattr(shutil, "which", lambda _: "/usr/local/bin/gh")
 
         def fake_run(cmd, **kwargs):
@@ -1331,11 +1331,11 @@ class TestGitHubChannel:
             raise FileNotFoundError(cmd[0])
 
         monkeypatch.setattr(subprocess, "run", fake_run)
-        from agent_reach.channels.github import GitHubChannel
+        from scrap_master.channels.github import GitHubChannel
         ch = GitHubChannel()
         status, msg = ch.check()
         assert status == "error"
-        assert "无法执行" in msg
+        assert "cannot execute" in msg
         assert "brew reinstall gh" in msg
         assert ch.active_backend is None
 
@@ -1353,11 +1353,11 @@ class TestGitHubChannel:
             return subprocess.CompletedProcess(cmd, 0, "gh version 2.92.0", "")
 
         monkeypatch.setattr(subprocess, "run", fake_run)
-        from agent_reach.channels.github import GitHubChannel
+        from scrap_master.channels.github import GitHubChannel
         ch = GitHubChannel()
         status, msg = ch.check()
         assert status == "warn"
-        assert "显式认证配置" in msg
+        assert "explicit authentication config" in msg
         assert "configured-secret" not in msg
         assert ch.active_backend is None
 
@@ -1375,7 +1375,7 @@ class TestGitHubChannel:
             return subprocess.CompletedProcess(cmd, 0, "gh version 2.92.0", "")
 
         monkeypatch.setattr(subprocess, "run", fake_run)
-        from agent_reach.channels.github import GitHubChannel
+        from scrap_master.channels.github import GitHubChannel
         ch = GitHubChannel()
         status, msg = ch.check()
         assert status == "warn"
@@ -1404,12 +1404,12 @@ class TestGitHubChannel:
             ),
         )
 
-        from agent_reach.channels.github import GitHubChannel
+        from scrap_master.channels.github import GitHubChannel
 
         status, message = GitHubChannel().check()
 
         assert status == "warn"
-        assert "显式认证配置" in message
+        assert "explicit authentication config" in message
         assert "alice" not in message
         assert "super-secret-token" not in message
 
@@ -1438,13 +1438,13 @@ class TestGitHubChannel:
             ),
         )
 
-        from agent_reach.channels.github import GitHubChannel
+        from scrap_master.channels.github import GitHubChannel
 
         channel = GitHubChannel()
         status, message = channel.check()
 
         assert status == "warn"
-        assert "无法安全确认" in message
+        assert "cannot be confirmed safely" in message
         assert "do-not-read" not in message
         assert channel.active_backend is None
 
@@ -1453,7 +1453,7 @@ class TestLinkedInChannel:
     def test_setup_hint_uses_current_stdio_contract(self, monkeypatch):
         monkeypatch.setattr(shutil, "which", lambda _: None)
 
-        from agent_reach.channels.linkedin import LinkedInChannel
+        from scrap_master.channels.linkedin import LinkedInChannel
 
         channel = LinkedInChannel()
         status, message = channel.check()
@@ -1498,12 +1498,12 @@ class TestLinkedInChannel:
             else None,
         )
 
-        from agent_reach.channels.linkedin import LinkedInChannel
+        from scrap_master.channels.linkedin import LinkedInChannel
 
         status, message = LinkedInChannel().check()
 
         assert status == "warn"
-        assert "uvx 未安装" in message
+        assert "uvx is not installed" in message
         assert "docs.astral.sh/uv/getting-started/installation" in message
 
     def test_mcporter_is_never_executed(
@@ -1518,7 +1518,7 @@ class TestLinkedInChannel:
                 "Doctor must not execute mcporter"
             ),
         )
-        from agent_reach.channels.linkedin import LinkedInChannel
+        from scrap_master.channels.linkedin import LinkedInChannel
         ch = LinkedInChannel()
         status, msg = ch.check()
         assert status == "off"
@@ -1558,11 +1558,11 @@ class TestLinkedInChannel:
                 "Doctor must not execute mcporter"
             ),
         )
-        from agent_reach.channels.linkedin import LinkedInChannel
+        from scrap_master.channels.linkedin import LinkedInChannel
         ch = LinkedInChannel()
         status, msg = ch.check()
         assert status == "warn"
-        assert "未启动" in msg
+        assert "has not started" in msg
         assert ch.active_backend is None
 
     def test_config_metadata_containing_linkedin_is_not_a_backend(
@@ -1585,7 +1585,7 @@ class TestLinkedInChannel:
             encoding="utf-8",
         )
         monkeypatch.setattr(shutil, "which", lambda _: "/usr/local/bin/mcporter")
-        from agent_reach.channels.linkedin import LinkedInChannel
+        from scrap_master.channels.linkedin import LinkedInChannel
 
         ch = LinkedInChannel()
         status, _ = ch.check()
@@ -1608,7 +1608,7 @@ class TestLinkedInChannel:
             encoding="utf-8",
         )
         monkeypatch.setattr(shutil, "which", lambda _: "/usr/local/bin/mcporter")
-        from agent_reach.channels.linkedin import LinkedInChannel
+        from scrap_master.channels.linkedin import LinkedInChannel
         ch = LinkedInChannel()
         status, msg = ch.check()
         assert status == "off"
@@ -1626,7 +1626,7 @@ class TestExaSearchChannel:
                 "Doctor must not execute mcporter"
             ),
         )
-        from agent_reach.channels.exa_search import ExaSearchChannel
+        from scrap_master.channels.exa_search import ExaSearchChannel
         ch = ExaSearchChannel()
         status, msg = ch.check()
         assert status == "off"
@@ -1650,11 +1650,11 @@ class TestExaSearchChannel:
             encoding="utf-8",
         )
         monkeypatch.setattr(shutil, "which", lambda _: "/usr/local/bin/mcporter")
-        from agent_reach.channels.exa_search import ExaSearchChannel
+        from scrap_master.channels.exa_search import ExaSearchChannel
         ch = ExaSearchChannel()
         status, msg = ch.check()
         assert status == "warn"
-        assert "未启动" in msg
+        assert "has not started" in msg
         assert ch.active_backend is None
 
     def test_config_metadata_containing_exa_is_not_a_backend(
@@ -1677,7 +1677,7 @@ class TestExaSearchChannel:
             encoding="utf-8",
         )
         monkeypatch.setattr(shutil, "which", lambda _: "/usr/local/bin/mcporter")
-        from agent_reach.channels.exa_search import ExaSearchChannel
+        from scrap_master.channels.exa_search import ExaSearchChannel
 
         ch = ExaSearchChannel()
         status, _ = ch.check()
@@ -1699,7 +1699,7 @@ class TestExaSearchChannel:
                 "Doctor must not execute mcporter"
             ),
         )
-        from agent_reach.channels.exa_search import ExaSearchChannel
+        from scrap_master.channels.exa_search import ExaSearchChannel
 
         ch = ExaSearchChannel()
         status, message = ch.check()
@@ -1710,18 +1710,18 @@ class TestExaSearchChannel:
 
 class TestXiaoyuzhouChannel:
     def test_reports_error_with_reinstall_hint_when_ffmpeg_broken(self, monkeypatch):
-        """ffmpeg which 命中但 exec 失败（pip 假 ffmpeg 断链）→ error + 重装处方。"""
+        """ffmpeg found by which but exec fails (broken pip fake ffmpeg) -> error + reinstall prescription."""
         monkeypatch.setattr(shutil, "which", lambda _: "/usr/local/bin/ffmpeg")
 
         def fake_run(cmd, **kwargs):
             raise FileNotFoundError(cmd[0])
 
         monkeypatch.setattr(subprocess, "run", fake_run)
-        from agent_reach.channels.xiaoyuzhou import XiaoyuzhouChannel
+        from scrap_master.channels.xiaoyuzhou import XiaoyuzhouChannel
         ch = XiaoyuzhouChannel()
         status, msg = ch.check()
         assert status == "error"
-        assert "无法执行" in msg
+        assert "cannot execute" in msg
         assert "brew install ffmpeg" in msg
         assert ch.active_backend is None
 
@@ -1732,9 +1732,9 @@ class TestXiaoyuzhouChannel:
             return subprocess.CompletedProcess(cmd, 0, "ffmpeg version 7.0", "")
 
         monkeypatch.setattr(subprocess, "run", fake_run)
-        monkeypatch.setattr("os.path.isfile", lambda p: True)  # transcribe.sh 已安装
+        monkeypatch.setattr("os.path.isfile", lambda p: True)  # transcribe.sh is installed
         monkeypatch.setenv("GROQ_API_KEY", "gsk_test")
-        from agent_reach.channels.xiaoyuzhou import XiaoyuzhouChannel
+        from scrap_master.channels.xiaoyuzhou import XiaoyuzhouChannel
         ch = XiaoyuzhouChannel()
         status, msg = ch.check()
         assert status == "ok"
@@ -1745,7 +1745,7 @@ class TestRSSChannel:
     """can_handle URL patterns + the three check() branches (ok / off / error)."""
 
     def test_can_handle_feed_urls(self):
-        from agent_reach.channels.rss import RSSChannel
+        from scrap_master.channels.rss import RSSChannel
         ch = RSSChannel()
         assert ch.can_handle("https://example.com/feed")
         assert ch.can_handle("https://example.com/rss")
@@ -1754,13 +1754,13 @@ class TestRSSChannel:
         assert ch.can_handle("https://example.com/index.atom")
 
     def test_can_handle_is_case_insensitive(self):
-        from agent_reach.channels.rss import RSSChannel
+        from scrap_master.channels.rss import RSSChannel
         ch = RSSChannel()
         assert ch.can_handle("https://example.com/FEED")
         assert ch.can_handle("https://example.com/Atom.XML")
 
     def test_can_handle_rejects_non_feed_urls(self):
-        from agent_reach.channels.rss import RSSChannel
+        from scrap_master.channels.rss import RSSChannel
         ch = RSSChannel()
         assert not ch.can_handle("https://github.com/user/repo")
         assert not ch.can_handle("https://example.com/blog/post-1")
@@ -1771,7 +1771,7 @@ class TestRSSChannel:
         import types
 
         monkeypatch.setitem(sys.modules, "feedparser", types.ModuleType("feedparser"))
-        from agent_reach.channels.rss import RSSChannel
+        from scrap_master.channels.rss import RSSChannel
         ch = RSSChannel()
         status, msg = ch.check()
         assert status == "ok"
@@ -1783,7 +1783,7 @@ class TestRSSChannel:
 
         # None in sys.modules makes `import feedparser` raise ImportError
         monkeypatch.setitem(sys.modules, "feedparser", None)
-        from agent_reach.channels.rss import RSSChannel
+        from scrap_master.channels.rss import RSSChannel
         ch = RSSChannel()
         status, msg = ch.check()
         assert status == "off"
@@ -1802,7 +1802,7 @@ class TestRSSChannel:
             return real_import(name, *args, **kwargs)
 
         monkeypatch.setattr(builtins, "__import__", crashing_import)
-        from agent_reach.channels.rss import RSSChannel
+        from scrap_master.channels.rss import RSSChannel
         ch = RSSChannel()
         status, msg = ch.check()
         assert status == "error"
@@ -1813,7 +1813,7 @@ class TestRSSChannel:
         """A previously healthy instance must not keep a stale active_backend."""
         import sys
 
-        from agent_reach.channels.rss import RSSChannel
+        from scrap_master.channels.rss import RSSChannel
         ch = RSSChannel()
         ch.active_backend = "feedparser"  # pretend an earlier check() succeeded
         monkeypatch.setitem(sys.modules, "feedparser", None)
