@@ -78,8 +78,8 @@ jobs:
           names = zipfile.ZipFile(whl).namelist()
           dupes = [n for n, c in collections.Counter(names).items() if c > 1]
           assert not dupes, f"duplicate entries in wheel: {dupes}"
-          assert "agent_reach/skill/SKILL.md" in names, "SKILL.md missing from wheel"
-          for prefix in ("agent_reach/guides/", "agent_reach/scripts/", "agent_reach/skill/references/"):
+          assert "scrap_master/skill/SKILL.md" in names, "SKILL.md missing from wheel"
+          for prefix in ("scrap_master/guides/", "scrap_master/scripts/", "scrap_master/skill/references/"):
               assert any(n.startswith(prefix) for n in names), f"{prefix} missing from wheel"
           print(f"wheel OK: {len(names)} entries, no duplicates, data files present")
           PY
@@ -88,5 +88,5 @@ jobs:
         run: |
           python -m venv /tmp/smoke
           /tmp/smoke/bin/pip install --quiet dist/*.whl
-          /tmp/smoke/bin/agent-reach version
-          cd /tmp && /tmp/smoke/bin/python -c "import agent_reach; from importlib.resources import files; assert (files('agent_reach')/'skill'/'SKILL.md').is_file(); print('SKILL.md ships in site-packages OK')"
+          /tmp/smoke/bin/scrap-master version
+          cd /tmp && /tmp/smoke/bin/python -c "import scrap_master; from importlib.resources import files; assert (files('scrap_master')/'skill'/'SKILL.md').is_file(); print('SKILL.md ships in site-packages OK')"

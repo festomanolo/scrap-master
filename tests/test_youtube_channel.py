@@ -14,9 +14,9 @@ reddit (#364), xueqiu (#365) and v2ex (#366).
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-from agent_reach.channels import youtube as yt
-from agent_reach.channels.youtube import YouTubeChannel, _has_js_runtime_config
-from agent_reach.probe import ProbeResult
+from scrap_master.channels import youtube as yt
+from scrap_master.channels.youtube import YouTubeChannel, _has_js_runtime_config
+from scrap_master.probe import ProbeResult
 
 
 def _which(*present):
@@ -105,7 +105,7 @@ def test_check_warn_when_no_js_runtime_but_backend_active():
         status, message = ch.check()
     assert status == "warn"
     assert "JS runtime" in message
-    assert "agent-reach install --system" in message
+    assert "scrap-master install --system" in message
     assert ch.active_backend == "yt-dlp"  # probe was ok → backend attributed
 
 
@@ -128,7 +128,7 @@ def test_check_tells_user_to_upgrade_when_ytdlp_predates_js_runtimes():
         status, message = ch.check()
 
     assert status == "warn"
-    assert "升级" in message
+    assert "Upgrade" in message
     assert "--js-runtimes" not in message
     assert ch.active_backend == "yt-dlp"
 
@@ -142,8 +142,8 @@ def test_check_does_not_prescribe_unverified_flag_when_version_is_unknown():
         status, message = ch.check()
 
     assert status == "warn"
-    assert "无法确认" in message
-    assert "升级" in message
+    assert "Cannot confirm" in message
+    assert "Upgrade" in message
     assert "yt-dlp[default]" in message
     assert "--js-runtimes" not in message
     assert ch.active_backend == "yt-dlp"
@@ -188,7 +188,7 @@ def test_check_ok_with_deno():
          patch("shutil.which", side_effect=_which("deno")):
         status, message = ch.check()
     assert status == "ok"
-    assert message == "可提取视频信息和字幕"
+    assert message == "Can extract video metadata and subtitles"
     assert ch.active_backend == "yt-dlp"
 
 
@@ -203,7 +203,7 @@ def test_check_ok_reports_transcription_when_provider_and_ffmpeg_present():
         status, message = ch.check(config=cfg)
     assert status == "ok"
     assert "groq" in message
-    assert "可转写音频" in message
+    assert "audio transcription available" in message
 
 
 def test_check_lists_multiple_transcription_providers_without_implying_fallback():
@@ -239,4 +239,4 @@ def test_check_ok_flags_missing_ffprobe_for_transcription():
         status, message = ch.check(config=cfg)
     assert status == "ok"
     assert "ffprobe" in message
-    assert "可转写音频" not in message
+    assert "audio transcription available" not in message
