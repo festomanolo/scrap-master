@@ -3,13 +3,13 @@
 
 from unittest.mock import patch
 
-from agent_reach.backends import opencli_status, opencli_summary
-from agent_reach.backends.opencli import (
+from scrap_master.backends import opencli_status, opencli_summary
+from scrap_master.backends.opencli import (
     OPENCLI_EXTENSION_ID,
     _extension_installed_on_disk,
     _unpacked_extension_files_present,
 )
-from agent_reach.probe import ProbeResult
+from scrap_master.probe import ProbeResult
 
 
 def _status_with(
@@ -25,17 +25,17 @@ def _status_with(
         calls.append(list(args))
         return version_probe
 
-    with patch("agent_reach.backends.opencli.probe_command", side_effect=fake_probe), \
+    with patch("scrap_master.backends.opencli.probe_command", side_effect=fake_probe), \
          patch(
-             "agent_reach.backends.opencli._fetch_daemon_status",
+             "scrap_master.backends.opencli._fetch_daemon_status",
              return_value=daemon_status,
          ), \
          patch(
-             "agent_reach.backends.opencli._extension_installed_on_disk",
+             "scrap_master.backends.opencli._extension_installed_on_disk",
              return_value=ext_on_disk,
          ), \
          patch(
-             "agent_reach.backends.opencli._unpacked_extension_files_present",
+             "scrap_master.backends.opencli._unpacked_extension_files_present",
              return_value=unpacked_files,
          ):
         return opencli_status(), calls
@@ -45,7 +45,7 @@ def test_not_installed():
     st, _ = _status_with(ProbeResult("missing"))
     assert not st.installed
     assert not st.ready
-    assert "未安装" in opencli_summary(st)
+    assert "not installed" in opencli_summary(st)
 
 
 def test_broken_node_env_gives_npm_hint():
@@ -93,8 +93,8 @@ def test_extension_files_on_disk_are_not_reported_as_loaded_or_ready():
     assert not st.extension_connected
     assert st.extension_installed
     assert not st.ready
-    assert "可用" not in opencli_summary(st)
-    assert "无法确认" in st.hint
+    assert "available" not in opencli_summary(st).lower()
+    assert "cannot confirm" in st.hint
 
 
 def test_unpacked_source_files_are_not_reported_as_loaded_or_ready():
@@ -107,8 +107,8 @@ def test_unpacked_source_files_are_not_reported_as_loaded_or_ready():
     assert st.unpacked_extension_files
     assert not st.extension_connected
     assert not st.ready
-    assert "不代表" in st.hint
-    assert "可用" not in opencli_summary(st)
+    assert "does not mean" in st.hint
+    assert "available" not in opencli_summary(st).lower()
 
 
 def test_daemon_not_running_parsed_correctly():
@@ -119,7 +119,7 @@ def test_daemon_not_running_parsed_correctly():
     assert st.installed
     assert not st.daemon_running
     assert not st.extension_connected
-    assert "自动启动" in opencli_summary(st)
+    assert "auto-starts" in opencli_summary(st)
 
 
 def test_probe_never_executes_any_daemon_or_doctor_command():
@@ -134,7 +134,7 @@ def test_probe_never_executes_any_daemon_or_doctor_command():
 def test_opencli_probes_strip_deprecated_app_env_only_from_children(monkeypatch):
     """OpenCLIApp can inject a variable that makes every CLI command exit 78.
 
-    Agent Reach must remove it from both read-only child probes without
+    Scrap Master must remove it from both read-only child probes without
     mutating the desktop app's parent environment.
     """
     monkeypatch.setenv("OPENCLI_DAEMON_PORT", "19825")
@@ -149,11 +149,11 @@ def test_opencli_probes_strip_deprecated_app_env_only_from_children(monkeypatch)
             )
         return ProbeResult("ok", output="1.8.6")
 
-    with patch("agent_reach.backends.opencli.probe_command", side_effect=fake_probe), patch(
-        "agent_reach.backends.opencli._fetch_daemon_status",
+    with patch("scrap_master.backends.opencli.probe_command", side_effect=fake_probe), patch(
+        "scrap_master.backends.opencli._fetch_daemon_status",
         return_value=None,
     ), patch(
-        "agent_reach.backends.opencli._extension_installed_on_disk",
+        "scrap_master.backends.opencli._extension_installed_on_disk",
         return_value=False,
     ):
         status = opencli_status()
@@ -176,7 +176,7 @@ def test_store_install_scan_includes_edge_profiles(tmp_path, monkeypatch):
     ).mkdir(parents=True)
 
     monkeypatch.setattr(
-        "agent_reach.backends.opencli._CHROME_PROFILE_ROOTS",
+        "scrap_master.backends.opencli._CHROME_PROFILE_ROOTS",
         (str(edge_root),),
     )
     monkeypatch.delenv("LOCALAPPDATA", raising=False)
@@ -190,7 +190,7 @@ def test_unpacked_scan_requires_manifest_but_does_not_claim_browser_load(
     unpacked = tmp_path / ".opencli" / "extension"
     unpacked.mkdir(parents=True)
     monkeypatch.setattr(
-        "agent_reach.backends.opencli._OPENCLI_UNPACKED_EXTENSION",
+        "scrap_master.backends.opencli._OPENCLI_UNPACKED_EXTENSION",
         str(unpacked),
     )
 

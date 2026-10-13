@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from agent_reach.utils import paths
+from scrap_master.utils import paths
 
 
 def test_posix_ytdlp_fix_is_single_line_executable_and_idempotent(
