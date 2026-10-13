@@ -8,14 +8,14 @@ from pathlib import Path
 
 import pytest
 
-from agent_reach.config import Config
+from scrap_master.config import Config
 
 
 @pytest.fixture(scope="session")
 def bash_executable() -> str:
     """Return a real GNU Bash, avoiding Windows' WSL launcher stub."""
     candidates: list[Path] = []
-    override = os.environ.get("AGENT_REACH_TEST_BASH")
+    override = os.environ.get("SCRAP_MASTER_TEST_BASH")
     if override:
         candidates.append(Path(override))
 
@@ -82,7 +82,7 @@ def isolated_home(tmp_path, monkeypatch):
     monkeypatch.setenv("LOCALAPPDATA", str(home / "AppData" / "Local"))
     monkeypatch.delenv("OPENCLAW_HOME", raising=False)
 
-    config_dir = home / ".agent-reach"
+    config_dir = home / ".scrap-master"
     monkeypatch.setattr(Config, "CONFIG_DIR", config_dir)
     monkeypatch.setattr(Config, "CONFIG_FILE", config_dir / "config.yaml")
     return home
@@ -91,7 +91,7 @@ def isolated_home(tmp_path, monkeypatch):
 @pytest.fixture(autouse=True)
 def isolated_xueqiu_cookie_jar(monkeypatch):
     """Prevent the module-level Xueqiu session from leaking between tests."""
-    from agent_reach.channels import xueqiu
+    from scrap_master.channels import xueqiu
 
     xueqiu._cookie_jar.clear()
     monkeypatch.setattr(xueqiu, "_cookies_initialized", False)

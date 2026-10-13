@@ -1,12 +1,12 @@
 #!/bin/bash
-# Agent Reach clean-environment integration test.
+# Scrap Master clean-environment integration test.
 # Creates an isolated venv, installs this checkout, runs a read-only doctor,
 # then executes the repository test suite.
 
 set -euo pipefail
 
 REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-TEST_DIR=$(mktemp -d "${TMPDIR:-/tmp}/agent-reach-test.XXXXXX")
+TEST_DIR=$(mktemp -d "${TMPDIR:-/tmp}/scrap-master-test.XXXXXX")
 TEST_DIR=$(cd "$TEST_DIR" && pwd -P)
 export HOME="$TEST_DIR/home"
 export XDG_CONFIG_HOME="$HOME/.config"
@@ -56,15 +56,15 @@ python -m pip install --quiet --upgrade pip
 python -m pip install --quiet -c "$REPO_ROOT/constraints.txt" -e "$REPO_ROOT[dev]"
 
 echo "[3/5] Verifying the installed CLI"
-agent-reach version
+scrap-master version
 
 echo "[4/5] Running read-only install check and doctor"
-agent-reach install --env=auto --safe
-agent-reach install --env=auto --system --dry-run
-agent-reach doctor --json > "$TEST_DIR/doctor.json"
+scrap-master install --env=auto --safe
+scrap-master install --env=auto --system --dry-run
+scrap-master doctor --json > "$TEST_DIR/doctor.json"
 python -c 'import json,sys; data=json.load(open(sys.argv[1], encoding="utf-8")); assert isinstance(data, dict) and data, "doctor returned no channels"; print(f"doctor OK: {len(data)} channels")' "$TEST_DIR/doctor.json"
 
 echo "[5/5] Running repository tests"
 pytest "$REPO_ROOT/tests" -q
 
-echo "Agent Reach integration test passed"
+echo "Scrap Master integration test passed"

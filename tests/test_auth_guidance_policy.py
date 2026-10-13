@@ -12,8 +12,8 @@ def _policy_documents() -> list[Path]:
     documents = list(ROOT.glob("README*.md"))
     for directory in (
         ROOT / "docs",
-        ROOT / "agent_reach" / "guides",
-        ROOT / "agent_reach" / "skill",
+        ROOT / "scrap_master" / "guides",
+        ROOT / "scrap_master" / "skill",
     ):
         documents.extend(directory.rglob("*.md"))
     return sorted(set(documents))
@@ -21,15 +21,11 @@ def _policy_documents() -> list[Path]:
 
 def test_xiaohongshu_guidance_never_starts_implicit_login():
     """Do not reintroduce QR or automatic browser-cookie login guidance."""
-    xhs_markers = ("xiaohongshu", "小红书", "小紅書", "xhs")
+    xhs_markers = ("xiaohongshu", "xhs")
     legacy_auth_markers = (
-        "扫码",
-        "二维码",
         "qr login",
         "qr scan",
         "qrcode",
-        "ブラウザからcookieを自動抽出",
-        "브라우저에서 cookie 자동 추출",
     )
     forbidden_commands = (
         "xhs " + "login",
@@ -58,33 +54,29 @@ def test_xiaohongshu_opencli_and_export_boundaries_are_truthful():
     """Cookie import is for MCP/legacy tools, never OpenCLI or Chrome."""
     boundary_docs = (
         ROOT / "docs" / "install.md",
-        ROOT / "agent_reach" / "guides" / "setup-xiaohongshu.md",
-        ROOT / "agent_reach" / "skill" / "references" / "social.md",
+        ROOT / "scrap_master" / "guides" / "setup-xiaohongshu.md",
+        ROOT / "scrap_master" / "skill" / "references" / "social.md",
     )
     for path in boundary_docs:
         text = path.read_text(encoding="utf-8")
-        assert "已经存在且明确控制" in text, path.relative_to(ROOT)
-        assert "不会把 Cookie 注入 OpenCLI" in text, path.relative_to(ROOT)
+        assert "existing Chrome session explicitly controlled by the user" in text, path.relative_to(ROOT)
+        assert "does not inject cookies into OpenCLI" in text, path.relative_to(ROOT)
 
     xhs_guide = boundary_docs[1].read_text(encoding="utf-8")
-    assert "xiaohongshu.com 同域 Cookie 集" in xhs_guide
-    assert "非 xiaohongshu.com 域 Cookie" in xhs_guide
+    assert "xiaohongshu.com-domain cookie set" in xhs_guide
+    assert "Cookies from non-xiaohongshu.com" in xhs_guide
 
 
 def test_twitter_operational_docs_explain_the_environment_boundary():
     """Saved cookies help doctor only; direct twitter commands need env vars."""
     operational_docs = (
         ROOT / "README.md",
-        ROOT / "docs" / "README_en.md",
-        ROOT / "docs" / "README_ja.md",
-        ROOT / "docs" / "README_ko.md",
         ROOT / "docs" / "cookie-export.md",
         ROOT / "docs" / "install.md",
         ROOT / "docs" / "troubleshooting.md",
-        ROOT / "agent_reach" / "guides" / "setup-twitter.md",
-        ROOT / "agent_reach" / "skill" / "SKILL.md",
-        ROOT / "agent_reach" / "skill" / "SKILL_en.md",
-        ROOT / "agent_reach" / "skill" / "references" / "social.md",
+        ROOT / "scrap_master" / "guides" / "setup-twitter.md",
+        ROOT / "scrap_master" / "skill" / "SKILL.md",
+        ROOT / "scrap_master" / "skill" / "references" / "social.md",
     )
 
     for path in operational_docs:
@@ -93,28 +85,26 @@ def test_twitter_operational_docs_explain_the_environment_boundary():
         assert "TWITTER_CT0" in text, path.relative_to(ROOT)
 
     twitter_guide = (
-        ROOT / "agent_reach" / "guides" / "setup-twitter.md"
+        ROOT / "scrap_master" / "guides" / "setup-twitter.md"
     ).read_text(encoding="utf-8")
-    assert "不会执行 `twitter status`" in twitter_guide
-    assert "不会修改当前 Shell" in twitter_guide
+    assert "does not run `twitter status`" in twitter_guide
+    assert "does not modify the current shell" in twitter_guide
     assert "Export → Header String" in twitter_guide
     assert "cookie JSON" not in twitter_guide
-    assert "复制全部" not in twitter_guide
+    assert "Copy all" not in twitter_guide
 
     for expected in (
         "--sync-legacy-twitter",
-        "~/.agent-reach/config.yaml",
+        "~/.scrap-master/config.yaml",
         "~/.config/xfetch/session.json",
         "~/.config/bird/credentials.env",
     ):
         assert expected in twitter_guide
-    assert "默认只写" in twitter_guide
-    assert "不会自动删除" in twitter_guide
+    assert "By default, only" in twitter_guide
+    assert "will not auto-delete" in twitter_guide
 
     rendered_as_verified = (
         "✅ Twitter/X tweets",
-        "✅ Twitter/Xツイート",
-        "✅ Twitter/X 트윗",
     )
     all_text = "\n".join(
         path.read_text(encoding="utf-8") for path in _policy_documents()
@@ -122,14 +112,9 @@ def test_twitter_operational_docs_explain_the_environment_boundary():
     assert not any(claim in all_text for claim in rendered_as_verified)
 
 
-def test_localized_readmes_keep_current_bilibili_and_xhs_routes():
-    """Translations must not revive retired yt-dlp/Bilibili or XHS defaults."""
-    readmes = (
-        ROOT / "README.md",
-        ROOT / "docs" / "README_en.md",
-        ROOT / "docs" / "README_ja.md",
-        ROOT / "docs" / "README_ko.md",
-    )
+def test_readme_keeps_current_bilibili_and_xhs_routes():
+    """The README must not revive retired yt-dlp/Bilibili or XHS defaults."""
+    readmes = (ROOT / "README.md",)
 
     for path in readmes:
         text = path.read_text(encoding="utf-8")
@@ -142,21 +127,13 @@ def test_localized_readmes_keep_current_bilibili_and_xhs_routes():
         ), path.relative_to(ROOT)
 
 
-def test_localized_readmes_do_not_advertise_retired_channels():
-    """Japanese and Korean docs must match the channels shipped by the CLI."""
-    for path in (ROOT / "docs" / "README_ja.md", ROOT / "docs" / "README_ko.md"):
-        text = path.read_text(encoding="utf-8").lower()
-        assert "douyin" not in text, path.relative_to(ROOT)
-        assert "weibo" not in text, path.relative_to(ROOT)
-
-
 def test_public_guidance_never_installs_the_unrelated_pypi_package():
-    """The PyPI name is owned by another project; GitHub URLs are required."""
+    """Install instructions must use the GitHub URL, not a bare PyPI name."""
     candidates = _policy_documents() + [
-        ROOT / "agent_reach" / "integrations" / "mcp_server.py",
+        ROOT / "scrap_master" / "integrations" / "mcp_server.py",
     ]
     bare_install = re.compile(
-        r"\bpip\s+install(?:\s+--upgrade)?\s+['\"]?agent-reach(?:\[[^\]]+\])?\b",
+        r"\bpip\s+install(?:\s+--upgrade)?\s+['\"]?scrap-master(?:\[[^\]]+\])?\b",
         re.IGNORECASE,
     )
     violations = []
@@ -165,7 +142,7 @@ def test_public_guidance_never_installs_the_unrelated_pypi_package():
             path.read_text(encoding="utf-8").splitlines(), 1
         ):
             if bare_install.search(line) and (
-                "github.com/Panniantong/agent-reach" not in line
+                "github.com/festomanolo/scrap-master" not in line
             ):
                 violations.append(
                     f"{path.relative_to(ROOT)}:{line_number}: {line.strip()}"
@@ -177,14 +154,14 @@ def test_public_guidance_never_installs_the_unrelated_pypi_package():
 def test_public_guidance_never_puts_secrets_in_process_arguments():
     """Operational docs should use hidden prompts or stdin for credentials."""
     forbidden = (
-        'agent-reach configure twitter-cookies "',
-        "agent-reach configure twitter-cookies '",
-        'agent-reach configure xhs-cookies "',
-        "agent-reach configure xhs-cookies '",
-        "agent-reach configure groq-key gsk_",
-        "agent-reach configure openai-key sk-",
-        "agent-reach configure github-token gh",
-        "agent-reach configure proxy http",
+        'scrap-master configure twitter-cookies "',
+        "scrap-master configure twitter-cookies '",
+        'scrap-master configure xhs-cookies "',
+        "scrap-master configure xhs-cookies '",
+        "scrap-master configure groq-key gsk_",
+        "scrap-master configure openai-key sk-",
+        "scrap-master configure github-token gh",
+        "scrap-master configure proxy http",
     )
     violations = []
     for path in _policy_documents():
@@ -199,8 +176,7 @@ def test_public_guidance_never_puts_secrets_in_process_arguments():
 def test_skill_explains_unverified_backend_state():
     """A null backend is an explicit safety state, not a routing instruction."""
     skills = (
-        ROOT / "agent_reach" / "skill" / "SKILL.md",
-        ROOT / "agent_reach" / "skill" / "SKILL_en.md",
+        ROOT / "scrap_master" / "skill" / "SKILL.md",
     )
     for path in skills:
         text = path.read_text(encoding="utf-8")
@@ -211,17 +187,16 @@ def test_skill_explains_unverified_backend_state():
 def test_video_reference_has_content_level_youtube_fallbacks():
     """Version-only health must not be presented as proof subtitles work."""
     text = (
-        ROOT / "agent_reach" / "skill" / "references" / "video.md"
+        ROOT / "scrap_master" / "skill" / "references" / "video.md"
     ).read_text(encoding="utf-8")
     assert "opencli youtube transcript" in text
-    assert "最多重试 3 次" in text
-    assert "agent-reach transcribe" in text
+    assert "retry up to 3 times" in text
+    assert "scrap-master transcribe" in text
 
 
 def test_skill_routes_finance_and_documents_opencli_discovery():
     skills = (
-        ROOT / "agent_reach" / "skill" / "SKILL.md",
-        ROOT / "agent_reach" / "skill" / "SKILL_en.md",
+        ROOT / "scrap_master" / "skill" / "SKILL.md",
     )
     for path in skills:
         text = path.read_text(encoding="utf-8")
@@ -229,7 +204,7 @@ def test_skill_routes_finance_and_documents_opencli_discovery():
         assert "opencli list" in text, path.relative_to(ROOT)
         assert "--help" in text, path.relative_to(ROOT)
 
-    finance = ROOT / "agent_reach" / "skill" / "references" / "finance.md"
+    finance = ROOT / "scrap_master" / "skill" / "references" / "finance.md"
     text = finance.read_text(encoding="utf-8")
     assert "opencli xueqiu stock" in text
-    assert "agent-reach configure --from-browser chrome --platform xueqiu" in text
+    assert "scrap-master configure --from-browser chrome --platform xueqiu" in text
