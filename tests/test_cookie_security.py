@@ -7,7 +7,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from agent_reach import cookie_extract
+from scrap_master import cookie_extract
 
 
 class RecordingConfig:

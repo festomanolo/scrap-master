@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
-"""Tests for AgentReach core class."""
+"""Tests for ScrapMaster core class."""
 
 import pytest
 
-from agent_reach.config import Config
-from agent_reach.core import AgentReach
+from scrap_master.config import Config
+from scrap_master.core import ScrapMaster
 
 
 @pytest.fixture
 def eyes(tmp_path):
     config = Config(config_path=tmp_path / "config.yaml")
-    return AgentReach(config=config)
+    return ScrapMaster(config=config)
 
 
-class TestAgentReach:
+class TestScrapMaster:
     def test_init(self, eyes):
         assert eyes.config is not None
 
@@ -26,4 +26,4 @@ class TestAgentReach:
     def test_doctor_report(self, eyes):
         report = eyes.doctor_report()
         assert isinstance(report, str)
-        assert "Agent Reach" in report
+        assert "Scrap Master" in report

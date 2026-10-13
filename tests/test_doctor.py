@@ -11,8 +11,8 @@ from pathlib import Path
 
 import pytest
 
-import agent_reach.doctor as doctor
-from agent_reach.config import Config
+import scrap_master.doctor as doctor
+from scrap_master.config import Config
 
 
 class _StubChannel:
@@ -41,10 +41,10 @@ class TestDoctor:
             doctor,
             "get_all_channels",
             lambda: [
-                _StubChannel("web", "网页", 0, "ok", "可抓取网页", ["requests"],
+                _StubChannel("web", "Web", 0, "ok", "Web pages can be fetched", ["requests"],
                              active_backend="requests"),
-                _StubChannel("github", "GitHub", 0, "warn", "gh 未安装", ["gh"]),
-                _StubChannel("exa_search", "全网语义搜索", 1, "off", "mcporter 未配置", ["Exa"]),
+                _StubChannel("github", "GitHub", 0, "warn", "gh not installed", ["gh"]),
+                _StubChannel("exa_search", "Web semantic search", 1, "off", "mcporter not configured", ["Exa"]),
             ],
         )
 
@@ -53,8 +53,8 @@ class TestDoctor:
         assert results == {
             "web": {
                 "status": "ok",
-                "name": "网页",
-                "message": "可抓取网页",
+                "name": "Web",
+                "message": "Web pages can be fetched",
                 "tier": 0,
                 "backends": ["requests"],
                 "active_backend": "requests",
@@ -62,15 +62,15 @@ class TestDoctor:
             "github": {
                 "status": "warn",
                 "name": "GitHub",
-                "message": "gh 未安装",
+                "message": "gh not installed",
                 "tier": 0,
                 "backends": ["gh"],
                 "active_backend": None,
             },
             "exa_search": {
                 "status": "off",
-                "name": "全网语义搜索",
-                "message": "mcporter 未配置",
+                "name": "Web semantic search",
+                "message": "mcporter not configured",
                 "tier": 1,
                 "backends": ["Exa"],
                 "active_backend": None,
@@ -82,22 +82,22 @@ class TestDoctor:
             {
                 "web": {
                     "status": "ok",
-                    "name": "网页",
-                    "message": "可抓取网页",
+                    "name": "Web",
+                    "message": "Web pages can be fetched",
                     "tier": 0,
                     "backends": ["requests"],
                 },
                 "exa_search": {
                     "status": "off",
-                    "name": "全网语义搜索",
-                    "message": "mcporter 未配置",
+                    "name": "Web semantic search",
+                    "message": "mcporter not configured",
                     "tier": 1,
                     "backends": ["Exa"],
                 },
                 "xiaohongshu": {
                     "status": "warn",
-                    "name": "小红书",
-                    "message": "MCP 已配置，但健康检查超时",
+                    "name": "XiaoHongShu",
+                    "message": "MCP configured, but the health check timed out",
                     "tier": 2,
                     "backends": ["mcporter"],
                 },
@@ -107,23 +107,23 @@ class TestDoctor:
         # Strip Rich markup tags for assertion (PR #170 added [bold], [yellow] etc.)
         import re
         plain = re.sub(r"\[[^\]]*\]", "", report)
-        assert "Agent Reach" in plain
-        assert "装好即用：" in plain
-        assert "1/3 个渠道可用" in plain
+        assert "Scrap Master" in plain
+        assert "Ready to use:" in plain
+        assert "1/3 channels available" in plain
         # Inactive optional channels should be summarized in one line
-        assert "可选渠道可以解锁" in plain
+        assert "optional channel(s) available to unlock" in plain
 
 
 def test_stale_active_backend_does_not_leak_into_errored_result(monkeypatch):
-    """渠道单例上一轮的 active_backend 不得泄漏进本轮异常结果(Codex review 发现)。"""
-    from agent_reach import doctor
+    """The previous run's active_backend on a channel singleton must not leak into this run's error result."""
+    from scrap_master import doctor
 
     class _ExplodingChannel:
         name = "boom"
-        description = "爆炸渠道"
+        description = "Exploding channel"
         tier = 0
         backends = ["a", "b"]
-        active_backend = "a"  # 上一轮成功的残留
+        active_backend = "a"  # leftover from the previous successful run
 
         def check(self, config=None):
             raise RuntimeError("boom")
@@ -139,7 +139,7 @@ def test_channel_exception_credentials_are_scrubbed(monkeypatch):
 
     class _ExplodingChannel:
         name = "secret"
-        description = "敏感渠道"
+        description = "Sensitive channel"
         tier = 0
         backends = ["secret-backend"]
         active_backend = None
@@ -164,7 +164,7 @@ def test_channel_success_message_credentials_are_scrubbed(monkeypatch):
     """Expected channel messages must pass through the same trust boundary."""
     channel = _StubChannel(
         "configured",
-        "已配置渠道",
+        "Configured channel",
         0,
         "warn",
         (
@@ -222,12 +222,12 @@ def test_real_doctor_path_is_zero_write_and_never_runs_risky_status_commands(
     monkeypatch, tmp_path, capsys
 ):
     """Run the real Doctor collector with deterministic external probes."""
-    import agent_reach.backends.opencli as opencli
-    import agent_reach.channels.bilibili as bilibili
-    import agent_reach.channels.v2ex as v2ex
-    import agent_reach.channels.xiaohongshu as xiaohongshu
-    import agent_reach.channels.xueqiu as xueqiu
-    from agent_reach import cli
+    import scrap_master.backends.opencli as opencli
+    import scrap_master.channels.bilibili as bilibili
+    import scrap_master.channels.v2ex as v2ex
+    import scrap_master.channels.xiaohongshu as xiaohongshu
+    import scrap_master.channels.xueqiu as xueqiu
+    from scrap_master import cli
 
     workdir = tmp_path / "empty-workdir"
     workdir.mkdir()
