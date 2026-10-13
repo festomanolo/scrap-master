@@ -1,16 +1,16 @@
-# Agent Reach — Installation Guide
+# Scrap Master — Installation Guide
 
 ## For Humans
 
 Copy this to your AI Agent:
 
 ```
-Install Agent Reach: https://raw.githubusercontent.com/Panniantong/agent-reach/main/docs/install.md
+Install Scrap Master: https://raw.githubusercontent.com/festomanolo/scrap-master/main/docs/install.md
 ```
 
-> 🛡️ **Safe by default:** `agent-reach install` only checks the machine and lists missing dependencies:
+> 🛡️ **Safe by default:** `scrap-master install` only checks the machine and lists missing dependencies:
 > ```
-> Safely check and install Agent Reach: https://raw.githubusercontent.com/Panniantong/agent-reach/main/docs/install.md
+> Safely check and install Scrap Master: https://raw.githubusercontent.com/festomanolo/scrap-master/main/docs/install.md
 > ```
 > Only use `--system` after the user explicitly approves system-level installs and configuration writes.
 
@@ -20,14 +20,14 @@ Install Agent Reach: https://raw.githubusercontent.com/Panniantong/agent-reach/m
 
 ### Goal
 
-Install Agent Reach and all upstream tools so your user's agent has full internet access. After installation, you'll use the upstream tools directly (OpenCLI, twitter-cli, bili-cli, rdt-cli, yt-dlp, mcporter, gh CLI, etc.) — Agent Reach is the selector, installer, health checker and router, never a wrapper.
+Install Scrap Master and all upstream tools so your user's agent has full internet access. After installation, you'll use the upstream tools directly (OpenCLI, twitter-cli, bili-cli, rdt-cli, yt-dlp, mcporter, gh CLI, etc.) — Scrap Master is the selector, installer, health checker and router, never a wrapper.
 
 ### ⚠️ Boundaries
 
 When fixing issues, stay within these limits:
 
 - **DO NOT** run commands with `sudo` unless the user explicitly approved
-- **DO NOT** modify system files outside `~/.agent-reach/`
+- **DO NOT** modify system files outside `~/.scrap-master/`
 - **DO NOT** install packages not listed in this guide
 - **DO NOT** disable firewalls, security settings, or system protections
 - **DO NOT** clone repos, create files, or run commands inside the agent workspace / working directory
@@ -35,14 +35,14 @@ When fixing issues, stay within these limits:
 
 ### 📁 Directory Rules
 
-All Agent Reach files go in dedicated directories — **never in the agent workspace**:
+All Scrap Master files go in dedicated directories — **never in the agent workspace**:
 
 | Purpose | Directory | Example |
 |---------|-----------|---------|
-| Config & tokens | `~/.agent-reach/` | `~/.agent-reach/config.json` |
-| Upstream tool repos | `~/.agent-reach/tools/` | `~/.agent-reach/tools/xiaoyuzhou/` |
+| Config & tokens | `~/.scrap-master/` | `~/.scrap-master/config.json` |
+| Upstream tool repos | `~/.scrap-master/tools/` | `~/.scrap-master/tools/xiaoyuzhou/` |
 | Temporary files | `/tmp/` | `/tmp/yt-dlp-output/` |
-| Skills | `~/.openclaw/skills/agent-reach/` | SKILL.md |
+| Skills | `~/.openclaw/skills/scrap-master/` | SKILL.md |
 
 **Why?** If you clone repos or create files in the workspace, it pollutes the user's project directory and can break their agent over time. Keep the workspace clean.
 
@@ -50,19 +50,19 @@ All Agent Reach files go in dedicated directories — **never in the agent works
 
 ```bash
 # Recommended: pipx (simplest method)
-pipx install https://github.com/Panniantong/agent-reach/archive/main.zip
-agent-reach install --env=auto               # Read-only check (default)
+pipx install https://github.com/festomanolo/scrap-master/archive/main.zip
+scrap-master install --env=auto               # Read-only check (default)
 # After the user explicitly approves system changes:
-agent-reach install --env=auto --system
+scrap-master install --env=auto --system
 
 # If your Python comes from Homebrew / you hit PEP 668 (externally-managed-environment)
 # install in a virtual environment:
-python3 -m venv ~/.agent-reach-venv
-source ~/.agent-reach-venv/bin/activate
-pip install https://github.com/Panniantong/agent-reach/archive/main.zip
-agent-reach install --env=auto               # Read-only check (default)
+python3 -m venv ~/.scrap-master-venv
+source ~/.scrap-master-venv/bin/activate
+pip install https://github.com/festomanolo/scrap-master/archive/main.zip
+scrap-master install --env=auto               # Read-only check (default)
 # After the user explicitly approves system changes:
-agent-reach install --env=auto --system
+scrap-master install --env=auto --system
 ```
 
 > 💡 **Windows / Microsoft Store Python alias?**
@@ -73,10 +73,10 @@ agent-reach install --env=auto --system
 >
 > PowerShell example:
 > ```powershell
-> py -3 -m venv $env:USERPROFILE\.agent-reach-venv
-> $env:USERPROFILE\.agent-reach-venv\Scripts\Activate.ps1
-> python -m pip install https://github.com/Panniantong/agent-reach/archive/main.zip
-> agent-reach install --env=auto
+> py -3 -m venv $env:USERPROFILE\.scrap-master-venv
+> $env:USERPROFILE\.scrap-master-venv\Scripts\Activate.ps1
+> python -m pip install https://github.com/festomanolo/scrap-master/archive/main.zip
+> scrap-master install --env=auto
 > ```
 
 The default command checks core infrastructure (gh CLI, Node.js, mcporter, Exa search, yt-dlp config) without changing the host. With explicit `--system` approval it installs/configures the missing pieces and activates these zero-config channels:
@@ -84,15 +84,15 @@ The default command checks core infrastructure (gh CLI, Node.js, mcporter, Exa s
 - Web (Jina Reader), YouTube, GitHub, RSS, Exa Search, V2EX, Bilibili (basic)
 
 > 💡 **macOS / Homebrew Python showing `externally-managed-environment`?**
-> This is PEP 668 protection — not an Agent Reach issue. Use `pipx install ...` first, or create a `venv` before installing.
+> This is PEP 668 protection — not an Scrap Master issue. Use `pipx install ...` first, or create a `venv` before installing.
 
 **Install modes:**
 
 ```bash
-agent-reach install --env=auto             # Check only; safe default
-agent-reach install --env=auto --safe      # Same check-only behavior (compatibility)
-agent-reach install --env=auto --system    # Explicitly allow external/system installs
-agent-reach install --env=auto --dry-run   # Preview what --system would do
+scrap-master install --env=auto             # Check only; safe default
+scrap-master install --env=auto --safe      # Same check-only behavior (compatibility)
+scrap-master install --env=auto --system    # Explicitly allow external/system installs
+scrap-master install --env=auto --dry-run   # Preview what --system would do
 ```
 
 ### Step 2: Ask the user which optional channels they want
@@ -120,17 +120,17 @@ After installing the basics, **ask the user** which additional channels they nee
 Based on the user's choice, run:
 
 ```bash
-agent-reach install --env=auto --system --channels=opencli,xiaohongshu   # Desktop user chose XHS
-agent-reach install --env=auto --system --channels=facebook,instagram    # Desktop Meta channels
-agent-reach install --env=local --system --channels=boss                # Desktop Boss Zhipin
-agent-reach install --env=auto --system --channels=all                   # User approved everything
+scrap-master install --env=auto --system --channels=opencli,xiaohongshu   # Desktop user chose XHS
+scrap-master install --env=auto --system --channels=facebook,instagram    # Desktop Meta channels
+scrap-master install --env=local --system --channels=boss                # Desktop Boss Zhipin
+scrap-master install --env=auto --system --channels=all                   # User approved everything
 ```
 
 Supported channel names: `opencli`, `twitter`, `xiaoyuzhou`, `xueqiu`, `xiaohongshu`, `reddit`, `facebook`, `instagram`, `bilibili`, `linkedin`, `boss`, `all`
 
 ### Step 3: Fix what's broken
 
-Run `agent-reach doctor` and check the output.
+Run `scrap-master doctor` and check the output.
 
 Try to get as many channels to ✅ as possible. If something failed during install or shows as ❌/⚠️ in doctor, diagnose the problem and try to fix it — but stay within the boundaries above. If a fix requires elevated permissions or system changes, ask the user first.
 
@@ -152,16 +152,16 @@ Some channels need credentials only the user can provide. Based on the doctor ou
 > 3. Click the extension → Export → Header String
 > 4. Paste the exported string to the Agent
 >
-> Twitter only accepts content explicitly exported by the user via Cookie-Editor. Agent Reach never logs the user in to XiaoHongShu and never reads XiaoHongShu browser cookies. XiaoHongShu OpenCLI only uses the user's existing, explicitly controlled Chrome session. If no existing session is present, use Cookie-Editor export to configure xiaohongshu-mcp / legacy tools instead. Xueqiu and Bilibili can be imported per-platform explicitly, e.g. `agent-reach configure --from-browser chrome --platform xueqiu`; the command does not scan or save cookies from other platforms.
+> Twitter only accepts content explicitly exported by the user via Cookie-Editor. Scrap Master never logs the user in to XiaoHongShu and never reads XiaoHongShu browser cookies. XiaoHongShu OpenCLI only uses the user's existing, explicitly controlled Chrome session. If no existing session is present, use Cookie-Editor export to configure xiaohongshu-mcp / legacy tools instead. Xueqiu and Bilibili can be imported per-platform explicitly, e.g. `scrap-master configure --from-browser chrome --platform xueqiu`; the command does not scan or save cookies from other platforms.
 
 **Twitter search & posting:**
 > "To unlock Twitter search, I need your Twitter cookies. Install the Cookie-Editor Chrome extension, go to x.com/twitter.com, click the extension → Export → Header String, and paste it to me."
 
 ```bash
-agent-reach configure twitter-cookies
+scrap-master configure twitter-cookies
 ```
 
-This saves `twitter_auth_token` and `twitter_ct0` for `agent-reach doctor` to check whether credentials are present. `doctor` does not run the upstream `twitter status` in real time and does not modify the current shell. Before running `twitter search/read/...` directly, you must explicitly set the following in that process environment:
+This saves `twitter_auth_token` and `twitter_ct0` for `scrap-master doctor` to check whether credentials are present. `doctor` does not run the upstream `twitter status` in real time and does not modify the current shell. Before running `twitter search/read/...` directly, you must explicitly set the following in that process environment:
 
 ```bash
 export TWITTER_AUTH_TOKEN="..."
@@ -174,9 +174,9 @@ twitter search "query" -n 10
 > twitter-cli and rdt-cli use Python and support proxies via environment variables.
 >
 > **What the Agent needs to do:**
-> 1. Confirm the user has a proxy configured: `agent-reach configure proxy` (hidden input)
+> 1. Confirm the user has a proxy configured: `scrap-master configure proxy` (hidden input)
 > 2. Set environment variables: `export HTTP_PROXY="..." HTTPS_PROXY="..."`
-> 3. Agent Reach handles the rest automatically — no additional action needed from the user
+> 3. Scrap Master handles the rest automatically — no additional action needed from the user
 >
 > If the user reports "fetch failed", see [troubleshooting.md](troubleshooting.md)
 
@@ -191,19 +191,19 @@ rdt login   # automatically extracts browser cookies; on a server without a brow
 
 > Mainland China access to Reddit requires a proxy; if server IPs are blocked, use a residential proxy (e.g. https://webshare.io, ~$1/month):
 > ```bash
-> agent-reach configure proxy
+> scrap-master configure proxy
 > ```
 
 **XiaoHongShu (multi-backend, choose by environment):**
 
-> **Authentication boundary:** Agent Reach never logs the user in to XiaoHongShu and never reads
+> **Authentication boundary:** Scrap Master never logs the user in to XiaoHongShu and never reads
 > browser cookies. OpenCLI only uses an existing Chrome session explicitly controlled by the user.
-> `agent-reach configure xhs-cookies` does not inject cookies into OpenCLI or Chrome.
+> `scrap-master configure xhs-cookies` does not inject cookies into OpenCLI or Chrome.
 > If no existing session is present, do not automate login; use a Cookie-Editor manual export
 > to configure xiaohongshu-mcp or a legacy tool instead:
 >
 > ```bash
-> agent-reach configure xhs-cookies
+> scrap-master configure xhs-cookies
 > ```
 >
 > This explicit command saves/imports the user-provided xiaohongshu.com-domain cookie set.
@@ -212,7 +212,7 @@ rdt login   # automatically extracts browser cookies; on a server without a brow
 > **Desktop (recommended: OpenCLI):**
 
 ```bash
-agent-reach install --system --channels opencli
+scrap-master install --system --channels opencli
 ```
 
 > After installation, guide the user through the one manual step (Chrome security limitation — cannot be automated):
@@ -224,7 +224,7 @@ agent-reach install --system --channels opencli
 > xiaohongshu-mcp / legacy tools Cookie-Editor route below.
 >
 > **Server / no-desktop environment (xiaohongshu-mcp):**
-> 1. Download the platform binary from https://github.com/xpzouying/xiaohongshu-mcp/releases to `~/.agent-reach/tools/`
+> 1. Download the platform binary from https://github.com/xpzouying/xiaohongshu-mcp/releases to `~/.scrap-master/tools/`
 > 2. Start the service (first run auto-downloads ~150MB headless browser — wait for it to finish)
 > 3. Import cookies manually using the Cookie-Editor flow above
 > 4. Connect: `mcporter config add xiaohongshu http://localhost:18060/mcp --scope home`
@@ -238,7 +238,7 @@ agent-reach install --system --channels opencli
 > Both platforms use OpenCLI, which reuses the user's Chrome login session without storing credentials and without going through the Meta Graph API approval process. Server / no-desktop environments are not supported.
 
 ```bash
-agent-reach install --system --channels facebook,instagram
+scrap-master install --system --channels facebook,instagram
 ```
 
 > After installation:
@@ -260,7 +260,7 @@ agent-reach install --system --channels facebook,instagram
 > "Xueqiu requires a login cookie. Please log in to xueqiu.com in Chrome first, then run:"
 
 ```bash
-agent-reach configure --from-browser chrome --platform xueqiu
+scrap-master configure --from-browser chrome --platform xueqiu
 ```
 
 > Only reads and saves the minimum cookies Xueqiu requires; does not collect cookies from other platforms.
@@ -268,10 +268,10 @@ agent-reach configure --from-browser chrome --platform xueqiu
 **Xiaoyuzhou Podcast (Groq Whisper):**
 > "Xiaoyuzhou Podcast transcription is installed by default. You only need a free Groq API key."
 
-The transcription script is automatically installed with Agent Reach; the user only needs to provide a key:
+The transcription script is automatically installed with Scrap Master; the user only needs to provide a key:
 
 ```bash
-agent-reach configure groq-key
+scrap-master configure groq-key
 ```
 
 > **Get a Groq API key (free, no credit card, 30 seconds):**
@@ -283,7 +283,7 @@ agent-reach configure groq-key
 > **How to use:**
 > The user sends a Xiaoyuzhou link to the Agent, which automatically calls:
 > ```bash
-> bash ~/.agent-reach/tools/xiaoyuzhou/transcribe.sh https://www.xiaoyuzhoufm.com/episode/xxxxx
+> bash ~/.scrap-master/tools/xiaoyuzhou/transcribe.sh https://www.xiaoyuzhoufm.com/episode/xxxxx
 > ```
 >
 > Auto-downloads audio → transcodes and splits → Groq Whisper transcription → full text transcript.
@@ -323,7 +323,7 @@ When the user says "help me configure Boss Zhipin", the Agent handles the automa
 1. First explain that an upstream CLI will be installed and a dedicated Chrome profile directory created, and request approval for system-level installation.
 2. After the user approves, run:
    ```bash
-   agent-reach install --env=local --system --channels=boss
+   scrap-master install --env=local --system --channels=boss
    ```
 3. Launch the dedicated Chrome bound to loopback only per your OS:
    ```bash
@@ -348,7 +348,7 @@ When the user says "help me configure Boss Zhipin", the Agent handles the automa
 5. After the user confirms login is complete, run:
    ```bash
    boss --cdp-url http://localhost:9222 login --cdp
-   agent-reach doctor    # check the boss line for the browser wt2 cookie probe result
+   scrap-master doctor    # check the boss line for the browser wt2 cookie probe result
    ```
 
 > Security boundary: any local process that can reach debug port 9222 has full control over this Chrome.
@@ -366,21 +366,21 @@ When the user says "help me configure Boss Zhipin", the Agent handles the automa
 
 ### Step 4: Final check
 
-Run `agent-reach doctor` one final time and report the results to your user.
+Run `scrap-master doctor` one final time and report the results to your user.
 
 ### Step 5: Set up daily monitoring (OpenClaw only)
 
 If you are running inside **OpenClaw**, ask your user:
 
-> "Agent Reach is set up! Would you like me to create a daily automated check task? It will monitor these channels and check for new versions — only notifying you when something is wrong or an update is available."
+> "Scrap Master is set up! Would you like me to create a daily automated check task? It will monitor these channels and check for new versions — only notifying you when something is wrong or an update is available."
 
 If the user agrees, create a **cron job** (daily, `sessionTarget: "isolated"`, `delivery: "announce"`) with this task:
 
 ```
-Run the agent-reach watch command.
+Run the scrap-master watch command.
 If the output contains "all good", do not notify the user — finish silently.
 If the output contains issues (❌ ⚠) or a new version (🆕), send the full report to the user with suggested fixes.
-If a new version is available, ask the user whether to upgrade (paste this to the user's Agent for a full update: Update Agent Reach: https://raw.githubusercontent.com/Panniantong/agent-reach/main/docs/update.md).
+If a new version is available, ask the user whether to upgrade (paste this to the user's Agent for a full update: Update Scrap Master: https://raw.githubusercontent.com/festomanolo/scrap-master/main/docs/update.md).
 ```
 
 If the user wants a different agent to handle it, let them choose.
@@ -391,19 +391,19 @@ If the user wants a different agent to handle it, let them choose.
 
 | Command | What it does |
 |---------|-------------|
-| `agent-reach install --env=auto` | Read-only dependency and channel check (default) |
-| `agent-reach install --env=auto --system` | Explicitly install/configure core external tools |
-| `agent-reach install --env=auto --system --channels=twitter,xiaohongshu` | Install approved optional channels |
-| `agent-reach install --env=local --system --channels=boss` | Install the desktop Boss Zhipin strict-CDP backend |
-| `agent-reach install --env=auto --system --channels=all` | Install everything after explicit approval |
-| `agent-reach install --env=auto --safe` | Compatibility alias for the safe default |
-| `agent-reach install --env=auto --dry-run` | Preview what would be done |
-| `agent-reach doctor` | Show channel status |
-| `agent-reach watch` | Quick health + update check (for scheduled tasks) |
-| `agent-reach check-update` | Check for new versions |
-| `agent-reach configure twitter-cookies` | Save Twitter cookies via hidden input; direct calls still require explicit env vars |
-| `agent-reach configure proxy` | Save proxy address via hidden input; not an automatic unlock switch |
-| `agent-reach configure groq-key` | Configure the Xiaoyuzhou transcription key via hidden input |
+| `scrap-master install --env=auto` | Read-only dependency and channel check (default) |
+| `scrap-master install --env=auto --system` | Explicitly install/configure core external tools |
+| `scrap-master install --env=auto --system --channels=twitter,xiaohongshu` | Install approved optional channels |
+| `scrap-master install --env=local --system --channels=boss` | Install the desktop Boss Zhipin strict-CDP backend |
+| `scrap-master install --env=auto --system --channels=all` | Install everything after explicit approval |
+| `scrap-master install --env=auto --safe` | Compatibility alias for the safe default |
+| `scrap-master install --env=auto --dry-run` | Preview what would be done |
+| `scrap-master doctor` | Show channel status |
+| `scrap-master watch` | Quick health + update check (for scheduled tasks) |
+| `scrap-master check-update` | Check for new versions |
+| `scrap-master configure twitter-cookies` | Save Twitter cookies via hidden input; direct calls still require explicit env vars |
+| `scrap-master configure proxy` | Save proxy address via hidden input; not an automatic unlock switch |
+| `scrap-master configure groq-key` | Configure the Xiaoyuzhou transcription key via hidden input |
 
 After installation, use upstream tools directly. See SKILL.md for the full command reference:
 
@@ -419,9 +419,9 @@ After installation, use upstream tools directly. See SKILL.md for the full comma
 | Web | `curl` + Jina | `curl -s "https://r.jina.ai/URL"` |
 | Exa Search | `mcporter` | `mcporter call exa.web_search_exa query="..." numResults=5` |
 | XiaoHongShu | `opencli` (server: `mcporter`) | `opencli xiaohongshu search "query" -f yaml` |
-| Xiaoyuzhou Podcast | `transcribe.sh` | `bash ~/.agent-reach/tools/xiaoyuzhou/transcribe.sh <URL>` |
+| Xiaoyuzhou Podcast | `transcribe.sh` | `bash ~/.scrap-master/tools/xiaoyuzhou/transcribe.sh <URL>` |
 | LinkedIn | `mcporter` | `mcporter call linkedin.get_person_profile linkedin_username="..."` |
-| Boss Zhipin | `boss` / Python public API | `agent-reach doctor` (browser wt2 probe; `boss status` only reflects local session.enc); see `references/career.md` for search and JD |
+| Boss Zhipin | `boss` / Python public API | `scrap-master doctor` (browser wt2 probe; `boss status` only reflects local session.enc); see `references/career.md` for search and JD |
 | RSS | `feedparser` | `python3 -c "import feedparser; ..."` |
 
-> For multi-backend platforms, use the `active_backend` from `agent-reach doctor --json`.
+> For multi-backend platforms, use the `active_backend` from `scrap-master doctor --json`.
