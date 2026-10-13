@@ -6,7 +6,7 @@ __pycache__/
 dist/
 build/
 .env
-.agent-reach/
+.scrap-master/
 *.log
 
 # Claude Code personal permission settings — local only, never commit
