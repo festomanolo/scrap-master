@@ -1,4 +1,4 @@
-from agent_reach.utils.process import mcporter_utf8_env_args, utf8_subprocess_env
+from scrap_master.utils.process import mcporter_utf8_env_args, utf8_subprocess_env
 
 
 def test_utf8_subprocess_env_forces_python_utf8():

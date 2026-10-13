@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Tests for agent_reach.probe — real-execution probing and failure classification."""
+"""Tests for scrap_master.probe — real-execution probing and failure classification."""
 
 import os
 import stat
@@ -7,7 +7,7 @@ import sys
 
 import pytest
 
-from agent_reach.probe import probe_command, reinstall_hint
+from scrap_master.probe import probe_command, reinstall_hint
 
 
 def _make_executable(path, content):

@@ -10,9 +10,9 @@ from argparse import Namespace
 
 import pytest
 
-from agent_reach import cli
-from agent_reach.cookie_extract import _sync_bird_env, _sync_xfetch_session
-from agent_reach.utils import paths
+from scrap_master import cli
+from scrap_master.cookie_extract import _sync_bird_env, _sync_xfetch_session
+from scrap_master.utils import paths
 
 
 @pytest.mark.skipif(os.name == "nt", reason="POSIX permission semantics")
@@ -120,7 +120,7 @@ def test_credential_writes_honor_home_when_expanduser_disagrees(
 
     assert (intended_home / ".config" / "xfetch" / "session.json").exists()
     assert (intended_home / ".config" / "bird" / "credentials.env").exists()
-    assert (intended_home / ".agent-reach" / "xhs-cookies.json").exists()
+    assert (intended_home / ".scrap-master" / "xhs-cookies.json").exists()
     assert list(windows_profile.rglob("*")) == []
 
 
@@ -211,11 +211,11 @@ def test_xhs_cookie_editor_json_ignores_non_xhs_domains(
 
     cli._configure_xhs_cookies(json.dumps(exported))
 
-    cookie_path = tmp_path / ".agent-reach" / "xhs-cookies.json"
+    cookie_path = tmp_path / ".scrap-master" / "xhs-cookies.json"
     saved = json.loads(cookie_path.read_text(encoding="utf-8"))
     assert [cookie["name"] for cookie in saved] == ["web_session", "a1"]
     output = capsys.readouterr().out
-    assert "忽略" in output
+    assert "Ignored" in output
     assert "2" in output
 
 
@@ -240,7 +240,7 @@ def test_xhs_cookie_editor_json_fails_without_valid_xhs_cookie(
         },
     ]
 
-    monkeypatch.setattr("agent_reach.config.Config", lambda: object())
+    monkeypatch.setattr("scrap_master.config.Config", lambda: object())
     with pytest.raises(SystemExit) as exc:
         cli._cmd_configure(
             Namespace(
@@ -252,9 +252,9 @@ def test_xhs_cookie_editor_json_fails_without_valid_xhs_cookie(
         )
 
     assert exc.value.code == 1
-    assert not (tmp_path / ".agent-reach" / "xhs-cookies.json").exists()
+    assert not (tmp_path / ".scrap-master" / "xhs-cookies.json").exists()
     output = capsys.readouterr().out
-    assert "没有有效的 xiaohongshu.com" in output
+    assert "No valid xiaohongshu.com" in output
 
 
 def test_xhs_local_fallback_refuses_target_symlink(
@@ -262,7 +262,7 @@ def test_xhs_local_fallback_refuses_target_symlink(
 ):
     monkeypatch.setenv("HOME", str(tmp_path))
     monkeypatch.setattr("shutil.which", lambda name: None)
-    cookie_path = tmp_path / ".agent-reach" / "xhs-cookies.json"
+    cookie_path = tmp_path / ".scrap-master" / "xhs-cookies.json"
     cookie_path.parent.mkdir()
     victim = tmp_path / "victim.json"
     victim.write_text('{"keep": "unchanged"}', encoding="utf-8")
@@ -282,7 +282,7 @@ def test_xhs_local_fallback_refuses_target_symlink(
 def test_xhs_docker_success_via_configure_command_does_not_exit(
     monkeypatch, capsys
 ):
-    monkeypatch.setattr("agent_reach.config.Config", lambda: object())
+    monkeypatch.setattr("scrap_master.config.Config", lambda: object())
     monkeypatch.setattr(
         "shutil.which",
         lambda name: "/usr/bin/docker" if name == "docker" else None,
@@ -316,7 +316,7 @@ def test_xhs_docker_success_via_configure_command_does_not_exit(
 def test_xhs_docker_failure_via_configure_command_exits_one(
     monkeypatch, capsys
 ):
-    monkeypatch.setattr("agent_reach.config.Config", lambda: object())
+    monkeypatch.setattr("scrap_master.config.Config", lambda: object())
     monkeypatch.setattr(
         "shutil.which",
         lambda name: "/usr/bin/docker" if name == "docker" else None,
@@ -358,7 +358,7 @@ def test_ytdlp_config_write_refuses_target_symlink(
 ):
     import shutil
 
-    import agent_reach.utils.paths as paths
+    import scrap_master.utils.paths as paths
 
     monkeypatch.setattr(paths.sys, "platform", "darwin")
     monkeypatch.setattr(
@@ -402,7 +402,7 @@ def test_ytdlp_config_write_refuses_target_symlink(
 def test_transcribe_cli_scrubs_credentials_from_errors(
     monkeypatch, capsys
 ):
-    import agent_reach.transcribe as transcribe_module
+    import scrap_master.transcribe as transcribe_module
 
     secret_url = (
         "https://alice:super-secret@example.test/audio"
@@ -441,11 +441,11 @@ def test_safe_install_with_proxy_makes_no_persistent_writes(
     monkeypatch.setattr(cli, "_install_system_deps_safe", lambda: None)
     monkeypatch.setattr(cli, "_install_mcporter_safe", lambda: None)
     monkeypatch.setattr(
-        "agent_reach.doctor.check_all",
+        "scrap_master.doctor.check_all",
         lambda config: observed_configs.append(config) or {},
     )
     monkeypatch.setattr(
-        "agent_reach.doctor.format_report",
+        "scrap_master.doctor.format_report",
         lambda _results: "report",
     )
     monkeypatch.setattr(
@@ -468,11 +468,11 @@ def test_safe_install_with_proxy_makes_no_persistent_writes(
     assert len(observed_configs) == 1
     assert observed_configs[0].read_only is True
     assert skill_calls == []
-    assert not (isolated_home / ".agent-reach").exists()
-    assert not (isolated_home / ".agent-reach" / "tools").exists()
-    assert not (isolated_home / ".openclaw" / "skills" / "agent-reach").exists()
-    assert not (isolated_home / ".claude" / "skills" / "agent-reach").exists()
-    assert not (isolated_home / ".agents" / "skills" / "agent-reach").exists()
+    assert not (isolated_home / ".scrap-master").exists()
+    assert not (isolated_home / ".scrap-master" / "tools").exists()
+    assert not (isolated_home / ".openclaw" / "skills" / "scrap-master").exists()
+    assert not (isolated_home / ".claude" / "skills" / "scrap-master").exists()
+    assert not (isolated_home / ".agents" / "skills" / "scrap-master").exists()
     output = capsys.readouterr().out
     assert "SAFE MODE" in output
     assert "Would save network proxy" in output
@@ -496,20 +496,20 @@ def test_install_is_safe_by_default(isolated_home, monkeypatch, capsys):
         "_install_skill",
         lambda: pytest.fail("default install must not register agent skills"),
     )
-    monkeypatch.setattr("agent_reach.doctor.check_all", lambda _config: {})
+    monkeypatch.setattr("scrap_master.doctor.check_all", lambda _config: {})
     monkeypatch.setattr(
-        "agent_reach.doctor.format_report",
+        "scrap_master.doctor.format_report",
         lambda _results: "report",
     )
     monkeypatch.setattr(
         cli.sys,
         "argv",
-        ["agent-reach", "install", "--env", "local"],
+        ["scrap-master", "install", "--env", "local"],
     )
 
     cli.main()
 
-    assert not (isolated_home / ".agent-reach").exists()
+    assert not (isolated_home / ".scrap-master").exists()
     output = capsys.readouterr().out
     assert "SAFE MODE" in output
     assert "No changes were made" in output
@@ -536,21 +536,21 @@ def test_install_system_flag_explicitly_enables_writes(
         "_install_skill",
         lambda: calls.append("skill"),
     )
-    monkeypatch.setattr("agent_reach.doctor.check_all", lambda _config: {})
+    monkeypatch.setattr("scrap_master.doctor.check_all", lambda _config: {})
     monkeypatch.setattr(
-        "agent_reach.doctor.format_report",
+        "scrap_master.doctor.format_report",
         lambda _results: "report",
     )
     monkeypatch.setattr(
         cli.sys,
         "argv",
-        ["agent-reach", "install", "--env", "local", "--system"],
+        ["scrap-master", "install", "--env", "local", "--system"],
     )
 
     cli.main()
 
     assert calls == ["system-deps", "mcporter", "skill"]
-    assert (isolated_home / ".agent-reach" / "tools").is_dir()
+    assert (isolated_home / ".scrap-master" / "tools").is_dir()
     assert "Installation complete" in capsys.readouterr().out
 
 
@@ -562,15 +562,15 @@ def test_install_system_exits_nonzero_when_core_steps_fail(
     monkeypatch.setattr(cli, "_install_system_deps", lambda: False)
     monkeypatch.setattr(cli, "_install_mcporter", lambda: False)
     monkeypatch.setattr(cli, "_install_skill", lambda: None)
-    monkeypatch.setattr("agent_reach.doctor.check_all", lambda _config: {})
+    monkeypatch.setattr("scrap_master.doctor.check_all", lambda _config: {})
     monkeypatch.setattr(
-        "agent_reach.doctor.format_report",
+        "scrap_master.doctor.format_report",
         lambda _results: "report",
     )
     monkeypatch.setattr(
         cli.sys,
         "argv",
-        ["agent-reach", "install", "--env", "local", "--system"],
+        ["scrap-master", "install", "--env", "local", "--system"],
     )
 
     with pytest.raises(SystemExit) as exc:
@@ -590,16 +590,16 @@ def test_install_system_exits_nonzero_when_requested_channel_fails(
     monkeypatch.setattr(cli, "_install_mcporter", lambda: True)
     monkeypatch.setattr(cli, "_install_opencli_deps", lambda: False)
     monkeypatch.setattr(cli, "_install_skill", lambda: True)
-    monkeypatch.setattr("agent_reach.doctor.check_all", lambda _config: {})
+    monkeypatch.setattr("scrap_master.doctor.check_all", lambda _config: {})
     monkeypatch.setattr(
-        "agent_reach.doctor.format_report",
+        "scrap_master.doctor.format_report",
         lambda _results: "report",
     )
     monkeypatch.setattr(
         cli.sys,
         "argv",
         [
-            "agent-reach",
+            "scrap-master",
             "install",
             "--env",
             "local",
@@ -622,15 +622,15 @@ def test_install_system_exits_nonzero_when_skill_install_fails(
     monkeypatch.setattr(cli, "_install_system_deps", lambda: True)
     monkeypatch.setattr(cli, "_install_mcporter", lambda: True)
     monkeypatch.setattr(cli, "_install_skill", lambda: False)
-    monkeypatch.setattr("agent_reach.doctor.check_all", lambda _config: {})
+    monkeypatch.setattr("scrap_master.doctor.check_all", lambda _config: {})
     monkeypatch.setattr(
-        "agent_reach.doctor.format_report",
+        "scrap_master.doctor.format_report",
         lambda _results: "report",
     )
     monkeypatch.setattr(
         cli.sys,
         "argv",
-        ["agent-reach", "install", "--env", "local", "--system"],
+        ["scrap-master", "install", "--env", "local", "--system"],
     )
 
     with pytest.raises(SystemExit) as exc:

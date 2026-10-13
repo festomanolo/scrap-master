@@ -5,7 +5,7 @@ import json
 import time
 from unittest.mock import Mock, patch
 
-from agent_reach.channels.reddit import RedditChannel
+from scrap_master.channels.reddit import RedditChannel
 
 
 def test_can_handle_matches_reddit_hosts():
@@ -59,7 +59,7 @@ def test_check_rdt_saved_credential_is_unverified_not_false_ok(
         status, message = RedditChannel()._check_rdt()
 
     assert status == "warn"
-    assert "未实时验证" in message
+    assert "not verified in real time" in message
     run.assert_not_called()
 
 
@@ -82,7 +82,7 @@ def test_check_rdt_stale_credential_is_not_refreshed(isolated_home):
         status, message = RedditChannel()._check_rdt()
 
     assert status == "warn"
-    assert "超过 7 天" in message
+    assert "over 7 days old" in message
     assert path.read_bytes() == before
     run.assert_not_called()
 
@@ -95,7 +95,7 @@ def test_check_rdt_unparseable_credential_is_warn(isolated_home):
         status, message = RedditChannel()._check_rdt()
 
     assert status == "warn"
-    assert "无法安全解析" in message
+    assert "cannot be parsed safely" in message
 
 
 def test_check_rdt_refuses_symlink_credential(isolated_home):
@@ -108,7 +108,7 @@ def test_check_rdt_refuses_symlink_credential(isolated_home):
         status, message = RedditChannel()._check_rdt()
 
     assert status == "warn"
-    assert "符号链接" in message
+    assert "symbolic link" in message
 
 
 def test_check_rdt_refuses_ancestor_symlink(isolated_home):
@@ -128,7 +128,7 @@ def test_check_rdt_refuses_ancestor_symlink(isolated_home):
         status, message = RedditChannel()._check_rdt()
 
     assert status == "warn"
-    assert "符号链接" in message
+    assert "symbolic link" in message
 
 
 def _opencli(installed=True, broken=False, ready=True, hint=""):
@@ -137,7 +137,7 @@ def _opencli(installed=True, broken=False, ready=True, hint=""):
 
 def test_check_opencli_not_installed_is_none():
     with patch(
-        "agent_reach.backends.opencli_status",
+        "scrap_master.backends.opencli_status",
         return_value=_opencli(installed=False),
     ):
         assert RedditChannel()._check_opencli() is None
@@ -145,7 +145,7 @@ def test_check_opencli_not_installed_is_none():
 
 def test_check_opencli_broken_is_error():
     with patch(
-        "agent_reach.backends.opencli_status",
+        "scrap_master.backends.opencli_status",
         return_value=_opencli(broken=True, hint="reinstall opencli"),
     ):
         status, message = RedditChannel()._check_opencli()
@@ -155,18 +155,18 @@ def test_check_opencli_broken_is_error():
 
 def test_check_opencli_bridge_ready_is_unverified():
     with patch(
-        "agent_reach.backends.opencli_status",
+        "scrap_master.backends.opencli_status",
         return_value=_opencli(ready=True),
     ):
         status, message = RedditChannel()._check_opencli()
     assert status == "warn"
-    assert "桥接已连接" in message
-    assert "登录态和实际命令未实时验证" in message
+    assert "OpenCLI bridge connected" in message
+    assert "login state and actual commands are not verified in real time" in message
 
 
 def test_check_opencli_installed_not_ready_is_warn():
     with patch(
-        "agent_reach.backends.opencli_status",
+        "scrap_master.backends.opencli_status",
         return_value=_opencli(ready=False, hint="connect the extension"),
     ):
         status, message = RedditChannel()._check_opencli()
@@ -222,5 +222,5 @@ def test_check_no_backend_installed_is_off():
         status, message = channel.check()
 
     assert status == "off"
-    assert "零配置" in message
+    assert "no zero-config path" in message
     assert channel.active_backend is None

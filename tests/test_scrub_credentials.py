@@ -5,12 +5,12 @@ from types import SimpleNamespace
 
 import pytest
 
-from agent_reach import cookie_extract
-from agent_reach.channels import v2ex as v2ex_module
-from agent_reach.channels import xueqiu as xueqiu_module
-from agent_reach.channels.v2ex import V2EXChannel
-from agent_reach.channels.xueqiu import XueqiuChannel
-from agent_reach.utils.text import scrub_url_credentials
+from scrap_master import cookie_extract
+from scrap_master.channels import v2ex as v2ex_module
+from scrap_master.channels import xueqiu as xueqiu_module
+from scrap_master.channels.v2ex import V2EXChannel
+from scrap_master.channels.xueqiu import XueqiuChannel
+from scrap_master.utils.text import scrub_url_credentials
 
 
 def test_scrubs_userinfo_and_sensitive_query_values():
