@@ -71,3 +71,40 @@ def _decompress_jsonp_bytes(raw: bytes) -> str:
                 return zlib.decompress(raw[offset:], -zlib.MAX_WBITS).decode(
                     "utf-8", errors="ignore"
                 )
+            except Exception:
+                pass
+
+    return raw.decode("utf-8", errors="ignore")
+
+
+def _parse_scribd_page_html(raw_html: str) -> Tuple[str, List[str]]:
+    """Reconstruct readable lines and image URLs from a Scribd page HTML/JSONP block."""
+    # Unescape JSONP string escapes if wrapped in window.pageN_callback(["..."])
+    m_cb = re.search(r'page\d+_callback\(\["(.*)"\]\)', raw_html, re.S)
+    if m_cb:
+        body = m_cb.group(1)
+        body = (
+            body.replace(r"\"", '"')
+            .replace(r"\n", "\n")
+            .replace(r"\t", "\t")
+            .replace(r"\/", "/")
+        )
+    else:
+        body = raw_html
+
+    items: List[Tuple[int, int, str]] = []
+    for m in re.finditer(
+        r'<span class=["\']?a["\']?\s+style=["\']left:(\d+)px;top:(\d+)px[^"\']*["\']>(.*?)(?=<span class=["\']?a|</div>)',
+        body,
+        re.S,
+    ):
+        x, y, inner = int(m.group(1)), int(m.group(2)), m.group(3)
+        clean = re.sub(r"<[^>]+>", "", inner)
+        clean = htmllib.unescape(clean).replace("\xa0", " ").replace("Â", " ").strip()
+        if clean:
+            items.append((y, x, clean))
+
+    items.sort(key=lambda t: (t[0] // 40, t[1]))
+    lines: List[str] = []
+    cur_y: Optional[int] = None
+    cur_line: List[str] = []
