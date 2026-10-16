@@ -61,7 +61,7 @@ Based on our live benchmark scraping **Tanzania Form Two National Assessment (FT
 | **Finding & Downloading Direct PDFs** | ⭐⭐⭐☆☆ → ⭐⭐⭐⭐⭐ | Great at extracting links from index pages; now upgraded with a built-in parallel batch downloader with retries. |
 | **Scanned PDFs / Document Viewers (Scribd)** | ⭐⭐☆☆☆ → ⭐⭐⭐⭐☆ | Upgraded with direct Scribd Embed/JSONP/Mobile API extraction (`scribd.py`) bypassing the web UI blur. |
 | **Interactive JS Apps / Cloudflare Sites** | ⭐☆☆☆☆ → ⭐⭐⭐☆☆ | `curl_cffi` + Playwright fallbacks pass passive bot walls; interactive captchas / click-driven UIs still unsupported. |
-| **Interactive JS Apps / Cloudflare Sites** | ⭐☆☆☆☆ | Needs a local headless/stealth browser fallback for `web` when Jina Reader is blocked or clicks are required. |
+| **End-to-End Bulk Harvesting** | ⭐⭐⭐⭐☆ | `scrap-master harvest <index> --depth 1 --extract` crawls, finds PDF/Drive/Scribd links, downloads in parallel, extracts text + OCR, writes `harvest_manifest.json`. Live: msomibora.com → 15 pages crawled, 41 Drive docs found, 5/5 downloaded + OCR'd. |
 
 ---
 
