@@ -144,3 +144,40 @@ class ScribdChannel(Channel):
         )
 
     def fetch_oembed(self, doc_id: str, timeout: int = 15) -> Dict:
+        """Fetch document metadata from Scribd's public OEmbed API."""
+        url = (
+            "https://www.scribd.com/services/oembed?format=json&url="
+            f"https://www.scribd.com/document/{doc_id}"
+        )
+        req = urllib.request.Request(url, headers={"User-Agent": _MOBILE_UA})
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            return json.loads(resp.read().decode("utf-8", errors="ignore"))
+
+    def extract_document(
+        self,
+        url_or_id: str,
+        max_workers: int = 10,
+        timeout: int = 20,
+        session_cookie: Optional[str] = None,
+    ) -> Dict:
+        """Extract all pages from a Scribd document via the Embed + JSONP asset API in parallel."""
+        doc_id = extract_scribd_id(url_or_id)
+        if not doc_id:
+            raise ValueError(f"Could not extract Scribd document ID from: {url_or_id}")
+
+        headers = {"User-Agent": _MOBILE_UA}
+        if session_cookie:
+            headers["Cookie"] = session_cookie
+
+        metadata = {}
+        try:
+            metadata = self.fetch_oembed(doc_id, timeout=timeout)
+        except Exception:
+            pass
+
+        embed_url = f"https://www.scribd.com/embeds/{doc_id}/content"
+        req = urllib.request.Request(embed_url, headers=headers)
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            embed_html = resp.read().decode("utf-8", errors="ignore")
+
+        pages_text: Dict[int, str] = {}
