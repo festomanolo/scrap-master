@@ -31,6 +31,19 @@ def _ddg_html(query: str) -> List[str]:
     with urllib.request.urlopen(req, timeout=25) as resp:
         html = resp.read().decode("utf-8", errors="ignore")
     return [_unwrap(h) for h in _DDG_RESULT_RE.findall(html)]
+
+
+def _ddg_lite(query: str) -> List[str]:
+    from curl_cffi import requests as cffi
+
+    html = cffi.post("https://lite.duckduckgo.com/lite/", data={"q": query},
+                     impersonate="chrome", timeout=25).text
+    return [_unwrap(h) for h in re.findall(r'class=.result-link.[^>]*href="([^"]+)"|href="([^"]+)"[^>]*class=.result-link.', html) for h in h if h]
+
+
+def _bing_rss(query: str) -> List[str]:
+    from curl_cffi import requests as cffi
+
 def web_search(query: str, max_results: int = 8) -> List[str]:
     """Keyless web search via DuckDuckGo's HTML endpoint. Returns result URLs."""
     url = "https://html.duckduckgo.com/html/?" + urllib.parse.urlencode({"q": query})
