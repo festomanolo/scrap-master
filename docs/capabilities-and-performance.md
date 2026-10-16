@@ -99,6 +99,7 @@ Yes—it is completely possible to make **Scrap Master** **5x to 15x faster** us
 We benchmarked all three stages live across the exact same **27 NECTA FTNA Form 2 Computer Studies PDFs + Syllabus (`19,906 KB` total)** from `maktaba.tetea.org`:
 
 | Download Architecture | Total Time (27 PDFs, 19.9 MB) | 4.4 MB Syllabus PDF Time | 2.85 MB `ICS-F2-2019.pdf` Time | Success Rate | Speedup |
+| :--- | :--- | :--- | :--- | :--- | :--- |
 - **After (`scrap_master/utils/parallel_downloader.py` with `max_workers=12`):**
   - **Live Measured Result:** All **27 / 27 PDFs (19,906 KB)** downloaded and passed `%PDF` magic-byte verification in **193.51 seconds (3 minutes 13 seconds)** with **0 failures** (`attempts=1` on all 27 files).
   - **Speedup Breakdown:**
