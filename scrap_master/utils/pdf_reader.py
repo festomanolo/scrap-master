@@ -29,11 +29,13 @@ var output: [String: String] = [:]
 let req = VNRecognizeTextRequest()
 req.recognitionLevel = .accurate
 req.usesLanguageCorrection = true
-let handler = VNImageRequestHandler(cgImage: cgImg, options: [:])
-try handler.perform([req])
-for obs in req.results ?? [] {
-    if let top = obs.topCandidates(1).first {
-        print(top.string)
+
+for path in args {
+    let url = URL(fileURLWithPath: path)
+    guard let img = NSImage(contentsOf: url),
+          let cgImg = img.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+        output[path] = ""
+        continue
     }
 }
 """
