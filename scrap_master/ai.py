@@ -55,7 +55,9 @@ def chat(messages: List[Dict[str, str]], json_mode: bool = False, timeout: int =
             raise AIError("No OpenRouter key. Set it in Settings or: scrap-master configure openrouter-key")
         models = [info["model"]] if info["model"] != "free" else []
         models += [m for m in free_openrouter_models()[:5] if m not in models]
-        if json_mode:
+        last: Exception = AIError("No OpenRouter model available")
+        for model in models:
+            payload = {"model": model, "messages": messages}
             payload["response_format"] = {"type": "json_object"}
         data = _post(
             OPENROUTER_URL,
