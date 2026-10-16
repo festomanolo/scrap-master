@@ -23,13 +23,9 @@ _SWIFT_VISION_BATCH_SOURCE = """import Foundation
 import Vision
 import AppKit
 
-let args = CommandLine.arguments
-guard args.count > 1 else { exit(1) }
-let url = URL(fileURLWithPath: args[1])
-guard let img = NSImage(contentsOf: url),
-      let cgImg = img.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
-    exit(2)
-}
+let args = Array(CommandLine.arguments.dropFirst())
+var output: [String: String] = [:]
+
 let req = VNRecognizeTextRequest()
 req.recognitionLevel = .accurate
 req.usesLanguageCorrection = true
