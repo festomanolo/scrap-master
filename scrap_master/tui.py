@@ -193,6 +193,10 @@ class ManoloScrap(App):
         yield Input(value=c.get("openrouter_api_key") or "", password=True, placeholder="sk-or-…", id="s-or-key")
         yield Label("OpenRouter model", classes="field-label")
         yield Input(value=c.get("openrouter_model") or ai.DEFAULT_OPENROUTER_MODEL, id="s-or-model")
+        from scrap_master.agent import seed_sites
+
+        yield Label("Favourite sites (comma separated — crawled when web search is down)", classes="field-label")
+        yield Input(value=", ".join(seed_sites()), id="s-seeds")
         yield Label("Workspace folder (results go here)", classes="field-label")
         yield Input(value=str(self.root), id="s-workspace")
         with Horizontal(classes="row"):
