@@ -82,6 +82,7 @@ def _safe_name(url: str, idx: int) -> str:
 
 def _site(url: str) -> str:
     host = urllib.parse.urlparse(url).netloc.lower()
+    return host[4:] if host.startswith("www.") else host
 def _same_site(a: str, b: str) -> bool:
     return urllib.parse.urlparse(a).netloc.lower() == urllib.parse.urlparse(b).netloc.lower()
 
