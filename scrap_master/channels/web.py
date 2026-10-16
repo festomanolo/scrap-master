@@ -104,7 +104,7 @@ class WebChannel(Channel):
         # Always-available fallback channel: no local command, no network probe
         # (doctor already makes multiple network calls), keeps overhead at zero.
         self.active_backend = self.backends[0]
-        return "ok", "Read any web page via Jina Reader (curl https://r.jina.ai/URL)"
+        return "ok", "Read any web page via Jina Reader + Playwright/BeautifulSoup fallback"
 
     def read(self, url: str) -> str:
         """Read a web page via Jina Reader and return the full Markdown text."""
