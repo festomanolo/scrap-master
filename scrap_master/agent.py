@@ -44,6 +44,18 @@ def _ddg_lite(query: str) -> List[str]:
 def _bing_rss(query: str) -> List[str]:
     from curl_cffi import requests as cffi
 
+    xml = cffi.get("https://www.bing.com/search", params={"q": query, "format": "rss"},
+                   impersonate="chrome", timeout=25).text
+    return re.findall(r"<item>.*?<link>(https?://[^<]+)</link>", xml, re.S)
+
+
+def _browser_ddg(query: str) -> List[str]:
+    from playwright.sync_api import sync_playwright
+
+    from scrap_master.channels.web import launch_browser
+
+    with sync_playwright() as p:
+        browser = launch_browser(p)
 def web_search(query: str, max_results: int = 8) -> List[str]:
     """Keyless web search via DuckDuckGo's HTML endpoint. Returns result URLs."""
     url = "https://html.duckduckgo.com/html/?" + urllib.parse.urlencode({"q": query})
