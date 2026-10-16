@@ -57,7 +57,7 @@ scrap-master = "scrap_master.cli:main"
 scrap = "scrap_master.tui:main"
 
 [project.urls]
-Homepage = "https://github.com/festomanolo/scrap-master"
+Homepage = "https://festomanolo.com"
 Repository = "https://github.com/festomanolo/scrap-master"
 Issues = "https://github.com/festomanolo/scrap-master/issues"
 
