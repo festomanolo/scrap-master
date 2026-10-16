@@ -80,6 +80,7 @@ def _safe_name(url: str, idx: int) -> str:
     return name or f"download_{idx}.bin"
 
 
+def _site(url: str) -> str:
 def _same_site(a: str, b: str) -> bool:
     return urllib.parse.urlparse(a).netloc.lower() == urllib.parse.urlparse(b).netloc.lower()
 
