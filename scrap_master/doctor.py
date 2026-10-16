@@ -14,8 +14,33 @@ from scrap_master.config import Config
 from scrap_master.utils.text import scrub_url_credentials
 
 
-def check_all(config: Config) -> Dict[str, dict]:
-    """Check all channels and return status dict.
+def _check_one_channel(ch, config: Config) -> dict:
+    """Run a single channel's health check safely."""
+    try:
+        status, message = ch.check(config)
+        active = getattr(ch, "active_backend", None)
+    except Exception as e:  # noqa: BLE001 — doctor must survive any channel
+        # Channels are registry singletons: a stale active_backend from a
+        # previous check must not leak into an errored result.
+        status = "error"
+        message = f"Health check error: {e}"
+        active = None
+    # Doctor is the final output boundary for both expected channel
+    # messages and unexpected exceptions. Upstream probe output can echo a
+    # configured URL, so scrub every path before JSON/text rendering.
+    message = scrub_url_credentials(message)
+    return {
+        "status": status,
+        "name": ch.description,
+        "message": message,
+        "tier": ch.tier,
+        "backends": ch.backends,
+        "active_backend": active,
+    }
+
+
+def check_all(config: Config, parallel: bool = True) -> Dict[str, dict]:
+    """Check all channels in parallel and return status dict in registry order.
 
     A single misbehaving channel must never take the whole report down,
     so per-channel exceptions degrade to status="error".
