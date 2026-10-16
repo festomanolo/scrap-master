@@ -4,14 +4,7 @@
 
 Type `scrap`, write *"today I want to scrape Form 2 computer studies exams with marking schemes"*, and MANOLO Scrap plans the job with AI, searches the web, crawls the result pages, downloads every PDF / Google Drive / Scribd document in parallel, extracts the text (OCR for scanned pages), and writes a report — all filed in one tidy project folder.
 
-<p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="MIT License"></a>
-  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.10+-green.svg?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.10+"></a>
-</p>
-
-<p align="center">
-  <a href="#quick-start">Quick Start</a> · <a href="#supported-platforms">Platforms</a> · <a href="#how-to-use-it">How to use it</a> · <a href="#design-philosophy">Philosophy</a>
-</p>
+By **festomanolo** · MIT License
 
 ---
 
