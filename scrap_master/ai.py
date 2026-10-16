@@ -9,7 +9,8 @@ from typing import Dict, List
 OLLAMA_URL = "http://localhost:11434"
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 DEFAULT_OLLAMA_MODEL = "llama3.1"
-DEFAULT_OPENROUTER_MODEL = "openrouter/auto"
+DEFAULT_OPENROUTER_MODEL = "free"  # auto-pick a currently free model (no credits needed)
+_SKIP_FREE = ("safety", "guard", "code", "embed", "vl", "omni")
 
 
 class AIError(RuntimeError):
