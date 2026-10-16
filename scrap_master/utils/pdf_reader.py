@@ -69,8 +69,8 @@ def _get_macos_vision_batch_binary() -> Optional[Path]:
         return bin_path
     try:
         bin_dir.mkdir(parents=True, exist_ok=True)
-        src_path = bin_dir / "vision_ocr.swift"
-        src_path.write_text(_SWIFT_VISION_SOURCE, encoding="utf-8")
+        src_path = bin_dir / "vision_ocr_batch.swift"
+        src_path.write_text(_SWIFT_VISION_BATCH_SOURCE, encoding="utf-8")
         subprocess.run(
             ["swiftc", "-O", str(src_path), "-o", str(bin_path)],
             check=True,
