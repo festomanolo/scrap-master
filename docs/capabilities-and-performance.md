@@ -101,7 +101,7 @@ We benchmarked all three stages live across the exact same **27 NECTA FTNA Form 
 | Download Architecture | Total Time (27 PDFs, 19.9 MB) | 4.4 MB Syllabus PDF Time | 2.85 MB `ICS-F2-2019.pdf` Time | Success Rate | Speedup |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **1. Sequential (`urllib.request` loop)** | **1,031.0s** (17m 11s) | 193.5s | 146.4s | 25 / 27 (2 SSL timeouts) | **1.0x** (Baseline) |
-  - **Live Measured Result:** All **27 / 27 PDFs (19,906 KB)** downloaded and passed `%PDF` magic-byte verification in **193.51 seconds (3 minutes 13 seconds)** with **0 failures** (`attempts=1` on all 27 files).
+| **2. File-Level Parallel (`max_workers=12`, `chunks=1`)** | **193.51s** (3m 13s) | 193.51s (`chunks=1`) | 146.44s (`chunks=1`) | **27 / 27** (`pdf=True`) | **5.3x Faster** |
   - **Speedup Breakdown:**
     - Small marking scheme PDFs (90–205 KB) finished in **6.6s – 9.0s** concurrently.
     - Medium exam papers (700–1,680 KB) finished in **35s – 79s** concurrently.
