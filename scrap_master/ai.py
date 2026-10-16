@@ -67,7 +67,9 @@ def chat(messages: List[Dict[str, str]], json_mode: bool = False, timeout: int =
                 )
                 content = data["choices"][0]["message"]["content"]
                 if content:
-            payload,
+                    return content
+            except (AIError, KeyError, IndexError, TypeError) as e:
+                # 402 no credits / 429 rate limit / 404 retired model -> try the next free model
             {"Authorization": f"Bearer {key}", "X-Title": "MANOLO Scrap"},
             timeout,
         )
