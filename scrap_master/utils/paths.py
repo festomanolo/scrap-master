@@ -187,7 +187,7 @@ def get_ytdlp_config_dir() -> Path:
 
     yt-dlp checks ``$XDG_CONFIG_HOME/yt-dlp`` first on every supported
     platform, falling back to ``~/.config/yt-dlp`` when the variable is not
-    set. Writing anywhere else can make Scrap Master and Doctor agree with each
+    set. Writing anywhere else can make MANOLO Scrap and Doctor agree with each
     other while the real yt-dlp process silently ignores the setting.
     """
 
