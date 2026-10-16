@@ -2179,6 +2179,51 @@ def _cmd_harvest(args):
     print(f"Manifest: {args.dir}/harvest_manifest.json")
 
 
+def _cmd_ask(args):
+    """Run a full AI scraping job from a plain-language request."""
+    from scrap_master.agent import run_job
+
+    project = run_job(" ".join(args.request), use_ai=not args.no_ai, only=args.only,
+                      organize=not args.no_organize)
+    print(f"\nDone → {project}")
+
+
+def _cmd_types():
+    from scrap_master.utils.filetypes import GROUPS, PRESETS
+
+    for name, exts in PRESETS.items():
+        print(f"  {name:<9} {' '.join(exts)}")
+    for name, parts in GROUPS.items():
+        print(f"  {name:<9} = {' + '.join(parts)}")
+    print('\nExamples: --only pdf   --only docs,slides   --only .epub   ask "… pdfs only"')
+
+
+def _cmd_organize(args):
+    from scrap_master.utils.filetypes import organize
+
+    counts = organize(args.folder, recursive=args.recursive)
+    if not counts:
+        print("Nothing to organize.")
+    for cat, n in sorted(counts.items()):
+        print(f"  {cat:<9} {n} file(s)")
+
+
+def _cmd_bench(args):
+    import json
+
+    from scrap_master import bench
+
+    results = bench.run(files=args.files, size_kb=args.size_kb, kbps=args.kbps,
+                        latency_ms=args.latency_ms, only=args.only or ["pdf"],
+                        log=(lambda m: None) if args.json else print)
+    if args.json:
+        print(json.dumps([{**r.__dict__, "mbps": r.mbps} for r in results], indent=2))
+        return
+    print()
+    print(bench.render(results))
+    top = results[0]
+    print(f"\n🏆 {top.tool} — Scrap Score {top.score}/100")
+
+
 if __name__ == "__main__":
     main()
-
