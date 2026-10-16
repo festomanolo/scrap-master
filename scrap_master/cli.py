@@ -62,6 +62,7 @@ def main():
     parser = argparse.ArgumentParser(
         prog="nolo-scrap",
         description="One toolkit to read, search and scrape data from the entire internet",
+        epilog=__credits__,
     )
     parser.add_argument("-v", "--verbose", action="store_true", help="Show debug logs")
     parser.add_argument("--version", action="version", version=f"MANOLO Scrap v{__version__}")
