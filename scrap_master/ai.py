@@ -83,6 +83,9 @@ def chat(messages: List[Dict[str, str]], json_mode: bool = False, timeout: int =
 
 
 def free_openrouter_models() -> List[str]:
+    """Currently free OpenRouter chat models, largest context first."""
+    try:
+        with urllib.request.urlopen("https://openrouter.ai/api/v1/models", timeout=20) as resp:
 
 
 def ollama_models() -> List[str]:
