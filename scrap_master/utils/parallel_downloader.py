@@ -86,7 +86,7 @@ def _fetch_byte_range(
 def download_one(
     url: str,
     dest: Union[str, Path],
-    timeout: int = 20,
+    timeout: int = 25,
     retries: int = 3,
     verify_pdf: bool = False,
     headers: Optional[Dict[str, str]] = None,
