@@ -94,7 +94,7 @@ def _read_via_direct_http(url: str, timeout: int = 20) -> str:
 class WebChannel(Channel):
     name = "web"
     description = "Any web page"
-    backends = ["Jina Reader"]
+    backends = ["Jina Reader", "Playwright Headless Chromium", "Direct HTTP + BeautifulSoup"]
     tier = 0
 
     def can_handle(self, url: str) -> bool:
