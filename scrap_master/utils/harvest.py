@@ -33,3 +33,38 @@ class HarvestItem:
 @dataclass
 class HarvestReport:
     pages_crawled: List[str] = field(default_factory=list)
+    items: List[HarvestItem] = field(default_factory=list)
+
+    @property
+    def ok_count(self) -> int:
+        return sum(1 for i in self.items if i.ok)
+
+    def to_json(self) -> str:
+        return json.dumps(
+            {"pages_crawled": self.pages_crawled, "items": [asdict(i) for i in self.items]},
+            indent=2,
+            ensure_ascii=False,
+        )
+
+
+def extract_links(markdown: str) -> List[str]:
+    """Return unique absolute URLs from Markdown/plain text, in order of appearance."""
+    seen: Dict[str, None] = {}
+    for m in _LINK_RE.finditer(markdown):
+        u = (m.group(1) or m.group(2)).rstrip(".,;")
+        seen.setdefault(u, None)
+    return list(seen)
+
+
+def classify_link(url: str, exts=_DEFAULT_EXTS, pattern: Optional[re.Pattern] = None) -> Optional[str]:
+    """Return the link kind if it is a harvestable document, else None."""
+    from scrap_master.channels.gdrive import extract_gdrive_id
+    from scrap_master.channels.scribd import extract_scribd_id
+
+    host = urllib.parse.urlparse(url).netloc.lower()
+    if "scribd.com" in host and extract_scribd_id(url):
+        return "scribd"
+    if ("drive.google.com" in host or "docs.google.com" in host) and extract_gdrive_id(url):
+        return "gdrive"
+    path = urllib.parse.unquote(urllib.parse.urlparse(url).path).lower()
+    if any(path.endswith(e) for e in exts):
