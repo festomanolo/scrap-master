@@ -86,7 +86,7 @@ def _site(url: str) -> str:
 
 
 def _same_site(a: str, b: str) -> bool:
-    return urllib.parse.urlparse(a).netloc.lower() == urllib.parse.urlparse(b).netloc.lower()
+    return _site(a) == _site(b)
 
 
 def discover(
