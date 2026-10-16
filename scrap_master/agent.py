@@ -56,6 +56,19 @@ def _browser_ddg(query: str) -> List[str]:
 
     with sync_playwright() as p:
         browser = launch_browser(p)
+        try:
+            page = browser.new_page()
+            page.goto("https://duckduckgo.com/?" + urllib.parse.urlencode({"q": query, "ia": "web"}),
+                      wait_until="domcontentloaded", timeout=60000)
+            page.wait_for_selector("a[data-testid=result-title-a]", timeout=30000)
+            return page.eval_on_selector_all("a[data-testid=result-title-a]", "els => els.map(a => a.href)")
+        finally:
+            browser.close()
+
+
+SEARCH_BACKENDS = (_ddg_html, _ddg_lite, _bing_rss, _browser_ddg)
+
+
 def web_search(query: str, max_results: int = 8) -> List[str]:
     """Keyless web search via DuckDuckGo's HTML endpoint. Returns result URLs."""
     url = "https://html.duckduckgo.com/html/?" + urllib.parse.urlencode({"q": query})
