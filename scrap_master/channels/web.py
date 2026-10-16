@@ -70,6 +70,11 @@ def _read_via_playwright(url: str, timeout_ms: int = 25000) -> str:
             page = context.new_page()
             page.goto(url, wait_until="domcontentloaded", timeout=timeout_ms)
             page.wait_for_timeout(1500)
+            # Give Cloudflare "Just a moment..." interstitials time to auto-clear.
+            for _ in range(10):
+                if not _is_challenge_html(page.content()):
+                    break
+                page.wait_for_timeout(1500)
             html_content = page.content()
             return _html_to_clean_markdown(html_content, base_url=url)
         finally:
