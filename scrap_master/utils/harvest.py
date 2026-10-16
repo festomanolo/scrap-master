@@ -166,7 +166,8 @@ def harvest(
     organize: bool = False,
 ) -> HarvestReport:
     """Discover, download and (optionally) extract every document linked from the start pages."""
-    report = discover(start_urls, depth=depth, exts=exts, pattern=pattern, max_pages=max_pages)
+    report = discover(start_urls, depth=depth, exts=exts, pattern=pattern, max_pages=max_pages,
+                      sources=sources)
     if limit is not None:
         report.items = report.items[:limit]
     return fetch(report, out_dir, extract_text=extract_text, ocr=ocr, workers=workers, chunks=chunks)
