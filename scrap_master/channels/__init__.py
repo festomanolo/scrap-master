@@ -41,6 +41,7 @@ ALL_CHANNELS: List[Channel] = [
     XueqiuChannel(),
     RSSChannel(),
     ExaSearchChannel(),
+    ScribdChannel(),
     WebChannel(),
 ]
 
