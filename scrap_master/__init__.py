@@ -3,6 +3,7 @@
 
 __version__ = "1.5.0"
 __author__ = "festomanolo"
+__credits__ = "Made by festomanolo · github.com/festomanolo · festomanolo.com"
 
 from scrap_master.core import ScrapMaster
 
