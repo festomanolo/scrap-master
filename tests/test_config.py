@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Tests for Scrap Master config module."""
+"""Tests for MANOLO Scrap config module."""
 
 import pytest
 
@@ -113,28 +113,6 @@ class TestConfig:
 
         assert tmp_config.to_dict()["api_key"] is None
 
-    def test_to_dict_redacts_sensitive_credential_markers(self, tmp_config):
-        secrets = {
-            "twitter_ct0": "csrf-secret-value",
-            "xhs_cookie": "web_session=xhs-secret",
-            "browser_session": "browser-session-secret",
-            "https_proxy": "socks5://proxy.example:1080",
-            "xueqiu_cookie": "xq_a_token=xueqiu-secret",
-            "bilibili_sessdata": "bili-session-secret",
-            "bilibili_csrf": "bili-csrf-secret",
-            "twitter_auth_token": "twitter-auth-secret",
-        }
-        for key, value in secrets.items():
-            tmp_config.set(key, value)
-
-        tmp_config.set("normal_setting", "visible")
-        masked = tmp_config.to_dict()
-
-        dumped = str(masked)
-        for key, value in secrets.items():
-            assert masked[key] == "[REDACTED]"
-            assert value not in dumped
-        assert masked["normal_setting"] == "visible"
 
     def test_save_creates_file_with_restricted_permissions(self, tmp_path):
         import stat

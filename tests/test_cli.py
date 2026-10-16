@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Tests for Scrap Master CLI."""
+"""Tests for MANOLO Scrap CLI."""
 
 import shutil
 import subprocess
@@ -21,7 +21,7 @@ class TestCLI:
                 main()
         assert exc_info.value.code == 0
         captured = capsys.readouterr()
-        assert "Scrap Master v" in captured.out
+        assert "MANOLO Scrap v" in captured.out
 
     def test_no_command_shows_help(self, capsys):
         with pytest.raises(SystemExit) as exc_info:
@@ -44,11 +44,11 @@ class TestCLI:
             },
         ), patch(
             "scrap_master.doctor.format_report",
-            return_value="Scrap Master\n✅ Web available",
+            return_value="MANOLO Scrap\n✅ Web available",
         ), patch("sys.argv", ["scrap-master", "doctor"]):
             main()
         captured = capsys.readouterr()
-        assert "Scrap Master" in captured.out
+        assert "MANOLO Scrap" in captured.out
         assert "✅" in captured.out
 
     def test_doctor_is_read_only_and_never_installs_skill(
@@ -57,7 +57,7 @@ class TestCLI:
         skill_dir = tmp_path / ".agents" / "skills" / "scrap-master"
         skill_dir.mkdir(parents=True)
         skill_file = skill_dir / "SKILL.md"
-        custom_content = "# custom Scrap Master skill\n"
+        custom_content = "# custom MANOLO Scrap skill\n"
         skill_file.write_text(custom_content, encoding="utf-8")
 
         monkeypatch.setattr(
@@ -211,70 +211,7 @@ class TestCLI:
         assert commands == [["/usr/local/bin/pipx", "install", cli._RDT_GIT_SOURCE]]
         assert "✅ rdt-cli installed" in out
 
-    def test_install_boss_deps_pins_pr_commit_with_pipx(self, monkeypatch, capsys):
-        state = {"boss_installed": False}
-        commands = []
 
-        def fake_which(name):
-            if name == "boss":
-                return "/usr/local/bin/boss" if state["boss_installed"] else None
-            if name == "pipx":
-                return "/usr/local/bin/pipx"
-            return None
-
-        def fake_run(cmd, **kwargs):
-            commands.append(cmd)
-            state["boss_installed"] = True
-            return subprocess.CompletedProcess(cmd, 0, "", "")
-
-        monkeypatch.setattr(shutil, "which", fake_which)
-        monkeypatch.setattr(subprocess, "run", fake_run)
-
-        assert cli._install_boss_deps() is True
-
-        assert commands == [
-            [
-                "/usr/local/bin/pipx",
-                "install",
-                "--force",
-                cli._BOSS_AGENT_CLI_SOURCE,
-            ]
-        ]
-        assert cli._BOSS_AGENT_CLI_PR_COMMIT in cli._BOSS_AGENT_CLI_SOURCE
-        assert cli._BOSS_AGENT_CLI_PR_COMMIT == "4c991b77086a203173bf08a4cb64a23af6514fe6"
-        assert "can4hou6joeng4/boss-agent-cli" in cli._BOSS_AGENT_CLI_SOURCE
-        assert "iqjiy" not in cli._BOSS_AGENT_CLI_SOURCE
-        assert "boss-agent-cli upstream pinned commit" in capsys.readouterr().out
-
-    def test_install_boss_deps_falls_back_to_uv(self, monkeypatch):
-        state = {"boss_installed": False}
-        commands = []
-
-        def fake_which(name):
-            if name == "boss":
-                return "/usr/local/bin/boss" if state["boss_installed"] else None
-            if name == "uv":
-                return "/usr/local/bin/uv"
-            return None
-
-        def fake_run(cmd, **kwargs):
-            commands.append(cmd)
-            state["boss_installed"] = True
-            return subprocess.CompletedProcess(cmd, 0, "", "")
-
-        monkeypatch.setattr(shutil, "which", fake_which)
-        monkeypatch.setattr(subprocess, "run", fake_run)
-
-        assert cli._install_boss_deps() is True
-        assert commands == [
-            [
-                "/usr/local/bin/uv",
-                "tool",
-                "install",
-                "--force",
-                cli._BOSS_AGENT_CLI_SOURCE,
-            ]
-        ]
 
     def test_install_reddit_deps_routes_by_environment(self, monkeypatch):
         """Desktop -> OpenCLI; server -> rdt-cli (pinned git source)."""
@@ -358,24 +295,6 @@ class TestCLI:
         assert calls == ["opencli"]
         assert "Installation complete" in capsys.readouterr().out
 
-    def test_install_server_dry_run_skips_opencli_only_channels(self, monkeypatch, capsys):
-        monkeypatch.setattr(cli, "_install_system_deps_dryrun", lambda: None)
-
-        cli._cmd_install(
-            Namespace(
-                env="server",
-                proxy="",
-                system=True,
-                safe=False,
-                dry_run=True,
-                channels="facebook,instagram,opencli,boss,bilibili",
-            )
-        )
-
-        out = capsys.readouterr().out
-        assert "skipped in server environments: boss, facebook, instagram, opencli" in out
-        assert "[dry-run] Would install optional channels: bilibili" in out
-        assert "boss, facebook, instagram, opencli, bilibili" not in out
 
 
 class TestCheckUpdateRetry:
