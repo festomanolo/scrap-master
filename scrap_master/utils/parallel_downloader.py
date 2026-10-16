@@ -102,6 +102,35 @@ def download_one(
 
     t0 = time.monotonic()
     last_err = ""
+
+    # Try multi-connection HTTP Range chunked download if enabled
+    if chunks_per_file > 1:
+        try:
+            total_size, supports_range = _probe_range_support(url, req_headers, timeout)
+            if (
+                supports_range
+                and total_size is not None
+                and total_size >= min_chunk_size_bytes * 2
+            ):
+                num_chunks = min(
+                    chunks_per_file, max(2, total_size // min_chunk_size_bytes)
+                )
+                step = total_size // num_chunks
+                ranges: List[Tuple[int, int]] = []
+                for i in range(num_chunks):
+                    s = i * step
+                    e = (total_size - 1) if (i == num_chunks - 1) else ((i + 1) * step - 1)
+                    ranges.append((s, e))
+
+                parts: Dict[int, bytes] = {}
+                with ThreadPoolExecutor(max_workers=num_chunks) as chunk_pool:
+                    futs = [
+                        chunk_pool.submit(
+                            _fetch_byte_range,
+                            url,
+                            s,
+                            e,
+                            req_headers,
     for attempt in range(1, retries + 2):
         try:
             req = urllib.request.Request(url, headers=req_headers)
