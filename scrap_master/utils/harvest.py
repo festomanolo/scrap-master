@@ -114,6 +114,7 @@ def discover(
         visited.update(batch)
 
         def _read(u):
+            # Direct HTML keeps every <a>/<iframe> link; Jina Reader often drops them,
             try:
                 return u, web.read(u)
             except Exception:
