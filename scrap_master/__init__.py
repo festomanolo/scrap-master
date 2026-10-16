@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Scrap Master — One toolkit to read, search and scrape data from the entire internet."""
+"""MANOLO Scrap — One toolkit to read, search and scrape data from the entire internet."""
 
 __version__ = "1.5.0"
 __author__ = "festomanolo"
