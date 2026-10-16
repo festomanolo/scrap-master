@@ -12,6 +12,8 @@ By **festomanolo** · MIT License
 
 ```bash
 pip install nolo-scrap            # installs the nolo-scrap command
+nolo-scrap --help         # every command
+nolo-scrap                # opens the TUI
 pip install "https://github.com/festomanolo/scrap-master/archive/main.zip[all]"
 scrap            # opens the TUI
 ```
