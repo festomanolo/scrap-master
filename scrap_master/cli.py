@@ -15,7 +15,7 @@ import os
 import sys
 import time
 
-from scrap_master import __version__
+from scrap_master import __credits__, __version__
 
 # Pinned to the 0.4.2 state — PyPI still only has 0.4.1 (upstream issue #10).
 _RDT_GIT_SOURCE = "git+https://github.com/public-clis/rdt-cli.git@5e4fb3720d5c174e976cd425ccc3b879d52cac66"
