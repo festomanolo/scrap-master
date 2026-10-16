@@ -104,7 +104,8 @@ Yes—it is completely possible to make **Scrap Master** **5x to 15x faster** us
     - Small marking scheme PDFs (90–205 KB) finished in **6.6s – 9.0s** concurrently.
     - Medium exam papers (700–1,680 KB) finished in **35s – 79s** concurrently.
     - The total wall-clock time (**193.51s**) was governed solely by the single largest file (`Syllabus_-_Information_and_Computer_Studies_-_F1-F4_-_2005.pdf`, **4,417 KB** at ~22.8 KB/s = `193.506s`), which started immediately in worker #1 and ran alongside all other 26 files!
-  - **Result:** Downloading 27 exam & marking scheme PDFs (~19 MB) drops from **17 minutes** to **~10–15 seconds**.
+  - **How to Push Beyond Per-Connection Server Throttling (193s -> <25s):**
+    - When a server caps each TCP connection to ~22 KB/s (like `maktaba.tetea.org`), a single 4.4 MB file still takes 193s on one thread. To break through per-connection throttling on large files, use **multi-connection HTTP `Range: bytes=start-end` chunked downloading** (splitting each large PDF into 4–8 byte-range segments in parallel, or delegating to `aria2c -x 16 -s 16`).
 
 ### Bottleneck 3: Parallel `.jsonp` Page Fetching in Scribd Extraction
 - When a Scribd marking scheme has 15 pages, fetching 15 `.jsonp` page files sequentially takes `15 × 400ms = 6 seconds`.
