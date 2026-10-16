@@ -150,12 +150,15 @@ def run_job(
         log(f"⚠ Search returned nothing — crawling your favourite sites: {', '.join(results) or 'none set'}")
 
     exts = tuple(e.lower() for e in plan["file_types"])
-    direct = [u for u in results if classify_link(u, exts)]
+    sources = sources_for(exts)
+    log(f"🎯 Collecting only: {' '.join(exts)}" + (" + Scribd/Drive" if sources else ""))
+    direct = [u for u in results if classify_link(u, exts, sources=sources)]
     pages = [u for u in results if u not in direct]
     log(f"📄 {len(direct)} direct documents, {len(pages)} pages to crawl")
 
     # 2. Crawl pages, collect linked documents
-    report = discover(pages, depth=1 if fallback_seeds else plan["depth"], exts=exts, max_pages=30)
+    report = discover(pages, depth=1 if fallback_seeds else plan["depth"], exts=exts, max_pages=30,
+                      sources=sources)
     if fallback_seeds:
         report.items = _relevant(report.items, request)
     known = {i.url for i in report.items}
