@@ -19,3 +19,10 @@ Based on our live benchmark scraping **Tanzania Form Two National Assessment (FT
 2. **Multi-Platform Routing & Fallback Architecture (16+ Platforms)**
    - Instead of being a single scraper, it is a **capability router** (`scrap_master/channels/`) that knows the best upstream tool for supported platforms (Web, YouTube, GitHub, Twitter/X, Reddit, Facebook, Instagram, LinkedIn, Bilibili, XiaoHongShu, RSS, Exa Search, Scribd, etc.) and falls back when one breaks.
    - **`scrap-master doctor` Health Checks:** It probes your machine and tells an agent in JSON (`--json`) which backends are actually working right now and how to fix missing ones.
+
+3. **Agent + Tool Synergy (PDF OCR & Inspection)**
+   - When combined with an AI agent environment, once the PDFs are downloaded, we can directly render, OCR, and cross-verify scanned image PDFs (like `ICS-F2-2025.pdf`) against digital text PDFs (like `ICS-F2-2025-Solutions.pdf`).
+
+---
+
+## 2. Where It Fails (Limitations & Blind Spots)
