@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Hybrid PDF text + parallel OCR extractor (`read-pdf`).
+"""Hybrid PDF text + batch macOS Apple Vision / Tesseract OCR extractor (`read-pdf`).
 
 Automatically extracts digital text from PDF pages via PyMuPDF (`pymupdf` / `fitz`)
 or `pypdf`. Whenever a page is a scanned camera/scanner image (like `ICS-F2-2025.pdf`
