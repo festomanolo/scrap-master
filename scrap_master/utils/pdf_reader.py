@@ -11,7 +11,7 @@ pages to PNG and runs a single batch OCR invocation using:
   2. `tesseract` CLI fallback (if installed on Linux/Windows/macOS).
 """
 
-from concurrent.futures import ThreadPoolExecutor, as_completed
+import json
 from pathlib import Path
 import shutil
 import subprocess
