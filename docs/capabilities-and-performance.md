@@ -94,6 +94,7 @@ Yes—it is completely possible to make **Scrap Master** **5x to 15x faster** us
 - **Before:** `scrap_master/doctor.py` looped over `ALL_CHANNELS` one by one (`for ch in get_all_channels(): ch.check(config)`). Because several channels spawn subprocesses (`gh`, `yt-dlp`, `opencli`, `bili`, `twitter`) or make live HTTP API probes (`bilibili`, `v2ex`, `xueqiu`) with up to 10-second timeouts, sequential execution took the **sum** of all probes (up to 35+ seconds).
 - **After (Parallel `ThreadPoolExecutor`):** Running all 17 channel checks concurrently inside `concurrent.futures.ThreadPoolExecutor(max_workers=len(channels))` in `scrap_master/doctor.py` completed in **10.07 seconds** (bounded solely by the single 10s timeout on `bilibili`/`xueqiu`, rather than summing across all 17 channels) while preserving exact registry order.
 
+### Bottleneck 2: Sequential vs. File-Parallel vs. HTTP `Range` Chunk-Parallel PDF Downloading (Measured Live: 1,031s -> 193.51s -> 87.41s, **11.8x Faster**)
 ### Bottleneck 2: Sequential vs. Parallel Batch PDF Downloading (Measured Live: 1,031s -> 193.51s, 5.3x Faster + 100% Success Rate)
 - **Before (Sequential Single-Thread):**
   - Downloading the 27 NECTA FTNA Form 2 Computer Studies PDFs (~19.9 MB) sequentially took **17 minutes 11 seconds (1,031 seconds)** and **failed on 2 files** (`ICS-F2-2025.pdf` and `ICS-F2-2025-Solutions.pdf` with `_ssl.c:983: The handshake operation timed out`).
