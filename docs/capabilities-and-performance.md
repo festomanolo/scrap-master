@@ -47,3 +47,11 @@ Based on our live benchmark scraping **Tanzania Form Two National Assessment (FT
 - Social platforms (Reddit, Facebook, Instagram, Twitter/X) have no zero-config scraping path—they require installing `opencli` and staying logged into a local Chrome session or manually exporting browser cookies.
 
 ### E. Anti-Bot / Cloudflare Turnstile / Heavy JS SPAs
+- For general websites (`web.py`), relying solely on `https://r.jina.ai/URL` fails when a target website blocks Jina's IP range, presents a Cloudflare Turnstile challenge, or requires interactive DOM state (such as selecting "Form 2" -> "Year" from a dynamic dropdown that doesn't change the URL).
+- **Recommendation:** Add a local stealth browser fallback (`Playwright` / `Patchright` / `Camoufox`) or `curl_cffi` TLS-fingerprint impersonation when `_is_antibot_page(body)` triggers.
+
+---
+
+## 3. Summary Verdict
+
+| Capability | Rating | Why |
