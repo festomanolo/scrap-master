@@ -62,3 +62,10 @@ Based on our live benchmark scraping **Tanzania Form Two National Assessment (FT
 | **Scanned PDFs / Document Viewers (Scribd)** | ⭐⭐☆☆☆ → ⭐⭐⭐⭐☆ | Upgraded with direct Scribd Embed/JSONP/Mobile API extraction (`scribd.py`) bypassing the web UI blur. |
 | **Interactive JS Apps / Cloudflare Sites** | ⭐☆☆☆☆ | Needs a local headless/stealth browser fallback for `web` when Jina Reader is blocked or clicks are required. |
 
+---
+
+## 4. How Scribd API & Embed Extraction Works (Bypassing the Web UI)
+
+Instead of loading the bloated Scribd website (`https://www.scribd.com/document/<DOC_ID>/<SLUG>`) like a normal browser user—which loads paywall modals, CSS blur filters (`text-shadow`, `opacity`), and ad trackers—specialized downloaders and `scrap_master/channels/scribd.py` communicate directly with Scribd's underlying endpoints across **three layers**:
+
+### Layer 1: Direct Mobile / Internal API Endpoint (With Session/Bearer Token or WordPress OEmbed)
