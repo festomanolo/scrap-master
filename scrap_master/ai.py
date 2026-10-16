@@ -58,7 +58,9 @@ def chat(messages: List[Dict[str, str]], json_mode: bool = False, timeout: int =
         last: Exception = AIError("No OpenRouter model available")
         for model in models:
             payload = {"model": model, "messages": messages}
-            payload["response_format"] = {"type": "json_object"}
+            try:
+                data = _post(
+                    OPENROUTER_URL,
         data = _post(
             OPENROUTER_URL,
             payload,
