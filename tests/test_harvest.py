@@ -14,3 +14,5 @@ def test_classify_link_kinds():
 
 
 def test_same_site_ignores_www():
+    assert _same_site("https://msomibora.com/", "https://www.msomibora.com/page/2/")
+    assert not _same_site("https://a.com/", "https://b.com/")
