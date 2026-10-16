@@ -99,6 +99,7 @@ def discover(
     pattern: Optional[str] = None,
     max_pages: int = 50,
     workers: int = 8,
+    sources=("scribd", "gdrive"),
 ) -> HarvestReport:
     """Crawl start pages (and same-site pages up to ``depth``) and collect document links."""
     from scrap_master.channels.web import WebChannel, _read_via_direct_http
