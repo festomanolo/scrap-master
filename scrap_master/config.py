@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Configuration management for Scrap Master.
+"""Configuration management for MANOLO Scrap.
 
 Stores settings in ~/.scrap-master/config.yaml. Reads never create files or
 directories; the private directory is created only on the first write.
@@ -97,7 +97,7 @@ def _atomic_write_yaml(target: Path, data: dict) -> None:
 
 
 class Config:
-    """Manages Scrap Master configuration."""
+    """Manages MANOLO Scrap configuration."""
 
     CONFIG_DIR = home_dir() / ".scrap-master"
     CONFIG_FILE = CONFIG_DIR / "config.yaml"

@@ -5,7 +5,7 @@ Supports: Chrome, Firefox, Edge, Brave, Opera
 Extracts one explicitly requested platform at a time.
 
 Usage:
-    scrap-master configure --from-browser chrome --platform xueqiu
+    scrap-master configure --from-browser chrome --platform twitter
 """
 
 from dataclasses import dataclass
@@ -36,24 +36,6 @@ PLATFORM_SPECS: Tuple[PlatformSpec, ...] = (
         "cookies": ("auth_token", "ct0"),
         "config_key": "twitter",
     },
-    {
-        "name": "XiaoHongShu",
-        "domains": (".xiaohongshu.com",),
-        "cookies": None,  # manual Cookie-Editor export only
-        "config_key": "xhs",
-    },
-    {
-        "name": "Bilibili",
-        "domains": (".bilibili.com",),
-        "cookies": ("SESSDATA", "bili_jct"),
-        "config_key": "bilibili",
-    },
-    {
-        "name": "Xueqiu",
-        "domains": (".xueqiu.com",),
-        "cookies": ("xq_a_token",),
-        "config_key": "xueqiu",
-    },
 )
 
 _PLATFORM_SPECS_BY_KEY: Dict[str, PlatformSpec] = {
@@ -64,7 +46,6 @@ PROFILE_SELECTABLE_BROWSERS = ("chrome", "edge", "brave")
 _MAX_XFETCH_SESSION_BYTES = 64 * 1024
 _COOKIE_EDITOR_ONLY = {
     "twitter": "twitter-cookies",
-    "xhs": "xhs-cookies",
 }
 
 _CHROMIUM_USER_DATA_DIRS: Dict[str, ChromiumPaths] = {
@@ -219,7 +200,7 @@ def extract_all(
     all-platform read is intentionally no longer supported.
 
     Returns:
-        {"xueqiu": {"xq_a_token": "xxx"}}
+        {"twitter": {"auth_token": "xxx"}}
     """
     spec = _platform_spec(platform)
     _require_browser_extractable(spec)
@@ -454,53 +435,5 @@ def configure_from_browser(
                 f"Make sure you're logged into the selected platform.",
             )
         ]
-
-    if config_key == "bilibili":
-        bc = extracted["bilibili"]
-        if "SESSDATA" in bc:
-            config.set("bilibili_sessdata", bc["SESSDATA"])
-            targets = ["bilibili_sessdata"]
-            if "bili_jct" in bc:
-                config.set("bilibili_csrf", bc["bili_jct"])
-                targets.append("bilibili_csrf")
-            results_list.append(
-                BrowserConfigResult(
-                    "Bilibili",
-                    True,
-                    "SESSDATA" + (" + bili_jct" if "bili_jct" in bc else ""),
-                    tuple(targets),
-                )
-            )
-        else:
-            results_list.append(
-                BrowserConfigResult(
-                    "Bilibili",
-                    False,
-                    f"No SESSDATA found. "
-                    f"Make sure you're logged into bilibili.com in {browser}.",
-                )
-            )
-
-    elif config_key == "xueqiu":
-        token = extracted["xueqiu"].get("xq_a_token", "")
-        if token:
-            cookie_str = f"xq_a_token={token}"
-            config.set("xueqiu_cookie", cookie_str)
-            results_list.append(
-                BrowserConfigResult(
-                    "Xueqiu",
-                    True,
-                    "xq_a_token",
-                    ("xueqiu_cookie",),
-                )
-            )
-        else:
-            results_list.append(
-                BrowserConfigResult(
-                    "Xueqiu",
-                    False,
-                    f"xq_a_token not found — please log in to xueqiu.com in {browser} first",
-                )
-            )
 
     return results_list
