@@ -45,30 +45,13 @@ def check_all(config: Config, parallel: bool = True) -> Dict[str, dict]:
     A single misbehaving channel must never take the whole report down,
     so per-channel exceptions degrade to status="error".
     """
-    results = {}
-    for ch in get_all_channels():
-        try:
-            status, message = ch.check(config)
-            active = getattr(ch, "active_backend", None)
-        except Exception as e:  # noqa: BLE001 — doctor must survive any channel
-            # Channels are registry singletons: a stale active_backend from a
-            # previous check must not leak into an errored result.
-            status = "error"
-            message = f"Health check error: {e}"
-            active = None
-        # Doctor is the final output boundary for both expected channel
-        # messages and unexpected exceptions. Upstream probe output can echo a
-        # configured URL, so scrub every path before JSON/text rendering.
-        message = scrub_url_credentials(message)
-        results[ch.name] = {
-            "status": status,
-            "name": ch.description,
-            "message": message,
-            "tier": ch.tier,
-            "backends": ch.backends,
-            "active_backend": active,
-        }
-    return results
+    channels = get_all_channels()
+    if not parallel or len(channels) <= 1:
+        return {ch.name: _check_one_channel(ch, config) for ch in channels}
+
+    with ThreadPoolExecutor(max_workers=len(channels)) as pool:
+        futures = {ch.name: pool.submit(_check_one_channel, ch, config) for ch in channels}
+        return {ch.name: futures[ch.name].result() for ch in channels}
 
 
 def _name_msg(r: dict, escape) -> str:
