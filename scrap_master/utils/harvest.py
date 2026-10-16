@@ -98,7 +98,7 @@ def discover(
     workers: int = 8,
 ) -> HarvestReport:
     """Crawl start pages (and same-site pages up to ``depth``) and collect document links."""
-    from scrap_master.channels.web import WebChannel
+    from scrap_master.channels.web import WebChannel, _read_via_direct_http
 
     rx = re.compile(pattern) if pattern else None
     web = WebChannel()
