@@ -86,6 +86,9 @@ def free_openrouter_models() -> List[str]:
     """Currently free OpenRouter chat models, largest context first."""
     try:
         with urllib.request.urlopen("https://openrouter.ai/api/v1/models", timeout=20) as resp:
+            data = json.loads(resp.read())["data"]
+    except Exception:
+        return []
 
 
 def ollama_models() -> List[str]:
