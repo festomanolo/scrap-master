@@ -33,3 +33,10 @@ Based on our live benchmark scraping **Tanzania Form Two National Assessment (FT
 - **Fix Implemented:** We added parallel `ThreadPoolExecutor` execution to `doctor.py` and a high-speed concurrent downloader (`scrap_master/utils/parallel_downloader.py`) with automatic exponential backoff retries and connection pooling.
 
 ### B. Paywalled / Login-Wall Document Hosts (Scribd, Academia, Google Drive Embeds)
+- **What happened in our test:** Many Tanzanian regional/mock marking schemes are hosted on **Scribd** (`scribd.com`) or embedded in **Google Drive viewers** on blogs like *Msomi Bora* or *Learning Hub TZ*.
+- Standard Jina Reader (`r.jina.ai/https://www.scribd.com/document/...`) hits Scribd's React paywall, blur overlay, and ad trackers, returning only truncated preview text or a login prompt.
+- **Fix Implemented:** See **Section 4** below and `scrap_master/channels/scribd.py` for direct Scribd API / Embed (`content/embed` + `.jsonp` page asset manifest + mobile API token) extraction.
+
+### C. No Built-In PDF/Binary OCR Inside `scrap-master`
+- Scrap Master has `transcribe.py` for audio/video (via Whisper), but scanned camera/scanner image PDFs (like `ICS-F2-2025.pdf`) contain only image streams plus a watermark footer (`Find this and other free resources at: https://maktaba.tetea.org`).
+- Without a vision model or OCR pipeline (`pypdf`/`pdfplumber` + `tesseract` or multimodal LLM vision), a plain-text scraper gets blank pages on scanned exams.
