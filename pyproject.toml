@@ -52,6 +52,7 @@ dev = [
 ]
 
 [project.scripts]
+nolo-scrap = "scrap_master.cli:main"
 scrap-master = "scrap_master.cli:main"
 scrap = "scrap_master.tui:main"
 
