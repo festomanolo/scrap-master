@@ -95,7 +95,7 @@ Yes—it is completely possible to make **Scrap Master** **5x to 15x faster** us
 - **After (Parallel `ThreadPoolExecutor`):** Running all 17 channel checks concurrently inside `concurrent.futures.ThreadPoolExecutor(max_workers=len(channels))` in `scrap_master/doctor.py` completed in **10.07 seconds** (bounded solely by the single 10s timeout on `bilibili`/`xueqiu`, rather than summing across all 17 channels) while preserving exact registry order.
 
 ### Bottleneck 2: Sequential vs. Parallel Batch PDF Downloading (Measured Live: 1,031s -> 193.51s, 5.3x Faster + 100% Success Rate)
-### Bottleneck 2: Sequential File & PDF Downloading (17 Minutes -> ~12 Seconds)
+- **Before (Sequential Single-Thread):**
 - **Before:** Downloading 27 PDFs sequentially over HTTPS from Tanzania's Maktaba TETEA server took **17 minutes** because each file waited for a fresh TCP + TLS handshake and sequential download stream, and any transient SSL timeout aborted that file.
 - **After (`scrap_master/utils/parallel_downloader.py`):**
   - Uses `ThreadPoolExecutor(max_workers=12)` to run **12 concurrent download workers**.
