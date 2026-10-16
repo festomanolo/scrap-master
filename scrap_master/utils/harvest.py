@@ -189,6 +189,7 @@ def fetch(
     """Download / extract every item in ``report`` and write a JSON manifest."""
     from scrap_master.channels.gdrive import extract_gdrive_id, get_direct_gdrive_url
     from scrap_master.channels.scribd import ScribdChannel, extract_scribd_id
+    from scrap_master.utils.filetypes import category_of
     from scrap_master.utils.parallel_downloader import download_batch_parallel
 
     out = Path(out_dir)
@@ -210,8 +211,9 @@ def fetch(
         while name in used:
             name = f"{idx}_{name}"
         used.add(name)
-        it.path = str(out / name)
-        pairs.append((url, out / name))
+        dest = out / category_of(name) / name if organize else out / name
+        it.path = str(dest)
+        pairs.append((url, dest))
     for it, res in zip(file_items, download_batch_parallel(pairs, max_workers=workers, chunks_per_file=chunks)):
         it.ok, it.size_bytes, it.error = res.ok, res.size_bytes, res.error
 
