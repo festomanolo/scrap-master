@@ -48,7 +48,7 @@ Based on our live benchmark scraping **Tanzania Form Two National Assessment (FT
 
 ### E. Anti-Bot / Cloudflare Turnstile / Heavy JS SPAs
 - For general websites (`web.py`), relying solely on `https://r.jina.ai/URL` fails when a target website blocks Jina's IP range, presents a Cloudflare Turnstile challenge, or requires interactive DOM state (such as selecting "Form 2" -> "Year" from a dynamic dropdown that doesn't change the URL).
-- **Recommendation:** Add a local stealth browser fallback (`Playwright` / `Patchright` / `Camoufox`) or `curl_cffi` TLS-fingerprint impersonation when `_is_antibot_page(body)` triggers.
+- **Fix Implemented:** `web.py` now falls back Jina Reader → direct HTTP + BeautifulSoup → `curl_cffi` Chrome TLS-fingerprint impersonation → headless Playwright (which waits up to ~15s for Cloudflare "Just a moment..." interstitials to clear). Interactive Turnstile captchas and click-driven dropdowns still need a human or an agent driving a real browser.
 
 ---
 
