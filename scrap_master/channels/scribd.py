@@ -181,3 +181,40 @@ class ScribdChannel(Channel):
             embed_html = resp.read().decode("utf-8", errors="ignore")
 
         pages_text: Dict[int, str] = {}
+        pages_images: Dict[int, List[str]] = {}
+
+        # 1. Parse inline outer_page_N blocks present directly in /embeds/<id>/content
+        for m in re.finditer(
+            r'id="outer_page_(\d+)"(.*?)(?=id="outer_page_|<script)',
+            embed_html,
+            re.S,
+        ):
+            pnum = int(m.group(1))
+            txt, imgs = _parse_scribd_page_html(m.group(2))
+            if txt or imgs:
+                pages_text[pnum] = txt
+                pages_images[pnum] = imgs
+
+        # 2. Discover all .jsonp page asset URLs from docManager.addPage(...)
+        jsonp_tasks: Dict[int, str] = {}
+        for m in re.finditer(
+            r"https://html\.scribdassets\.com/[^\"'\s]+/pages/(\d+)-[a-zA-Z0-9]+\.jsonp",
+            embed_html,
+        ):
+            pnum = int(m.group(1))
+            jsonp_tasks[pnum] = m.group(0)
+
+        # 3. Fetch all .jsonp page slices concurrently
+        if jsonp_tasks:
+            def _fetch_one(p_num: int, j_url: str):
+                r = urllib.request.Request(j_url, headers=headers)
+                with urllib.request.urlopen(r, timeout=timeout) as resp_j:
+                    raw_bytes = resp_j.read()
+                decoded = _decompress_jsonp_bytes(raw_bytes)
+                return p_num, _parse_scribd_page_html(decoded)
+
+            with ThreadPoolExecutor(max_workers=min(max_workers, len(jsonp_tasks))) as pool:
+                futures = [
+                    pool.submit(_fetch_one, pnum, jurl)
+                    for pnum, jurl in jsonp_tasks.items()
+                ]
