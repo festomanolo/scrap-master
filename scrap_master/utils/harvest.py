@@ -34,6 +34,7 @@ class HarvestItem:
 class HarvestReport:
     pages_crawled: List[str] = field(default_factory=list)
     items: List[HarvestItem] = field(default_factory=list)
+    page_text: Dict[str, str] = field(default_factory=dict, repr=False)
 
     @property
     def ok_count(self) -> int:
@@ -133,6 +134,7 @@ def discover(
                 if not md:
                     continue
                 report.pages_crawled.append(page_url)
+                report.page_text[page_url] = md
                 for link in extract_links(md):
                     kind = classify_link(link, exts, rx)
                     if kind:
@@ -159,15 +161,34 @@ def harvest(
     limit: Optional[int] = None,
 ) -> HarvestReport:
     """Discover, download and (optionally) extract every document linked from the start pages."""
+    report = discover(start_urls, depth=depth, exts=exts, pattern=pattern, max_pages=max_pages)
+    if limit is not None:
+        report.items = report.items[:limit]
+    return fetch(report, out_dir, extract_text=extract_text, ocr=ocr, workers=workers, chunks=chunks)
+
+
+def fetch(
+    report: HarvestReport,
+    out_dir,
+    extract_text: bool = False,
+    ocr: bool = True,
+    workers: int = 12,
+    chunks: int = 8,
+    scribd_dir=None,
+    text_dir=None,
+    manifest_dir=None,
+) -> HarvestReport:
+    """Download / extract every item in ``report`` and write a JSON manifest."""
     from scrap_master.channels.gdrive import extract_gdrive_id, get_direct_gdrive_url
     from scrap_master.channels.scribd import ScribdChannel, extract_scribd_id
     from scrap_master.utils.parallel_downloader import download_batch_parallel
 
     out = Path(out_dir)
-    out.mkdir(parents=True, exist_ok=True)
-    report = discover(start_urls, depth=depth, exts=exts, pattern=pattern, max_pages=max_pages)
-    if limit is not None:
-        report.items = report.items[:limit]
+    scribd_out = Path(scribd_dir or out)
+    text_out = Path(text_dir or out)
+    manifest_out = Path(manifest_dir or out)
+    for d in (out, scribd_out, text_out, manifest_out):
+        d.mkdir(parents=True, exist_ok=True)
 
     # Binary downloads (direct files + Google Drive exports)
     file_items = [i for i in report.items if i.kind in ("file", "gdrive")]
@@ -192,7 +213,7 @@ def harvest(
     def _scribd(it: HarvestItem):
         try:
             doc = ScribdChannel().extract_document(it.url)
-            p = out / f"scribd_{extract_scribd_id(it.url)}.md"
+            p = scribd_out / f"scribd_{extract_scribd_id(it.url)}.md"
             p.write_text(doc["markdown"], encoding="utf-8")
             it.path = it.text_path = str(p)
             it.ok, it.size_bytes = True, p.stat().st_size
@@ -204,20 +225,20 @@ def harvest(
             list(pool.map(_scribd, scribd_items))
 
     if extract_text:
-        _extract_texts([i for i in file_items if i.ok and i.path.lower().endswith(".pdf")], ocr)
+        _extract_texts([i for i in file_items if i.ok and i.path.lower().endswith(".pdf")], ocr, text_out)
 
-    (out / "harvest_manifest.json").write_text(report.to_json(), encoding="utf-8")
+    (manifest_out / "harvest_manifest.json").write_text(report.to_json(), encoding="utf-8")
     return report
 
 
-def _extract_texts(items: List[HarvestItem], ocr: bool) -> None:
+def _extract_texts(items: List[HarvestItem], ocr: bool, text_dir: Path) -> None:
     from scrap_master.utils.pdf_reader import extract_pdf_text
 
     # OCR runs a single native batch process per PDF, so extract PDFs one at a time.
     for it in items:
         try:
             res = extract_pdf_text(it.path, ocr_fallback=ocr)
-            p = Path(it.path).with_suffix(".md")
+            p = text_dir / (Path(it.path).stem + ".md")
             p.write_text(res["markdown"], encoding="utf-8")
             it.text_path = str(p)
         except Exception as e:
