@@ -4,7 +4,7 @@
 
 Reddit blocks almost all non-browser direct access (including datacenter and ISP proxy IPs) — the JSON API returns 403.
 
-Scrap Master uses **rdt-cli** (or **OpenCLI** on desktop) to enable Reddit search and reading:
+MANOLO Scrap uses **rdt-cli** (or **OpenCLI** on desktop) to enable Reddit search and reading:
 - **Search**: `rdt search "query"`
 - **Read full post + comments**: `rdt read POST_ID`
 
