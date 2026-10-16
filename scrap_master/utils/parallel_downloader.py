@@ -198,7 +198,7 @@ def download_one(
 def download_batch_parallel(
     items: Iterable[Tuple[str, Union[str, Path]]],
     max_workers: int = 12,
-    timeout: int = 20,
+    timeout: int = 25,
     retries: int = 3,
     verify_pdf: bool = False,
     headers: Optional[Dict[str, str]] = None,
