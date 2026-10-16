@@ -117,3 +117,63 @@ def extract_pdf_text(
     path = Path(pdf_path)
     if not path.exists():
         raise FileNotFoundError(f"PDF file not found: {path}")
+
+    import pymupdf  # PyMuPDF
+
+    doc = pymupdf.open(str(path))
+    total_pages = len(doc)
+    limit = min(total_pages, max_pages) if max_pages else total_pages
+
+    pages_digital: Dict[int, str] = {}
+    scanned_pages: List[int] = []
+
+    for i in range(limit):
+        pnum = i + 1
+        txt = doc[i].get_text("text").strip()
+        if ocr_fallback and _is_watermark_only(txt):
+            scanned_pages.append(pnum)
+        else:
+            pages_digital[pnum] = txt
+
+    pages_ocr: Dict[int, str] = {}
+    if scanned_pages and ocr_fallback:
+        with tempfile.TemporaryDirectory(prefix="scrap_master_ocr_") as tmpdir:
+            img_paths: Dict[int, Path] = {}
+            for pnum in scanned_pages:
+                pix = doc[pnum - 1].get_pixmap(dpi=dpi)
+                img_file = Path(tmpdir) / f"page_{pnum}.png"
+                pix.save(str(img_file))
+                img_paths[pnum] = img_file
+
+            workers = max(1, min(max_workers, len(scanned_pages)))
+            with ThreadPoolExecutor(max_workers=workers) as pool:
+                fut_to_pnum = {
+                    pool.submit(ocr_image_file, img_paths[pnum]): pnum
+                    for pnum in scanned_pages
+                }
+                for fut in as_completed(fut_to_pnum):
+                    pnum = fut_to_pnum[fut]
+                    pages_ocr[pnum] = fut.result()
+
+    doc.close()
+
+    all_pages: Dict[int, str] = {}
+    md_lines = [
+        f"# {path.name}",
+        f"**Total Pages:** {total_pages} | **Digital Pages:** {len(pages_digital)} | **OCR Scanned Pages:** {len(pages_ocr)}\n",
+    ]
+    for pnum in range(1, limit + 1):
+        mode = "OCR" if pnum in pages_ocr else "Digital"
+        content = pages_ocr.get(pnum) or pages_digital.get(pnum, "")
+        all_pages[pnum] = content
+        md_lines.append(f"\n---\n## Page {pnum} ({mode})\n")
+        md_lines.append(content)
+
+    return {
+        "file": str(path),
+        "total_pages": total_pages,
+        "digital_pages": len(pages_digital),
+        "ocr_pages": len(pages_ocr),
+        "pages": all_pages,
+        "markdown": "\n".join(md_lines),
+    }
