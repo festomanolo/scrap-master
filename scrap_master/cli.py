@@ -2430,5 +2430,84 @@ def _cmd_watch():
         print("    Update Scrap Master: https://raw.githubusercontent.com/festomanolo/scrap-master/main/docs/update.md")
 
 
+def _cmd_read_pdf(args):
+    """Extract digital and OCR text from a PDF file."""
+    from pathlib import Path
+    from scrap_master.utils.pdf_reader import extract_pdf_text
+
+    res = extract_pdf_text(
+        args.source,
+        ocr_fallback=not args.no_ocr,
+        max_pages=args.max_pages,
+    )
+    if args.output:
+        out_path = Path(args.output)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(res["markdown"], encoding="utf-8")
+        print(
+            f"Extracted {res['total_pages']} pages "
+            f"(digital={res['digital_pages']}, ocr={res['ocr_pages']}) -> {out_path}"
+        )
+    else:
+        print(res["markdown"])
+
+
+def _cmd_scribd(args):
+    """Extract full unblurred document from Scribd via API/JSONP."""
+    from pathlib import Path
+    from scrap_master.channels.scribd import ScribdChannel
+
+    sc = ScribdChannel()
+    doc = sc.extract_document(args.url_or_id)
+    if args.output:
+        out_path = Path(args.output)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(doc["markdown"], encoding="utf-8")
+        print(
+            f"Extracted Scribd document '{doc['title']}' "
+            f"({doc['page_count']} pages) -> {out_path}"
+        )
+    else:
+        print(doc["markdown"])
+
+
+def _cmd_download(args):
+    """Download one or more URLs / Google Drive links in parallel with HTTP Range chunking."""
+    from pathlib import Path
+    import urllib.parse
+    from scrap_master.channels.gdrive import extract_gdrive_id, get_direct_gdrive_url
+    from scrap_master.utils.parallel_downloader import download_batch_parallel
+
+    out_dir = Path(args.dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    items = []
+    for idx, u in enumerate(args.urls, 1):
+        gd = extract_gdrive_id(u)
+        if gd:
+            fid, _ = gd
+            direct_u = get_direct_gdrive_url(u)
+            fname = f"gdrive_{fid}.pdf"
+        else:
+            direct_u = u
+            raw_name = urllib.parse.unquote(u.split("?")[0].rstrip("/").split("/")[-1])
+            fname = raw_name.replace(" ", "_") or f"download_{idx}.bin"
+        items.append((direct_u, out_dir / fname))
+
+    results = download_batch_parallel(
+        items,
+        max_workers=args.workers,
+        chunks_per_file=args.chunks,
+        verify_pdf=args.verify_pdf,
+    )
+    ok = sum(1 for r in results if r.ok)
+    print(f"Downloaded {ok}/{len(results)} file(s) to {out_dir}:")
+    for r in results:
+        status = "OK" if r.ok else f"ERR: {r.error}"
+        print(
+            f"  [{status}] {r.path.name} ({r.size_bytes // 1024} KB, "
+            f"{r.elapsed_sec}s, chunks={r.chunks_used}, pdf={r.is_valid_pdf})"
+        )
+
+
 if __name__ == "__main__":
     main()
