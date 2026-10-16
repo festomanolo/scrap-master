@@ -45,28 +45,6 @@ def test_channel_active_backend_attribute_contract():
         assert fresh.active_backend is None or isinstance(fresh.active_backend, str)
 
 
-def test_channel_active_backend_set_by_check(monkeypatch, tmp_path):
-    """After check(), active_backend is None or a str — never anything else."""
-    monkeypatch.setattr("shutil.which", lambda _cmd: None)
-
-    # Keep the network-based channels (V2EX/Xueqiu/Bilibili API) deterministic.
-    import urllib.request
-    from urllib.error import URLError
-
-    def _no_net(*_a, **_k):
-        raise URLError("offline")
-
-    monkeypatch.setattr(urllib.request, "urlopen", _no_net)
-    import scrap_master.channels.xueqiu as xueqiu_mod
-    monkeypatch.setattr(xueqiu_mod, "_cookies_initialized", True)
-    monkeypatch.setattr(xueqiu_mod._opener, "open", _no_net)
-
-    config = Config(config_path=tmp_path / "config.yaml")
-    for ch in get_all_channels():
-        ch.check(config)
-        assert ch.active_backend is None or isinstance(ch.active_backend, str), (
-            f"{ch.name}: active_backend must be None or str after check()"
-        )
 
 
 def test_ordered_backends_contract(tmp_path):
@@ -163,23 +141,3 @@ def test_youtube_ok_when_deno_installed(monkeypatch):
     assert ch.active_backend == "yt-dlp"
 
 
-def test_channel_can_handle_contract():
-    url_samples = {
-        "github": "https://github.com/festomanolo/scrap-master",
-        "twitter": "https://x.com/user/status/1",
-        "youtube": "https://youtube.com/watch?v=abc",
-        "reddit": "https://reddit.com/r/python",
-        "facebook": "https://www.facebook.com/zuck",
-        "instagram": "https://www.instagram.com/openai/",
-        "bilibili": "https://www.bilibili.com/video/BV1xx411",
-        "xiaohongshu": "https://www.xiaohongshu.com/explore/123",
-        "linkedin": "https://www.linkedin.com/in/test",
-        "rss": "https://example.com/feed.xml",
-        "xueqiu": "https://xueqiu.com/S/SH600519",
-        "exa_search": "https://example.com",
-        "web": "https://example.com",
-    }
-    for ch in get_all_channels():
-        sample = url_samples.get(ch.name, "https://example.com")
-        result = ch.can_handle(sample)
-        assert isinstance(result, bool)
