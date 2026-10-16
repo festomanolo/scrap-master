@@ -59,8 +59,8 @@ if let data = try? JSONSerialization.data(withJSONObject: output, options: []),
 """
 
 
-def _get_macos_vision_ocr_binary() -> Optional[Path]:
-    """Compile and cache the native macOS Apple Vision OCR binary on first use."""
+def _get_macos_vision_batch_binary() -> Optional[Path]:
+    """Compile and cache the native macOS Apple Vision batch OCR binary."""
     if sys.platform != "darwin" or not shutil.which("swiftc"):
         return None
     bin_dir = Path.home() / ".scrap-master" / "bin"
