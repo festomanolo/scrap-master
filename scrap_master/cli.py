@@ -320,6 +320,7 @@ def main():
     _configure_logging(getattr(args, "verbose", False))
 
     if not args.command:
+        # Interactive terminal: open the TUI, like `scrap`. Scripts and pipes get help.
         parser.print_help()
         sys.exit(0)
 
