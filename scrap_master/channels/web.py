@@ -106,8 +106,8 @@ class WebChannel(Channel):
         self.active_backend = self.backends[0]
         return "ok", "Read any web page via Jina Reader + Playwright/BeautifulSoup fallback"
 
-    def read(self, url: str) -> str:
-        """Read a web page via Jina Reader and return the full Markdown text."""
+    def read(self, url: str, allow_fallback: bool = True) -> str:
+        """Read a web page via Jina Reader, falling back to Direct HTTP / Playwright on anti-bot or error."""
         url = normalize_public_http_url(url)
         jina_url = f"https://r.jina.ai/{url}"
         req = urllib.request.Request(
