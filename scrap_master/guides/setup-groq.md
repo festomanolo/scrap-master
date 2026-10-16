@@ -1,7 +1,6 @@
 # Groq Whisper Setup Guide
 
 ## What it does
-When YouTube/Bilibili videos have no subtitles, use Groq's Whisper API for speech-to-text. Groq offers a generous free tier.
 
 ## Steps the Agent can do automatically
 

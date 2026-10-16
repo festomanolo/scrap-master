@@ -39,4 +39,3 @@ If `scrap-master install --system` didn't configure Exa due to a network issue, 
 A: The MCP endpoint is provided by Exa directly (mcp.exa.ai) and is currently free without limits. If that changes, scrap-master updates will adapt accordingly.
 
 **Q: What is mcporter?**
-A: A CLI bridge for the MCP protocol, used to call MCP servers. Scrap Master uses it to connect to Exa and XiaoHongShu.
