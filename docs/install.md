@@ -1,16 +1,16 @@
-# Scrap Master — Installation Guide
+# MANOLO Scrap — Installation Guide
 
 ## For Humans
 
 Copy this to your AI Agent:
 
 ```
-Install Scrap Master: https://raw.githubusercontent.com/festomanolo/scrap-master/main/docs/install.md
+Install MANOLO Scrap: https://raw.githubusercontent.com/festomanolo/scrap-master/main/docs/install.md
 ```
 
 > 🛡️ **Safe by default:** `scrap-master install` only checks the machine and lists missing dependencies:
 > ```
-> Safely check and install Scrap Master: https://raw.githubusercontent.com/festomanolo/scrap-master/main/docs/install.md
+> Safely check and install MANOLO Scrap: https://raw.githubusercontent.com/festomanolo/scrap-master/main/docs/install.md
 > ```
 > Only use `--system` after the user explicitly approves system-level installs and configuration writes.
 
@@ -20,7 +20,6 @@ Install Scrap Master: https://raw.githubusercontent.com/festomanolo/scrap-master
 
 ### Goal
 
-Install Scrap Master and all upstream tools so your user's agent has full internet access. After installation, you'll use the upstream tools directly (OpenCLI, twitter-cli, bili-cli, rdt-cli, yt-dlp, mcporter, gh CLI, etc.) — Scrap Master is the selector, installer, health checker and router, never a wrapper.
 
 ### ⚠️ Boundaries
 
@@ -35,12 +34,11 @@ When fixing issues, stay within these limits:
 
 ### 📁 Directory Rules
 
-All Scrap Master files go in dedicated directories — **never in the agent workspace**:
+All MANOLO Scrap files go in dedicated directories — **never in the agent workspace**:
 
 | Purpose | Directory | Example |
 |---------|-----------|---------|
 | Config & tokens | `~/.scrap-master/` | `~/.scrap-master/config.json` |
-| Upstream tool repos | `~/.scrap-master/tools/` | `~/.scrap-master/tools/xiaoyuzhou/` |
 | Temporary files | `/tmp/` | `/tmp/yt-dlp-output/` |
 | Skills | `~/.openclaw/skills/scrap-master/` | SKILL.md |
 
@@ -81,10 +79,9 @@ scrap-master install --env=auto --system
 
 The default command checks core infrastructure (gh CLI, Node.js, mcporter, Exa search, yt-dlp config) without changing the host. With explicit `--system` approval it installs/configures the missing pieces and activates these zero-config channels:
 
-- Web (Jina Reader), YouTube, GitHub, RSS, Exa Search, V2EX, Bilibili (basic)
 
 > 💡 **macOS / Homebrew Python showing `externally-managed-environment`?**
-> This is PEP 668 protection — not an Scrap Master issue. Use `pipx install ...` first, or create a `venv` before installing.
+> This is PEP 668 protection — not an MANOLO Scrap issue. Use `pipx install ...` first, or create a `venv` before installing.
 
 **Install modes:**
 
@@ -103,30 +100,20 @@ After installing the basics, **ask the user** which additional channels they nee
 >
 > Here are the optional channels — which ones do you need?
 >
-> - 🌟 **OpenCLI** (recommended on desktop) — one install unlocks Reddit/Facebook/Instagram/Bilibili subtitles/Twitter fallback, and serves as the XiaoHongShu desktop backend; only uses your existing, explicitly controlled Chrome session for XiaoHongShu
 > - 🐦 **Twitter/X** — search tweets, view timeline (requires login cookie)
-> - 📈 **Xueqiu** — stock quotes, trending posts (requires login cookie)
-> - 🎙️ **Xiaoyuzhou Podcast** — audio transcription (requires a free Groq key)
-> - 📕 **XiaoHongShu** — search, read, comments (OpenCLI uses existing session; MCP/legacy tools use Cookie-Editor)
 > - 📖 **Reddit** — search and read posts (login required: desktop OpenCLI or rdt-cli + cookie)
 > - 📘 **Facebook** — search, pages, feed, group list (desktop OpenCLI, reuses Chrome session)
 > - 📷 **Instagram** — user search, profiles, recent posts, explore (desktop OpenCLI, reuses Chrome session)
-> - 📺 **Bilibili full** — trending, rankings, search, video detail (bili-cli, no login needed)
 > - 💼 **LinkedIn** — profile, job search
-> - 🎯 **Boss Zhipin** — job search + full JD text (local dedicated Chrome; user logs in manually)
 >
-> Tell me which ones you want, e.g. "help me install XiaoHongShu and Twitter", "help me install Facebook and Instagram", or "install everything".
 
 Based on the user's choice, run:
 
 ```bash
-scrap-master install --env=auto --system --channels=opencli,xiaohongshu   # Desktop user chose XHS
 scrap-master install --env=auto --system --channels=facebook,instagram    # Desktop Meta channels
-scrap-master install --env=local --system --channels=boss                # Desktop Boss Zhipin
 scrap-master install --env=auto --system --channels=all                   # User approved everything
 ```
 
-Supported channel names: `opencli`, `twitter`, `xiaoyuzhou`, `xueqiu`, `xiaohongshu`, `reddit`, `facebook`, `instagram`, `bilibili`, `linkedin`, `boss`, `all`
 
 ### Step 3: Fix what's broken
 
@@ -140,19 +127,16 @@ Only ask the user when you genuinely need their input (credentials, permissions,
 
 Some channels need credentials only the user can provide. Based on the doctor output, ask for what's missing:
 
-> 🔒 **Security tip:** For platforms that need cookies or browser sessions (Twitter, XiaoHongShu, Reddit, Facebook, Instagram, Boss Zhipin), we recommend using a **dedicated/secondary account** rather than your main account. Cookie/browser-session auth carries two risks:
 > 1. **Account ban** — platforms may detect non-browser API calls and restrict or ban the account
 > 2. **Credential exposure** — cookies grant full account access; using a secondary account limits the blast radius if credentials are ever compromised
 
 > 🍪 **Cookies / login sessions:**
 >
-> For platforms that need cookies via CLI (Twitter, Xueqiu, etc.), **prefer Cookie-Editor import** — it is the simplest and most reliable method:
 > 1. The user logs in to the platform in their browser
 > 2. Install the [Cookie-Editor](https://chromewebstore.google.com/detail/cookie-editor/hlkenndednhfkekhgcdicdfddnkalmdm) Chrome extension
 > 3. Click the extension → Export → Header String
 > 4. Paste the exported string to the Agent
 >
-> Twitter only accepts content explicitly exported by the user via Cookie-Editor. Scrap Master never logs the user in to XiaoHongShu and never reads XiaoHongShu browser cookies. XiaoHongShu OpenCLI only uses the user's existing, explicitly controlled Chrome session. If no existing session is present, use Cookie-Editor export to configure xiaohongshu-mcp / legacy tools instead. Xueqiu and Bilibili can be imported per-platform explicitly, e.g. `scrap-master configure --from-browser chrome --platform xueqiu`; the command does not scan or save cookies from other platforms.
 
 **Twitter search & posting:**
 > "To unlock Twitter search, I need your Twitter cookies. Install the Cookie-Editor Chrome extension, go to x.com/twitter.com, click the extension → Export → Header String, and paste it to me."
@@ -176,7 +160,7 @@ twitter search "query" -n 10
 > **What the Agent needs to do:**
 > 1. Confirm the user has a proxy configured: `scrap-master configure proxy` (hidden input)
 > 2. Set environment variables: `export HTTP_PROXY="..." HTTPS_PROXY="..."`
-> 3. Scrap Master handles the rest automatically — no additional action needed from the user
+> 3. MANOLO Scrap handles the rest automatically — no additional action needed from the user
 >
 > If the user reports "fetch failed", see [troubleshooting.md](troubleshooting.md)
 
@@ -194,20 +178,13 @@ rdt login   # automatically extracts browser cookies; on a server without a brow
 > scrap-master configure proxy
 > ```
 
-**XiaoHongShu (multi-backend, choose by environment):**
 
-> **Authentication boundary:** Scrap Master never logs the user in to XiaoHongShu and never reads
 > browser cookies. OpenCLI only uses an existing Chrome session explicitly controlled by the user.
-> `scrap-master configure xhs-cookies` does not inject cookies into OpenCLI or Chrome.
 > If no existing session is present, do not automate login; use a Cookie-Editor manual export
-> to configure xiaohongshu-mcp or a legacy tool instead:
 >
 > ```bash
-> scrap-master configure xhs-cookies
 > ```
 >
-> This explicit command saves/imports the user-provided xiaohongshu.com-domain cookie set.
-> Confirm the cookie names and scope before running. Non-xiaohongshu.com domain cookies are ignored.
 >
 > **Desktop (recommended: OpenCLI):**
 
@@ -221,16 +198,11 @@ scrap-master install --system --channels opencli
 > 3. Run `opencli doctor` to verify (shows "Extension: connected" when successful)
 >
 > When AUTH_REQUIRED and the user has no existing session, do not auto-login; switch to the
-> xiaohongshu-mcp / legacy tools Cookie-Editor route below.
 >
-> **Server / no-desktop environment (xiaohongshu-mcp):**
-> 1. Download the platform binary from https://github.com/xpzouying/xiaohongshu-mcp/releases to `~/.scrap-master/tools/`
 > 2. Start the service (first run auto-downloads ~150MB headless browser — wait for it to finish)
 > 3. Import cookies manually using the Cookie-Editor flow above
-> 4. Connect: `mcporter config add xiaohongshu http://localhost:18060/mcp --scope home`
 > 5. Always include `--timeout 120000` when calling it
 >
-> **Legacy users (xhs-cli):** An already-installed xhs-cli continues to work as a fallback backend
 > (upstream unmaintained since March 2026 — not recommended for new installs); authentication still
 > uses the Cookie-Editor manual export flow above.
 
@@ -256,19 +228,13 @@ scrap-master install --system --channels facebook,instagram
 >
 > Facebook Groups currently only guarantees reading the group list and recent activity visible to the current account — arbitrary group posts and comments are not guaranteed. Instagram `search` is a user search, not a global post keyword search; on 429/login errors, have the user re-login in Chrome and reduce call frequency.
 
-**Xueqiu (stock quotes + trending posts):**
-> "Xueqiu requires a login cookie. Please log in to xueqiu.com in Chrome first, then run:"
 
 ```bash
-scrap-master configure --from-browser chrome --platform xueqiu
 ```
 
-> Only reads and saves the minimum cookies Xueqiu requires; does not collect cookies from other platforms.
 
-**Xiaoyuzhou Podcast (Groq Whisper):**
-> "Xiaoyuzhou Podcast transcription is installed by default. You only need a free Groq API key."
 
-The transcription script is automatically installed with Scrap Master; the user only needs to provide a key:
+The transcription script is automatically installed with MANOLO Scrap; the user only needs to provide a key:
 
 ```bash
 scrap-master configure groq-key
@@ -281,9 +247,7 @@ scrap-master configure groq-key
 > 4. Copy the key (starts with `gsk_`) and paste it to the Agent
 >
 > **How to use:**
-> The user sends a Xiaoyuzhou link to the Agent, which automatically calls:
 > ```bash
-> bash ~/.scrap-master/tools/xiaoyuzhou/transcribe.sh https://www.xiaoyuzhoufm.com/episode/xxxxx
 > ```
 >
 > Auto-downloads audio → transcodes and splits → Groq Whisper transcription → full text transcript.
@@ -316,49 +280,36 @@ scrap-master configure groq-key
 >
 > See https://github.com/stickerdaniel/linkedin-mcp-server for details
 
-**Boss Zhipin (desktop only — boss-agent-cli + CDP):**
 
-When the user says "help me configure Boss Zhipin", the Agent handles the automatable parts and leaves only the website login to the user:
 
 1. First explain that an upstream CLI will be installed and a dedicated Chrome profile directory created, and request approval for system-level installation.
 2. After the user approves, run:
    ```bash
-   scrap-master install --env=local --system --channels=boss
    ```
 3. Launch the dedicated Chrome bound to loopback only per your OS:
    ```bash
    # macOS
    open -na "Google Chrome" --args --remote-debugging-address=127.0.0.1 \
-     --remote-debugging-port=9222 --user-data-dir="$HOME/.boss-chrome-profile" \
-     "https://www.zhipin.com/web/geek/job"
 
    # Linux
    google-chrome --remote-debugging-address=127.0.0.1 \
-     --remote-debugging-port=9222 --user-data-dir="$HOME/.boss-chrome-profile" \
-     "https://www.zhipin.com/web/geek/job"
    ```
    Windows PowerShell：
    ```powershell
-   Start-Process chrome.exe -ArgumentList '--remote-debugging-address=127.0.0.1','--remote-debugging-port=9222',"--user-data-dir=$env:USERPROFILE\.boss-chrome-profile",'https://www.zhipin.com/web/geek/job'
    ```
 4. Pause and have the **user visually confirm** they are logged in (avatar in the top right); if not logged in, have the **user manually
    log in**, scan QR, or handle any slider. The Agent must not request credentials, log in on
-   the user's behalf, or use `boss status` as a substitute — it only validates local `session.enc`
    and does not represent the Chrome login state.
 5. After the user confirms login is complete, run:
    ```bash
-   boss --cdp-url http://localhost:9222 login --cdp
-   scrap-master doctor    # check the boss line for the browser wt2 cookie probe result
    ```
 
 > Security boundary: any local process that can reach debug port 9222 has full control over this Chrome.
 > You must use `--remote-debugging-address=127.0.0.1` — never expose it to LAN or the internet.
 > Use a dedicated profile and reuse it long-term; do not delete or recreate it for each run, and do
-> not default to the user's daily Chrome. Close the dedicated Chrome when not in use. Boss Zhipin does
 > not support server / no-desktop environments. Search commands must include
 > `--browser-source existing-browser --cdp-url http://localhost:9222`。
 >
-> Dependency: boss-agent-cli PRs #403–#407 are all merged into upstream master. The installer pins to
 > upstream commit
 > `4c991b77086a203173bf08a4cb64a23af6514fe6` rather than a moving branch. That commit includes
 > `browser_source="existing-browser"` (strict CDP), `JobItem.lid`, and `job_card_browser()`. Switch to
@@ -372,7 +323,7 @@ Run `scrap-master doctor` one final time and report the results to your user.
 
 If you are running inside **OpenClaw**, ask your user:
 
-> "Scrap Master is set up! Would you like me to create a daily automated check task? It will monitor these channels and check for new versions — only notifying you when something is wrong or an update is available."
+> "MANOLO Scrap is set up! Would you like me to create a daily automated check task? It will monitor these channels and check for new versions — only notifying you when something is wrong or an update is available."
 
 If the user agrees, create a **cron job** (daily, `sessionTarget: "isolated"`, `delivery: "announce"`) with this task:
 
@@ -380,7 +331,7 @@ If the user agrees, create a **cron job** (daily, `sessionTarget: "isolated"`, `
 Run the scrap-master watch command.
 If the output contains "all good", do not notify the user — finish silently.
 If the output contains issues (❌ ⚠) or a new version (🆕), send the full report to the user with suggested fixes.
-If a new version is available, ask the user whether to upgrade (paste this to the user's Agent for a full update: Update Scrap Master: https://raw.githubusercontent.com/festomanolo/scrap-master/main/docs/update.md).
+If a new version is available, ask the user whether to upgrade (paste this to the user's Agent for a full update: Update MANOLO Scrap: https://raw.githubusercontent.com/festomanolo/scrap-master/main/docs/update.md).
 ```
 
 If the user wants a different agent to handle it, let them choose.
@@ -393,8 +344,6 @@ If the user wants a different agent to handle it, let them choose.
 |---------|-------------|
 | `scrap-master install --env=auto` | Read-only dependency and channel check (default) |
 | `scrap-master install --env=auto --system` | Explicitly install/configure core external tools |
-| `scrap-master install --env=auto --system --channels=twitter,xiaohongshu` | Install approved optional channels |
-| `scrap-master install --env=local --system --channels=boss` | Install the desktop Boss Zhipin strict-CDP backend |
 | `scrap-master install --env=auto --system --channels=all` | Install everything after explicit approval |
 | `scrap-master install --env=auto --safe` | Compatibility alias for the safe default |
 | `scrap-master install --env=auto --dry-run` | Preview what would be done |
@@ -403,7 +352,6 @@ If the user wants a different agent to handle it, let them choose.
 | `scrap-master check-update` | Check for new versions |
 | `scrap-master configure twitter-cookies` | Save Twitter cookies via hidden input; direct calls still require explicit env vars |
 | `scrap-master configure proxy` | Save proxy address via hidden input; not an automatic unlock switch |
-| `scrap-master configure groq-key` | Configure the Xiaoyuzhou transcription key via hidden input |
 
 After installation, use upstream tools directly. See SKILL.md for the full command reference:
 
@@ -411,17 +359,13 @@ After installation, use upstream tools directly. See SKILL.md for the full comma
 |----------|--------------|---------|
 | Twitter/X | `twitter` (fallback: `opencli`) | Set `TWITTER_AUTH_TOKEN` / `TWITTER_CT0` then run `twitter search "query" -n 10` |
 | YouTube | `yt-dlp` | `yt-dlp --dump-json URL` |
-| Bilibili | `bili` (subtitles via `opencli`) | `bili search "query" --type video` / `opencli bilibili subtitle BVxxx` |
 | Reddit | `opencli` (fallback: `rdt`) | `opencli reddit search "query" -f yaml` / `rdt read POST_ID` |
 | Facebook | `opencli` | `opencli facebook search "query" -f yaml` |
 | Instagram | `opencli` | `opencli instagram user nasa -f yaml` |
 | GitHub | `gh` | `gh search repos "query"` |
 | Web | `curl` + Jina | `curl -s "https://r.jina.ai/URL"` |
 | Exa Search | `mcporter` | `mcporter call exa.web_search_exa query="..." numResults=5` |
-| XiaoHongShu | `opencli` (server: `mcporter`) | `opencli xiaohongshu search "query" -f yaml` |
-| Xiaoyuzhou Podcast | `transcribe.sh` | `bash ~/.scrap-master/tools/xiaoyuzhou/transcribe.sh <URL>` |
 | LinkedIn | `mcporter` | `mcporter call linkedin.get_person_profile linkedin_username="..."` |
-| Boss Zhipin | `boss` / Python public API | `scrap-master doctor` (browser wt2 probe; `boss status` only reflects local session.enc); see `references/career.md` for search and JD |
 | RSS | `feedparser` | `python3 -c "import feedparser; ..."` |
 
 > For multi-backend platforms, use the `active_backend` from `scrap-master doctor --json`.
