@@ -81,6 +81,22 @@ def _read_via_playwright(url: str, timeout_ms: int = 25000) -> str:
             browser.close()
 
 
+def _is_challenge_html(html_text: str) -> bool:
+    sample = html_text[:20000].casefold()
+    return "<title>just a moment" in sample or "/cdn-cgi/challenge-platform/" in sample
+
+
+def _read_via_curl_cffi(url: str, timeout: int = 20) -> str:
+    """Fetch with a real Chrome TLS/HTTP2 fingerprint (curl_cffi) to pass fingerprint-based bot walls."""
+    from curl_cffi import requests as cffi_requests
+
+    resp = cffi_requests.get(url, impersonate="chrome", timeout=timeout)
+    resp.raise_for_status()
+    if _is_challenge_html(resp.text):
+        raise RuntimeError("curl_cffi received a challenge page")
+    return _html_to_clean_markdown(resp.text[:_MAX_RESPONSE_BYTES], base_url=url)
+
+
 def _read_via_direct_http(url: str, timeout: int = 20) -> str:
     """Fetch HTML directly with browser headers and convert to Markdown with links."""
     req = urllib.request.Request(
