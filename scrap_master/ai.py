@@ -74,8 +74,6 @@ def chat(messages: List[Dict[str, str]], json_mode: bool = False, timeout: int =
         raise AIError(
             f"OpenRouter failed ({last}). 402 = no credits: use a ':free' model or add credits at openrouter.ai."
         )
-        try:
-            return data["choices"][0]["message"]["content"]
         except (KeyError, IndexError) as e:
             raise AIError(f"Unexpected OpenRouter reply: {str(data)[:300]}") from e
 
