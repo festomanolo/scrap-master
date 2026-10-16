@@ -2530,6 +2530,33 @@ def _cmd_download(args):
         )
 
 
+def _cmd_harvest(args):
+    """Crawl index pages, then download and extract every document they link to."""
+    from scrap_master.utils.harvest import discover, harvest
+
+    exts = tuple(e if e.startswith(".") else f".{e}" for e in (args.ext or [".pdf"]))
+    exts = tuple(e.lower() for e in exts)
+    if args.dry_run:
+        report = discover(args.urls, depth=args.depth, exts=exts, pattern=args.match,
+                          max_pages=args.max_pages)
+        print(f"Crawled {len(report.pages_crawled)} page(s), found {len(report.items)} document(s):")
+        for it in report.items[: args.limit]:
+            print(f"  [{it.kind}] {it.url}")
+        return
+    report = harvest(
+        args.urls, args.dir, depth=args.depth, exts=exts, pattern=args.match,
+        extract_text=args.extract, ocr=not args.no_ocr, workers=args.workers,
+        chunks=args.chunks, max_pages=args.max_pages, limit=args.limit,
+    )
+    print(f"Crawled {len(report.pages_crawled)} page(s); "
+          f"{report.ok_count}/{len(report.items)} document(s) saved to {args.dir}")
+    for it in report.items:
+        status = "OK" if it.ok else f"ERR: {it.error}"
+        extra = f" -> {it.text_path}" if it.text_path and it.text_path != it.path else ""
+        print(f"  [{status}] [{it.kind}] {it.path or it.url} ({it.size_bytes // 1024} KB){extra}")
+    print(f"Manifest: {args.dir}/harvest_manifest.json")
+
+
 if __name__ == "__main__":
     main()
 
