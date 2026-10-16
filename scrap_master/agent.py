@@ -185,8 +185,9 @@ def run_job(
     log(f"⬇ Downloading {len(report.items)} documents…")
     fetch(
         report,
-        project / "pdfs",
+        project / ("pdfs" if exts == (".pdf",) else "files"),
         extract_text=plan["extract_text"],
+        organize=organize and exts != (".pdf",),
         scribd_dir=project / "scribd",
         text_dir=project / "markdown",
         manifest_dir=data,
