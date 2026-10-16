@@ -93,7 +93,7 @@ def download_one(
     min_chunk_size_bytes: int = 256 * 1024,
     headers: Optional[Dict[str, str]] = None,
 ) -> DownloadResult:
-    """Download a single file with exponential backoff retries and optional PDF magic-byte check."""
+    """Download a single file with optional multi-connection HTTP Range chunking and retries."""
     dest_path = Path(dest)
     dest_path.parent.mkdir(parents=True, exist_ok=True)
     req_headers = {"User-Agent": _DEFAULT_UA}
