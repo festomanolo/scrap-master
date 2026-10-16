@@ -1,4 +1,4 @@
-# Scrap Master tested dependency set
+# MANOLO Scrap tested dependency set
 # Usage:
 #   pip install -c constraints.txt -e .[dev]
 

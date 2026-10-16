@@ -1,12 +1,12 @@
-# Scrap Master — Capability Benchmark, Limitations, Scribd API Extraction & Parallel Speedup Architecture
+# MANOLO Scrap — Capability Benchmark, Limitations, Scribd API Extraction & Parallel Speedup Architecture
 
-Based on our live benchmark scraping **Tanzania Form Two National Assessment (FTNA — Subject Code `036`: Information and Computer Studies / Computer Science)** examination papers and marking schemes—and inspecting the architecture of **Scrap Master**—this document provides:
+Based on our live benchmark scraping **Tanzania Form Two National Assessment (FTNA — Subject Code `036`: Information and Computer Studies / Computer Science)** examination papers and marking schemes—and inspecting the architecture of **MANOLO Scrap**—this document provides:
 
-1. **Where Scrap Master Succeeds (Core Abilities)**
-2. **Where Scrap Master Fails (Limitations & Blind Spots)**
+1. **Where MANOLO Scrap Succeeds (Core Abilities)**
+2. **Where MANOLO Scrap Fails (Limitations & Blind Spots)**
 3. **Summary Verdict Matrix**
 4. **How Scribd API / Embed Extraction Works (Bypassing the Web UI & Paywall Blur)**
-5. **How to Make Scrap Master Significantly Faster (Parallel Execution & Async Batch Downloading)**
+5. **How to Make MANOLO Scrap Significantly Faster (Parallel Execution & Async Batch Downloading)**
 
 ---
 
@@ -17,7 +17,6 @@ Based on our live benchmark scraping **Tanzania Form Two National Assessment (FT
    - **Why it's powerful:** You don't need to write brittle BeautifulSoup/XPath/CSS selectors for every new website. Any static or server-rendered web page is immediately readable by an LLM or a 3-line regex script.
 
 2. **Multi-Platform Routing & Fallback Architecture (16+ Platforms)**
-   - Instead of being a single scraper, it is a **capability router** (`scrap_master/channels/`) that knows the best upstream tool for supported platforms (Web, YouTube, GitHub, Twitter/X, Reddit, Facebook, Instagram, LinkedIn, Bilibili, XiaoHongShu, RSS, Exa Search, Scribd, etc.) and falls back when one breaks.
    - **`scrap-master doctor` Health Checks:** It probes your machine and tells an agent in JSON (`--json`) which backends are actually working right now and how to fix missing ones.
 
 3. **Agent + Tool Synergy (PDF OCR & Inspection)**
@@ -28,7 +27,7 @@ Based on our live benchmark scraping **Tanzania Form Two National Assessment (FT
 ## 2. Where It Fails (Limitations & Blind Spots)
 
 ### A. It Was Not Originally a File Downloader or Bulk Crawler
-- **What happened in our test:** Scrap Master's `web` channel (`r.jina.ai`) could read the Maktaba index page and give us the 65 `.pdf` URLs, **but Scrap Master previously had no built-in parallel PDF/file downloader or retry queue**.
+- **What happened in our test:** MANOLO Scrap's `web` channel (`r.jina.ai`) could read the Maktaba index page and give us the 65 `.pdf` URLs, **but MANOLO Scrap previously had no built-in parallel PDF/file downloader or retry queue**.
 - Sequential `urllib.request` downloads took ~17 minutes for 27 files because of slow single-threaded TCP/SSL handshakes (`_ssl.c:983: The handshake operation timed out` on `ICS-F2-2025.pdf`).
 - **Fix Implemented:** We added parallel `ThreadPoolExecutor` execution to `doctor.py` and a high-speed concurrent downloader (`scrap_master/utils/parallel_downloader.py`) with automatic exponential backoff retries and connection pooling.
 
@@ -38,11 +37,10 @@ Based on our live benchmark scraping **Tanzania Form Two National Assessment (FT
 - **Fix Implemented:** See **Section 4** below and `scrap_master/channels/scribd.py` for direct Scribd API / Embed (`content/embed` + `.jsonp` page asset manifest + mobile API token) extraction.
 
 ### C. No Built-In PDF/Binary OCR Inside `scrap-master`
-- Scrap Master has `transcribe.py` for audio/video (via Whisper), but scanned camera/scanner image PDFs (like `ICS-F2-2025.pdf`) contain only image streams plus a watermark footer (`Find this and other free resources at: https://maktaba.tetea.org`).
+- MANOLO Scrap has `transcribe.py` for audio/video (via Whisper), but scanned camera/scanner image PDFs (like `ICS-F2-2025.pdf`) contain only image streams plus a watermark footer (`Find this and other free resources at: https://maktaba.tetea.org`).
 - Without a vision model or OCR pipeline (`pypdf`/`pdfplumber` + `tesseract` or multimodal LLM vision), a plain-text scraper gets blank pages on scanned exams.
 
 ### D. Heavy Dependency on External Tools & Browser Sessions
-- **What we saw in `scrap-master doctor --json`:** Out of 16 channels on a fresh machine, only **3 worked out of the box** (`web`, `v2ex`, `bilibili`).
 - `exa_search` requires `mcporter` + the Exa MCP server installed.
 - Social platforms (Reddit, Facebook, Instagram, Twitter/X) have no zero-config scraping path—they require installing `opencli` and staying logged into a local Chrome session or manually exporting browser cookies.
 
@@ -87,13 +85,11 @@ Instead of loading the bloated Scribd website (`https://www.scribd.com/document/
 
 ---
 
-## 5. Making Scrap Master Significantly Faster (Parallel Execution Architecture)
+## 5. Making MANOLO Scrap Significantly Faster (Parallel Execution Architecture)
 
-Yes—it is completely possible to make **Scrap Master** **5x to 15x faster** using parallel processes and threads. Here is where the bottlenecks were and how we parallelized them:
+Yes—it is completely possible to make **MANOLO Scrap** **5x to 15x faster** using parallel processes and threads. Here is where the bottlenecks were and how we parallelized them:
 
 ### Bottleneck 1: `scrap-master doctor` Was Running Channels Sequentially
-- **Before:** `scrap_master/doctor.py` looped over `ALL_CHANNELS` one by one (`for ch in get_all_channels(): ch.check(config)`). Because several channels spawn subprocesses (`gh`, `yt-dlp`, `opencli`, `bili`, `twitter`) or make live HTTP API probes (`bilibili`, `v2ex`, `xueqiu`) with up to 10-second timeouts, sequential execution took the **sum** of all probes (up to 35+ seconds).
-- **After (Parallel `ThreadPoolExecutor`):** Running all 17 channel checks concurrently inside `concurrent.futures.ThreadPoolExecutor(max_workers=len(channels))` in `scrap_master/doctor.py` completed in **10.07 seconds** (bounded solely by the single 10s timeout on `bilibili`/`xueqiu`, rather than summing across all 17 channels) while preserving exact registry order.
 
 ### Bottleneck 2: Sequential vs. File-Parallel vs. HTTP `Range` Chunk-Parallel PDF Downloading (Measured Live: 1,031s -> 193.51s -> 87.41s, **11.8x Faster**)
 
