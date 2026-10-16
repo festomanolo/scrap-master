@@ -2,9 +2,7 @@
 
 **Tell it what you want. It finds, downloads, reads and files it.**
 
-<p align="center">
-  For each platform, Scrap Master picks the most reliable access path, installs it, health-checks it, and falls back to the next one when it breaks.
-</p>
+Type `scrap`, write *"today I want to scrape Form 2 computer studies exams with marking schemes"*, and MANOLO Scrap plans the job with AI, searches the web, crawls the result pages, downloads every PDF / Google Drive / Scribd document in parallel, extracts the text (OCR for scanned pages), and writes a report — all filed in one tidy project folder.
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="MIT License"></a>
