@@ -29,6 +29,7 @@ class DownloadResult:
     size_bytes: int = 0
     is_valid_pdf: bool = False
     attempts: int = 1
+    chunks_used: int = 1
     elapsed_sec: float = 0.0
     error: str = ""
 
