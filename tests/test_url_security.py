@@ -2,17 +2,12 @@
 
 import pytest
 
-from scrap_master.channels.bilibili import BilibiliChannel
 from scrap_master.channels.facebook import FacebookChannel
 from scrap_master.channels.github import GitHubChannel
 from scrap_master.channels.instagram import InstagramChannel
 from scrap_master.channels.linkedin import LinkedInChannel
 from scrap_master.channels.reddit import RedditChannel
 from scrap_master.channels.twitter import TwitterChannel
-from scrap_master.channels.v2ex import V2EXChannel
-from scrap_master.channels.xiaohongshu import XiaoHongShuChannel
-from scrap_master.channels.xiaoyuzhou import XiaoyuzhouChannel
-from scrap_master.channels.xueqiu import XueqiuChannel
 from scrap_master.channels.youtube import YouTubeChannel
 from scrap_master.utils.url import host_matches
 
@@ -22,11 +17,6 @@ from scrap_master.utils.url import host_matches
     [
         (TwitterChannel(), "https://mobile.twitter.com/user/status/1"),
         (TwitterChannel(), "https://X.COM./user/status/1"),
-        (XiaoHongShuChannel(), "https://www.xiaohongshu.com/explore/1"),
-        (XiaoHongShuChannel(), "https://xhslink.com/a/1"),
-        (BilibiliChannel(), "https://www.bilibili.com/video/BV1"),
-        (BilibiliChannel(), "https://b23.tv/abc"),
-        (XueqiuChannel(), "https://stock.xueqiu.com/v5/stock/quote"),
     ],
 )
 def test_credential_channels_accept_exact_hosts_and_subdomains(channel, valid_url):
@@ -41,12 +31,6 @@ def test_credential_channels_accept_exact_hosts_and_subdomains(channel, valid_ur
         (TwitterChannel(), "https://x.com@evil.test/user/status/1"),
         (TwitterChannel(), "https://user:pass@x.com/user/status/1"),
         (TwitterChannel(), "ftp://x.com/user/status/1"),
-        (XiaoHongShuChannel(), "https://xiaohongshu.com.evil.test/explore/1"),
-        (XiaoHongShuChannel(), "https://xiaohongshu.com@evil.test/explore/1"),
-        (BilibiliChannel(), "https://bilibili.com.evil.test/video/BV1"),
-        (BilibiliChannel(), "https://b23.tv@evil.test/abc"),
-        (XueqiuChannel(), "https://xueqiu.com.evil.test/S/SH600519"),
-        (XueqiuChannel(), "https://xueqiu.com@evil.test/S/SH600519"),
     ],
 )
 def test_credential_channels_reject_lookalikes_and_userinfo(channel, malicious_url):
@@ -77,16 +61,6 @@ def test_credential_channels_reject_lookalikes_and_userinfo(channel, malicious_u
             "https://linkedin.com:443/in/example",
         ),
         (
-            V2EXChannel(),
-            "https://www.v2ex.com/t/1",
-            "https://v2ex.com:443/t/1",
-        ),
-        (
-            XiaoyuzhouChannel(),
-            "https://www.xiaoyuzhoufm.com/episode/1",
-            "https://xiaoyuzhoufm.com:443/episode/1",
-        ),
-        (
             FacebookChannel(),
             "https://m.facebook.com/groups/1",
             "https://facebook.com:443/groups/1",
@@ -112,8 +86,6 @@ def test_fixed_domain_channels_accept_subdomains_and_explicit_ports(
         (YouTubeChannel(), "youtube.com"),
         (RedditChannel(), "reddit.com"),
         (LinkedInChannel(), "linkedin.com"),
-        (V2EXChannel(), "v2ex.com"),
-        (XiaoyuzhouChannel(), "xiaoyuzhoufm.com"),
         (FacebookChannel(), "facebook.com"),
         (InstagramChannel(), "instagram.com"),
     ],

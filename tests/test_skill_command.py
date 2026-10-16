@@ -105,35 +105,6 @@ class TestSkillCommand(unittest.TestCase):
         self.assertNotIn("linkedin-scraper.", linkedin_section)
         self.assertNotIn("--transport streamable-http", linkedin_section)
 
-    def test_boss_setup_is_agent_driven_and_reproducible(self):
-        root = Path(__file__).resolve().parents[1]
-        install_doc = (root / "docs" / "install.md").read_text(encoding="utf-8")
-        skill = (root / "scrap_master" / "skill" / "SKILL.md").read_text(
-            encoding="utf-8"
-        )
-        career = (
-            root / "scrap_master" / "skill" / "references" / "career.md"
-        ).read_text(encoding="utf-8")
-        readme = (root / "README.md").read_text(encoding="utf-8")
-
-        for content in (install_doc, skill, readme):
-            self.assertIn("help me configure Boss Zhipin", content)
-        self.assertIn("scrap-master install --env=local --system --channels=boss", install_doc)
-        self.assertIn("--remote-debugging-address=127.0.0.1", install_doc)
-        self.assertIn("user logs in manually", install_doc)
-        self.assertIn("full control", install_doc)
-
-        self.assertIn(
-            'auth = AuthManager(Path.home() / ".boss-agent")', career
-        )
-        self.assertIn('browser_source="existing-browser"', career)
-        self.assertIn("job_card_browser", career)
-        self.assertIn("4c991b77086a203173bf08a4cb64a23af6514fe6", career)
-        self.assertIn("ENVIRONMENT_RISK", career)
-        self.assertIn("--browser-source existing-browser", career)
-        self.assertIn("long-term", career)
-        self.assertNotIn("code 37 (TOKEN_REFRESH_FAILED) → re-login", career)
-        self.assertNotIn("client = BossClient(auth", career)
 
     def test_readme_uses_current_linkedin_server_name(self):
         root = Path(__file__).resolve().parents[1]
@@ -170,7 +141,7 @@ class TestSkillCommand(unittest.TestCase):
                     # Verify content is non-empty
                     with open(os.path.join(dirpath, "SKILL.md"), encoding="utf-8") as f:
                         content = f.read()
-                    self.assertIn("Scrap Master", content)
+                    self.assertIn("MANOLO Scrap", content)
             # _install_skill may or may not find dirs depending on mock; just ensure no crash
             # The important test is that the function runs without error
 
@@ -216,7 +187,7 @@ class TestSkillCommand(unittest.TestCase):
             self.assertTrue(os.path.exists(target))
             with open(target, encoding="utf-8") as f:
                 content = f.read()
-            self.assertIn("Scrap Master", content)
+            self.assertIn("MANOLO Scrap", content)
 
 
 if __name__ == "__main__":
