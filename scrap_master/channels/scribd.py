@@ -108,3 +108,39 @@ def _parse_scribd_page_html(raw_html: str) -> Tuple[str, List[str]]:
     lines: List[str] = []
     cur_y: Optional[int] = None
     cur_line: List[str] = []
+    for y, x, txt in items:
+        if cur_y is None or abs(y - cur_y) > 45:
+            if cur_line:
+                lines.append(" ".join(cur_line))
+            cur_line = [txt]
+            cur_y = y
+        else:
+            cur_line.append(txt)
+    if cur_line:
+        lines.append(" ".join(cur_line))
+
+    images = re.findall(
+        r'https://html\.scribdassets\.com/[^"\'\s>]+?\.(?:jpg|png)', body
+    )
+    return "\n".join(lines), images
+
+
+class ScribdChannel(Channel):
+    """Direct Scribd API & Embed/JSONP document extractor."""
+
+    name = "scribd"
+    description = "Scribd documents and marking schemes (API + JSONP bypass)"
+    backends = ["Scribd Embed/JSONP API", "Jina Reader"]
+    tier = 0
+
+    def can_handle(self, url: str) -> bool:
+        return extract_scribd_id(url) is not None
+
+    def check(self, config=None) -> Tuple[str, str]:
+        self.active_backend = self.backends[0]
+        return (
+            "ok",
+            "Direct Scribd OEmbed + Embed/JSONP asset API ready (zero-config, parallel page fetch)",
+        )
+
+    def fetch_oembed(self, doc_id: str, timeout: int = 15) -> Dict:
