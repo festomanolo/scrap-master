@@ -96,7 +96,7 @@ Yes—it is completely possible to make **Scrap Master** **5x to 15x faster** us
 
 ### Bottleneck 2: Sequential vs. Parallel Batch PDF Downloading (Measured Live: 1,031s -> 193.51s, 5.3x Faster + 100% Success Rate)
 - **Before (Sequential Single-Thread):**
-- **Before:** Downloading 27 PDFs sequentially over HTTPS from Tanzania's Maktaba TETEA server took **17 minutes** because each file waited for a fresh TCP + TLS handshake and sequential download stream, and any transient SSL timeout aborted that file.
+  - Downloading the 27 NECTA FTNA Form 2 Computer Studies PDFs (~19.9 MB) sequentially took **17 minutes 11 seconds (1,031 seconds)** and **failed on 2 files** (`ICS-F2-2025.pdf` and `ICS-F2-2025-Solutions.pdf` with `_ssl.c:983: The handshake operation timed out`).
 - **After (`scrap_master/utils/parallel_downloader.py`):**
   - Uses `ThreadPoolExecutor(max_workers=12)` to run **12 concurrent download workers**.
   - Implements **automatic exponential backoff retries** (`retries=3`) on SSL handshake timeouts (`_ssl.c:983`), HTTP `429`/`5xx`, and incomplete reads.
