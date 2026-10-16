@@ -11,12 +11,8 @@ By **festomanolo** · MIT License
 ## Install
 
 ```bash
-# 1. Install from GitHub
-pipx install https://github.com/festomanolo/scrap-master/archive/main.zip
-#    or: pip install https://github.com/festomanolo/scrap-master/archive/main.zip
-
-# 2. See what works right now
-scrap-master doctor
+pip install "https://github.com/festomanolo/scrap-master/archive/main.zip[all]"
+scrap            # opens the TUI
 ```
 
 That is enough to read web pages, GitHub, YouTube, Bilibili, RSS and V2EX. Everything else is optional and unlocked on demand (see below).
