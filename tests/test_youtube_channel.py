@@ -1,15 +1,4 @@
 # -*- coding: utf-8 -*-
-"""Dedicated tests for the ``youtube`` channel.
-
-YouTube's readiness is layered: yt-dlp must probe alive (missing / broken /
-unrunnable are distinct), a JS runtime is mandatory (deno works out of the
-box, Node needs an explicit ``--js-runtimes`` config), and transcription
-readiness (whisper provider + ffmpeg/ffprobe) is surfaced for ``doctor`` without
-gating the backend. These tests stub ``probe_command`` / ``shutil.which``
-so every branch runs offline. Follow-up to #331 — extends dedicated
-channel coverage after rss (#360), github (#361), web (#363),
-reddit (#364), xueqiu (#365) and v2ex (#366).
-"""
 
 from pathlib import Path
 from unittest.mock import Mock, patch
