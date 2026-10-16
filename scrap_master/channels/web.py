@@ -59,6 +59,14 @@ def _html_to_clean_markdown(html_text: str, base_url: str = "") -> str:
     return "\n".join(lines)
 
 
+def launch_browser(p):
+    """Launch headless Chromium; fall back to the system Chrome when Playwright's own build is missing."""
+    try:
+        return p.chromium.launch(headless=True)
+    except Exception:
+        return p.chromium.launch(headless=True, channel="chrome")
+
+
 def _read_via_playwright(url: str, timeout_ms: int = 25000) -> str:
     """Render a JS/Cloudflare-protected page via headless Playwright Chromium and convert to Markdown."""
     from playwright.sync_api import sync_playwright
