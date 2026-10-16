@@ -103,7 +103,7 @@ We benchmarked all three stages live across the exact same **27 NECTA FTNA Form 
 | **1. Sequential (`urllib.request` loop)** | **1,031.0s** (17m 11s) | 193.5s | 146.4s | 25 / 27 (2 SSL timeouts) | **1.0x** (Baseline) |
 | **2. File-Level Parallel (`max_workers=12`, `chunks=1`)** | **193.51s** (3m 13s) | 193.51s (`chunks=1`) | 146.44s (`chunks=1`) | **27 / 27** (`pdf=True`) | **5.3x Faster** |
 | **3. File + HTTP `Range` Chunk Parallel (`max_workers=12`, `chunks=8..12`)** | **87.41s** (1m 27s) | **54.53s** (`chunks=12`) / **87.41s** (`chunks=8` in batch) | **36.80s** (`chunks=8`) | **27 / 27** (`pdf=True`) | **11.8x Faster** |
-    - Small marking scheme PDFs (90–205 KB) finished in **6.6s – 9.0s** concurrently.
+
     - Medium exam papers (700–1,680 KB) finished in **35s – 79s** concurrently.
     - The total wall-clock time (**193.51s**) was governed solely by the single largest file (`Syllabus_-_Information_and_Computer_Studies_-_F1-F4_-_2005.pdf`, **4,417 KB** at ~22.8 KB/s = `193.506s`), which started immediately in worker #1 and ran alongside all other 26 files!
   - **How to Push Beyond Per-Connection Server Throttling (193s -> <25s):**
