@@ -26,3 +26,10 @@ Based on our live benchmark scraping **Tanzania Form Two National Assessment (FT
 ---
 
 ## 2. Where It Fails (Limitations & Blind Spots)
+
+### A. It Was Not Originally a File Downloader or Bulk Crawler
+- **What happened in our test:** Scrap Master's `web` channel (`r.jina.ai`) could read the Maktaba index page and give us the 65 `.pdf` URLs, **but Scrap Master previously had no built-in parallel PDF/file downloader or retry queue**.
+- Sequential `urllib.request` downloads took ~17 minutes for 27 files because of slow single-threaded TCP/SSL handshakes (`_ssl.c:983: The handshake operation timed out` on `ICS-F2-2025.pdf`).
+- **Fix Implemented:** We added parallel `ThreadPoolExecutor` execution to `doctor.py` and a high-speed concurrent downloader (`scrap_master/utils/parallel_downloader.py`) with automatic exponential backoff retries and connection pooling.
+
+### B. Paywalled / Login-Wall Document Hosts (Scribd, Academia, Google Drive Embeds)
