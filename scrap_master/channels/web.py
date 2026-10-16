@@ -114,15 +114,35 @@ class WebChannel(Channel):
             jina_url,
             headers={"User-Agent": _UA, "Accept": "text/plain"},
         )
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            body = resp.read(_MAX_RESPONSE_BYTES + 1)
-        if len(body) > _MAX_RESPONSE_BYTES:
-            raise ValueError(
-                f"Jina Reader response exceeds {_MAX_RESPONSE_BYTES} byte limit"
-            )
-        if _is_antibot_page(body):
-            raise RuntimeError(
-                "Jina Reader returned an anti-bot challenge page — target content was not retrieved. "
-                "Try a site-specific tool or open the page in a browser."
-            )
-        return body.decode("utf-8")
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                body = resp.read(_MAX_RESPONSE_BYTES + 1)
+            if len(body) > _MAX_RESPONSE_BYTES:
+                raise ValueError(
+                    f"Jina Reader response exceeds {_MAX_RESPONSE_BYTES} byte limit"
+                )
+            if _is_antibot_page(body):
+                raise RuntimeError(
+                    "Jina Reader returned an anti-bot challenge page — target content was not retrieved. "
+                    "Try a site-specific tool or open the page in a browser."
+                )
+            return body.decode("utf-8")
+        except Exception as primary_err:
+            if not allow_fallback:
+                raise
+            # Fallback 1: Direct HTTP + BeautifulSoup Markdown converter
+            try:
+                md = _read_via_direct_http(url)
+                if len(md) > 200 and not _is_antibot_page(md.encode("utf-8")):
+                    return md
+            except Exception:
+                pass
+            # Fallback 2: Local headless Playwright Chromium browser
+            try:
+                md = _read_via_playwright(url)
+                if md.strip():
+                    return md
+            except Exception:
+                pass
+            raise primary_err
+
