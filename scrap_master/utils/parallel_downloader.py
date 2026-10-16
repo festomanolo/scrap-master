@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
-"""High-speed parallel file/PDF downloader with automatic backoff retries."""
+"""High-speed parallel file/PDF downloader with HTTP Range chunk splitting and backoff retries.
+
+Combines two levels of parallelism:
+  1. File-level parallelism (`download_batch_parallel`): downloads multiple files concurrently.
+  2. Byte-range chunk parallelism (`download_one` with `chunks_per_file > 1`): splits files larger
+     than `min_chunk_size_bytes` (default 256 KB) into parallel `Range: bytes=start-end` requests
+     to bypass per-TCP-connection server bandwidth throttling (e.g. ~22 KB/s per stream).
+"""
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
