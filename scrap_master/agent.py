@@ -147,7 +147,9 @@ def run_job(
     log(f"📄 {len(direct)} direct documents, {len(pages)} pages to crawl")
 
     # 2. Crawl pages, collect linked documents
-    report = discover(pages, depth=plan["depth"], exts=exts, max_pages=30)
+    report = discover(pages, depth=1 if fallback_seeds else plan["depth"], exts=exts, max_pages=30)
+    if fallback_seeds:
+        report.items = _relevant(report.items, request)
     known = {i.url for i in report.items}
     for u in direct:
         if u not in known:
