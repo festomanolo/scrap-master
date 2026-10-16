@@ -2129,7 +2129,7 @@ def _cmd_download(args):
             direct_u = u
             raw_name = urllib.parse.unquote(u.split("?")[0].rstrip("/").split("/")[-1])
             fname = raw_name.replace(" ", "_") or f"download_{idx}.bin"
-        items.append((direct_u, out_dir / fname))
+        items.append((direct_u, out_dir / (category_of(fname) if args.organize else "") / fname))
 
     results = download_batch_parallel(
         items,
