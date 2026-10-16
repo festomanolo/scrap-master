@@ -64,7 +64,7 @@ def _get_macos_vision_batch_binary() -> Optional[Path]:
     if sys.platform != "darwin" or not shutil.which("swiftc"):
         return None
     bin_dir = Path.home() / ".scrap-master" / "bin"
-    bin_path = bin_dir / "vision_ocr"
+    bin_path = bin_dir / "vision_ocr_batch"
     if bin_path.exists() and bin_path.stat().st_size > 0:
         return bin_path
     try:
