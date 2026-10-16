@@ -76,3 +76,10 @@ Instead of loading the bloated Scribd website (`https://www.scribd.com/document/
 - Requesting `https://www.scribd.com/embeds/<DOC_ID>/content` with a mobile/embed `User-Agent` bypasses the main site's marketing wrapper and serves the raw document reader HTML containing:
   1. Inline text spans (`<span class="a">...</span>`) for the initial unblurred pages.
   2. Embedded JavaScript `docManager.addPage(...)` calls containing the direct **`.jsonp` asset URLs** for every page in the document!
+
+### Layer 3: Direct `.jsonp` / Image Page Asset Manifest (`html.scribdassets.com`)
+- Inside the `/embeds/<DOC_ID>/content` payload, Scribd lists every page's raw asset URL on its CDN (`https://html.scribdassets.com/<HASH>/pages/<PAGE_NUM>-<TOKEN>.jsonp` or `.jpg`/`.png`).
+- Even when pages 3+ are visually blurred or hidden behind a "Continue Reading" overlay in the browser, the **`.jsonp` URLs or image URLs are often embedded directly in the page source**!
+- By fetching those `.jsonp` URLs directly in parallel:
+  - Each `.jsonp` file wraps raw HTML/text or image references in `window.pageN_callback(["..."])`.
+  - Unwrapping the JSONP callback and parsing the text/image nodes extracts **100% of the document's pages** without ever rendering CSS blur filters, executing paywall scripts, or loading ad trackers.
