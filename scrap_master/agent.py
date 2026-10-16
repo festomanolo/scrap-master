@@ -164,7 +164,7 @@ def run_job(
     known = {i.url for i in report.items}
     for u in direct:
         if u not in known:
-            report.items.insert(0, HarvestItem(url=u, kind=classify_link(u, exts), source_page="search"))
+            report.items.insert(0, HarvestItem(url=u, kind=classify_link(u, exts, sources=sources), source_page="search"))
     report.items = report.items[: plan["max_documents"]]
 
     # Pages that could not be read directly: try the full web chain once more.
