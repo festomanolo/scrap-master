@@ -34,6 +34,55 @@ class DownloadResult:
     error: str = ""
 
 
+def _probe_range_support(
+    url: str, headers: Dict[str, str], timeout: int
+) -> Tuple[Optional[int], bool]:
+    """Probe file size and HTTP 206 Partial Content support using a 1-byte Range GET."""
+    probe_headers = dict(headers)
+    probe_headers["Range"] = "bytes=0-0"
+    req = urllib.request.Request(url, headers=probe_headers)
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
+        status = getattr(resp, "status", resp.getcode())
+        content_range = resp.headers.get("Content-Range", "")
+        # e.g. "bytes 0-0/4523456"
+        if status == 206 and "/" in content_range:
+            total_str = content_range.split("/")[-1].strip()
+            if total_str.isdigit():
+                return int(total_str), True
+        content_len = resp.headers.get("Content-Length", "")
+        if content_len.isdigit():
+            return int(content_len), False
+    return None, False
+
+
+def _fetch_byte_range(
+    url: str,
+    start: int,
+    end: int,
+    headers: Dict[str, str],
+    timeout: int,
+    retries: int,
+) -> Tuple[int, bytes]:
+    """Fetch a single [start, end] inclusive byte slice with exponential backoff retries."""
+    range_headers = dict(headers)
+    range_headers["Range"] = f"bytes={start}-{end}"
+    last_err: Optional[Exception] = None
+    for attempt in range(1, retries + 2):
+        try:
+            req = urllib.request.Request(url, headers=range_headers)
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                status = getattr(resp, "status", resp.getcode())
+                data = resp.read()
+                if status != 206:
+                    raise RuntimeError(f"Expected HTTP 206 for Range, got {status}")
+                return start, data
+        except Exception as e:  # noqa: BLE001
+            last_err = e
+            if attempt <= retries:
+                time.sleep(0.4 * (2 ** (attempt - 1)))
+    raise RuntimeError(f"Range {start}-{end} failed: {last_err}")
+
+
 def download_one(
     url: str,
     dest: Union[str, Path],
