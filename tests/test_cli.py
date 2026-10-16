@@ -33,6 +33,7 @@ class TestCLI:
         with patch("sys.argv", ["nolo-scrap"]), \
              patch("sys.stdin.isatty", return_value=True), \
              patch("sys.stdout.isatty", return_value=True), \
+             patch("scrap_master.tui.main") as tui_main:
 
     def test_doctor_runs(self, capsys):
         with patch(
