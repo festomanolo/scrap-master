@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Scrap Master MCP Server — expose doctor/status as MCP tool.
+MANOLO Scrap MCP Server — expose doctor/status as MCP tool.
 
 Run: python -m scrap_master.integrations.mcp_server
 
-Scrap Master is an installer + doctor tool. For actual reading/searching,
+MANOLO Scrap is an installer + doctor tool. For actual reading/searching,
 agents should call upstream tools directly (twitter-cli, yt-dlp, mcporter, etc.).
 """
 
@@ -44,7 +44,7 @@ def create_server():
     async def list_tools():
         return [
             Tool(name="get_status",
-                 description="Get Scrap Master status: which channels are installed and active.",
+                 description="Get MANOLO Scrap status: which channels are installed and active.",
                  inputSchema={"type": "object", "properties": {}}),
         ]
 
