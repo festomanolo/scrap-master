@@ -114,6 +114,8 @@ Web pages (with anti-bot fallbacks: direct HTML → Chrome-fingerprint TLS → h
 
 ## Made by
 
+festomanolo · [github.com/festomanolo](https://github.com/festomanolo) · [festomanolo.com](https://festomanolo.com)
+
 ## License
 
 MIT © festomanolo
