@@ -113,6 +113,7 @@ Web pages (with anti-bot fallbacks: direct HTML → Chrome-fingerprint TLS → h
 - **LinkedIn:** full profiles/jobs need the `mcp-server-linkedin` MCP server (see `scrap-master doctor`).
 
 ## Made by
+
 ## License
 
 MIT © festomanolo
