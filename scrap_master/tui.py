@@ -455,6 +455,7 @@ class ManoloScrap(App):
         c.set("ai_provider", str(self.query_one("#s-provider", Select).value))
         c.set("ollama_model", self.query_one("#s-ollama-model", Input).value.strip())
         c.set("openrouter_model", self.query_one("#s-or-model", Input).value.strip())
+        c.set("seed_sites", self.query_one("#s-seeds", Input).value.strip())
         key = self.query_one("#s-or-key", Input).value.strip()
         if key:
             c.set("openrouter_api_key", key)
