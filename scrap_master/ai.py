@@ -116,7 +116,7 @@ Reply with ONLY a JSON object:
   "project_name": "short folder name",
   "queries": ["3-6 precise web search queries that find pages or files with this data"],
   "urls": ["known direct URLs to start from, if any (else empty)"],
-  "file_types": [".pdf"],
+  "file_types": [".pdf"] (extensions or presets: pdf, docs, slides, sheets, ebooks, images, audio, video, archives, code, data; honour "X only" wording),
   "depth": 0 or 1 (1 = also follow same-site links from result pages),
   "extract_text": true or false (extract text / OCR from downloaded PDFs),
   "max_documents": 5-60
