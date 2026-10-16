@@ -2113,8 +2113,13 @@ def _cmd_download(args):
 
     out_dir = Path(args.dir)
     out_dir.mkdir(parents=True, exist_ok=True)
+    urls = args.urls
+    if args.only:
+        exts = resolve(args.only)
+        urls = [u for u in urls if classify_link(u, exts)]
+        print(f"--only {' '.join(exts)}: kept {len(urls)}/{len(args.urls)} URL(s)")
     items = []
-    for idx, u in enumerate(args.urls, 1):
+    for idx, u in enumerate(urls, 1):
         gd = extract_gdrive_id(u)
         if gd:
             fid, _ = gd
