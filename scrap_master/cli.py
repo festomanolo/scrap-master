@@ -324,6 +324,8 @@ def main():
         if sys.stdin.isatty() and sys.stdout.isatty():
             from scrap_master.tui import main as tui_main
 
+            tui_main()
+            sys.exit(0)
         parser.print_help()
         sys.exit(0)
 
