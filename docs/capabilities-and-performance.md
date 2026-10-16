@@ -91,7 +91,7 @@ Instead of loading the bloated Scribd website (`https://www.scribd.com/document/
 Yes—it is completely possible to make **Scrap Master** **5x to 15x faster** using parallel processes and threads. Here is where the bottlenecks were and how we parallelized them:
 
 ### Bottleneck 1: `scrap-master doctor` Was Running Channels Sequentially
-- **Before:** `scrap_master/doctor.py` looped over `ALL_CHANNELS` one by one (`for ch in get_all_channels(): ch.check(config)`). Because several channels spawn subprocesses (`gh`, `yt-dlp`, `opencli`, `bili`, `twitter`) or make live HTTP API probes (`bilibili`, `v2ex`, `xueqiu`) with up to 10-second timeouts, `scrap-master doctor` took **5 to 35+ seconds**.
+- **Before:** `scrap_master/doctor.py` looped over `ALL_CHANNELS` one by one (`for ch in get_all_channels(): ch.check(config)`). Because several channels spawn subprocesses (`gh`, `yt-dlp`, `opencli`, `bili`, `twitter`) or make live HTTP API probes (`bilibili`, `v2ex`, `xueqiu`) with up to 10-second timeouts, sequential execution took the **sum** of all probes (up to 35+ seconds).
 - **After (Parallel `ThreadPoolExecutor`):** Because subprocess execution and HTTP socket I/O release Python's GIL, running all channel checks concurrently inside `concurrent.futures.ThreadPoolExecutor(max_workers=16)` reduces `scrap-master doctor` execution time to the duration of the **single slowest probe (~0.8–1.5 seconds)** while preserving the exact channel registry order.
 
 ### Bottleneck 2: Sequential File & PDF Downloading (17 Minutes -> ~12 Seconds)
