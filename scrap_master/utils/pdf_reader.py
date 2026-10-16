@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """Hybrid PDF text + batch macOS Apple Vision / Tesseract OCR extractor (`read-pdf`).
 
-Automatically extracts digital text from PDF pages via PyMuPDF (`pymupdf` / `fitz`)
-or `pypdf`. Whenever a page is a scanned camera/scanner image (like `ICS-F2-2025.pdf`
-where digital text is empty or only contains a watermark footer), it renders the
-page to PNG and runs OCR in parallel across all scanned pages using:
+Automatically extracts digital text from PDF pages via PyMuPDF (`pymupdf` / `fitz`).
+Whenever a page is a scanned camera/scanner image (like `ICS-F2-2025.pdf` where
+digital text is empty or only contains a watermark footer), it renders the scanned
+pages to PNG and runs a single batch OCR invocation using:
   1. macOS Native Apple Vision (`VNRecognizeTextRequest` compiled via `swiftc` and
      cached at `~/.scrap-master/bin/vision_ocr`) — zero third-party OCR install needed!
   2. `tesseract` CLI fallback (if installed on Linux/Windows/macOS).
