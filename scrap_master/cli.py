@@ -333,6 +333,8 @@ def main():
         _cmd_read_pdf(args)
     elif args.command == "scribd":
         _cmd_scribd(args)
+    elif args.command == "harvest":
+        _cmd_harvest(args)
     elif args.command == "download":
         _cmd_download(args)
 
