@@ -80,4 +80,4 @@ Web pages (with anti-bot fallbacks: direct HTML → Chrome-fingerprint TLS → h
 
 ## License
 
-[MIT](LICENSE)
+MIT © festomanolo
