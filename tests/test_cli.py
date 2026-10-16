@@ -29,6 +29,7 @@ class TestCLI:
                 main()
         assert exc_info.value.code == 0
 
+    def test_no_command_opens_tui_in_terminal(self):
 
     def test_doctor_runs(self, capsys):
         with patch(
