@@ -34,6 +34,35 @@ pip install -e ".[all,dev]" && pytest
 
 **Keys:** `ctrl+a` Ask AI · `ctrl+t` Tools · `ctrl+s` Settings · `n` new folder · `f` new file · `r` rename · `del` delete · `o` open in Finder · `ctrl+e` edit/save · `ctrl+r` refresh · `ctrl+q` quit
 
+## Scrape only what you need
+
+```bash
+scrap-master ask "form 4 chemistry past papers, pdfs only"          # AI job, PDFs only
+scrap-master ask "TCP/IP lecture decks" --only slides                # force a type
+scrap-master harvest https://site/library --only docs,sheets --organize
+scrap-master download URL… --only pdf --organize                     # skip everything else
+scrap-master organize ~/Downloads                                    # sort a folder by type
+scrap-master types                                                   # list presets
+```
+
+Presets: `pdf docs slides sheets ebooks images audio video archives code data`, groups
+`office media documents all`, or any raw extension (`--only .djvu`). Scribd and Google
+Drive are only crawled when a document type is selected.
+
+## Benchmark
+
+`scrap-master bench` serves a mixed batch from a local, bandwidth-capped server and races
+MANOLO Scrap against a plain Python loop, `curl`, `curl -Z`, `wget` and `aria2c` (whichever
+are installed). Plain tools get a hand-filtered list; Scrap gets the full mixed list and must
+pick the right types itself. Score = 60% speed · 20% filtering · 10% folders · 10% integrity.
+
+```
+#  Tool                      Time  ×naive   Files  Filter  Folders  Score
+1  MANOLO Scrap             0.23s   17.4×     8/8       ✔        ✔    100
+2  curl -Z (parallel)       1.09s    3.6×     8/8       ✘        ✘     23
+3  python loop (naive)      3.98s    1.0×     8/8       ✘        ✘     13
+```
+
 ## Where results go
 
 ```
