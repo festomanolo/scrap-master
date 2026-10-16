@@ -89,7 +89,7 @@ def _explicit_github_credentials(config) -> bool:
     try:
         return bool(config.get("github_token"))
     except Exception as exc:
-        raise GitHubConfigError("Scrap Master GitHub config cannot be read") from exc
+        raise GitHubConfigError("MANOLO Scrap GitHub config cannot be read") from exc
 
 
 class GitHubChannel(Channel):
