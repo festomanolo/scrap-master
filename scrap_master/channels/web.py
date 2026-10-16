@@ -72,7 +72,7 @@ def _read_via_playwright(url: str, timeout_ms: int = 25000) -> str:
     from playwright.sync_api import sync_playwright
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        browser = launch_browser(p)
         try:
             context = browser.new_context(user_agent=_UA)
             page = context.new_page()
