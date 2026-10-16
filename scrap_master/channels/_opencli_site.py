@@ -9,7 +9,7 @@ from .base import Channel
 class OpenCLISiteChannel(Channel):
     """A platform served directly by OpenCLI.
 
-    These channels are intentionally thin: Scrap Master only installs,
+    These channels are intentionally thin: MANOLO Scrap only installs,
     health-checks, and routes. Agents call `opencli <site> ...` directly.
     """
 
