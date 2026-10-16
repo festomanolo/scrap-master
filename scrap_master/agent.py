@@ -123,6 +123,10 @@ def run_job(
                 log(f"⚠ AI planning unavailable ({e}); using keyword plan")
                 ai_ok = False
         plan = plan or fallback_plan(request)
+    # Explicit --only wins, then "pdfs only"-style wording in the request, then the AI's choice.
+    forced = resolve(only) if only else types_from_text(request)
+    if forced:
+        plan["file_types"] = list(forced)
 
     project = new_project(plan["project_name"])
     data = project / "data"
