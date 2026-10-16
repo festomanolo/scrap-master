@@ -89,6 +89,9 @@ def free_openrouter_models() -> List[str]:
             data = json.loads(resp.read())["data"]
     except Exception:
         return []
+    free = [m for m in data if m["id"].endswith(":free") and not any(k in m["id"] for k in _SKIP_FREE)]
+    free.sort(key=lambda m: m.get("context_length") or 0, reverse=True)
+    return [m["id"] for m in free]
 
 
 def ollama_models() -> List[str]:
