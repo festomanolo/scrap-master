@@ -69,3 +69,10 @@ Based on our live benchmark scraping **Tanzania Form Two National Assessment (FT
 Instead of loading the bloated Scribd website (`https://www.scribd.com/document/<DOC_ID>/<SLUG>`) like a normal browser user—which loads paywall modals, CSS blur filters (`text-shadow`, `opacity`), and ad trackers—specialized downloaders and `scrap_master/channels/scribd.py` communicate directly with Scribd's underlying endpoints across **three layers**:
 
 ### Layer 1: Direct Mobile / Internal API Endpoint (With Session/Bearer Token or WordPress OEmbed)
+- **Mobile App API Architecture:** Mobile apps (iOS/Android) cannot easily render obfuscated desktop HTML; they request structured document metadata and raw stream URLs via internal JSON endpoints (`/api/v2/` or `/mobile/documents/<DOC_ID>`). When authenticated with a session token (`_scribd_session` / Bearer token), the client requests the raw PDF/EPUB binary stream directly.
+- **Public OEmbed API (`https://www.scribd.com/services/oembed?format=json&url=...`):** Returns clean JSON metadata (`title`, `author_name`, `thumbnail_url`, `html` iframe parameters) without loading the main web page.
+
+### Layer 2: Unblurred Embed Viewer Endpoint (`/embeds/<DOC_ID>/content`)
+- Requesting `https://www.scribd.com/embeds/<DOC_ID>/content` with a mobile/embed `User-Agent` bypasses the main site's marketing wrapper and serves the raw document reader HTML containing:
+  1. Inline text spans (`<span class="a">...</span>`) for the initial unblurred pages.
+  2. Embedded JavaScript `docManager.addPage(...)` calls containing the direct **`.jsonp` asset URLs** for every page in the document!
