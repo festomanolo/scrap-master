@@ -60,6 +60,7 @@ Based on our live benchmark scraping **Tanzania Form Two National Assessment (FT
 | **Multi-Platform Social/Video Routing** | ⭐⭐⭐⭐☆ | Great unified guide for agents (`yt-dlp`, `gh`, `opencli`), once dependencies are installed. |
 | **Finding & Downloading Direct PDFs** | ⭐⭐⭐☆☆ → ⭐⭐⭐⭐⭐ | Great at extracting links from index pages; now upgraded with a built-in parallel batch downloader with retries. |
 | **Scanned PDFs / Document Viewers (Scribd)** | ⭐⭐☆☆☆ → ⭐⭐⭐⭐☆ | Upgraded with direct Scribd Embed/JSONP/Mobile API extraction (`scribd.py`) bypassing the web UI blur. |
+| **Interactive JS Apps / Cloudflare Sites** | ⭐☆☆☆☆ → ⭐⭐⭐☆☆ | `curl_cffi` + Playwright fallbacks pass passive bot walls; interactive captchas / click-driven UIs still unsupported. |
 | **Interactive JS Apps / Cloudflare Sites** | ⭐☆☆☆☆ | Needs a local headless/stealth browser fallback for `web` when Jina Reader is blocked or clicks are required. |
 
 ---
