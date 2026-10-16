@@ -139,7 +139,7 @@ def discover(
                 report.pages_crawled.append(page_url)
                 report.page_text[page_url] = md
                 for link in extract_links(md):
-                    kind = classify_link(link, exts, rx)
+                    kind = classify_link(link, exts, rx, sources)
                     if kind:
                         found.setdefault(link, HarvestItem(url=link, kind=kind, source_page=page_url))
                     elif level < depth and _same_site(link, page_url):
@@ -162,6 +162,8 @@ def harvest(
     chunks: int = 8,
     max_pages: int = 50,
     limit: Optional[int] = None,
+    sources=("scribd", "gdrive"),
+    organize: bool = False,
 ) -> HarvestReport:
     """Discover, download and (optionally) extract every document linked from the start pages."""
     report = discover(start_urls, depth=depth, exts=exts, pattern=pattern, max_pages=max_pages)
