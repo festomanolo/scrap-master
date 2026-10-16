@@ -208,6 +208,25 @@ def main():
         "-o", "--output", default=None, help="Write extracted Markdown to a file"
     )
 
+    # ── harvest ──
+    p_hv = sub.add_parser(
+        "harvest",
+        help="Crawl index page(s), find PDF/Drive/Scribd links, download and extract them all",
+    )
+    p_hv.add_argument("urls", nargs="+", help="Index page URL(s) to start from")
+    p_hv.add_argument("-d", "--dir", default="harvest", help="Output directory (default: ./harvest)")
+    p_hv.add_argument("--depth", type=int, default=0, help="Follow same-site links this many levels (default: 0)")
+    p_hv.add_argument("--ext", action="append", default=None,
+                      help="File extension to collect, repeatable (default: .pdf)")
+    p_hv.add_argument("--match", default=None, help="Also collect links matching this regex")
+    p_hv.add_argument("--limit", type=int, default=None, help="Maximum number of documents")
+    p_hv.add_argument("--max-pages", type=int, default=50, help="Maximum pages to crawl (default: 50)")
+    p_hv.add_argument("--workers", type=int, default=12, help="Parallel file workers (default: 12)")
+    p_hv.add_argument("--chunks", type=int, default=8, help="HTTP Range chunks per file (default: 8)")
+    p_hv.add_argument("--extract", action="store_true", help="Extract text from downloaded PDFs to .md")
+    p_hv.add_argument("--no-ocr", action="store_true", help="Skip OCR on scanned pages when extracting")
+    p_hv.add_argument("--dry-run", action="store_true", help="Only list discovered documents")
+
     # ── download ──
     p_dl = sub.add_parser(
         "download",
