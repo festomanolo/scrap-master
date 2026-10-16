@@ -82,6 +82,9 @@ def chat(messages: List[Dict[str, str]], json_mode: bool = False, timeout: int =
     return data.get("message", {}).get("content", "")
 
 
+def free_openrouter_models() -> List[str]:
+
+
 def ollama_models() -> List[str]:
     try:
         with urllib.request.urlopen(f"{OLLAMA_URL}/api/tags", timeout=3) as resp:
