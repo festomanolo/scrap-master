@@ -2108,6 +2108,9 @@ def _cmd_download(args):
     from scrap_master.channels.gdrive import extract_gdrive_id, get_direct_gdrive_url
     from scrap_master.utils.parallel_downloader import download_batch_parallel
 
+    from scrap_master.utils.filetypes import category_of, resolve
+    from scrap_master.utils.harvest import classify_link
+
     out_dir = Path(args.dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     items = []
