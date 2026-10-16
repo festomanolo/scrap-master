@@ -57,7 +57,8 @@ def extract_links(markdown: str) -> List[str]:
     return list(seen)
 
 
-def classify_link(url: str, exts=_DEFAULT_EXTS, pattern: Optional[re.Pattern] = None) -> Optional[str]:
+def classify_link(url: str, exts=_DEFAULT_EXTS, pattern: Optional[re.Pattern] = None,
+                  sources=("scribd", "gdrive")) -> Optional[str]:
     """Return the link kind if it is a harvestable document, else None."""
     from scrap_master.channels.gdrive import extract_gdrive_id
     from scrap_master.channels.scribd import extract_scribd_id
