@@ -40,3 +40,10 @@ Based on our live benchmark scraping **Tanzania Form Two National Assessment (FT
 ### C. No Built-In PDF/Binary OCR Inside `scrap-master`
 - Scrap Master has `transcribe.py` for audio/video (via Whisper), but scanned camera/scanner image PDFs (like `ICS-F2-2025.pdf`) contain only image streams plus a watermark footer (`Find this and other free resources at: https://maktaba.tetea.org`).
 - Without a vision model or OCR pipeline (`pypdf`/`pdfplumber` + `tesseract` or multimodal LLM vision), a plain-text scraper gets blank pages on scanned exams.
+
+### D. Heavy Dependency on External Tools & Browser Sessions
+- **What we saw in `scrap-master doctor --json`:** Out of 16 channels on a fresh machine, only **3 worked out of the box** (`web`, `v2ex`, `bilibili`).
+- `exa_search` requires `mcporter` + the Exa MCP server installed.
+- Social platforms (Reddit, Facebook, Instagram, Twitter/X) have no zero-config scraping path—they require installing `opencli` and staying logged into a local Chrome session or manually exporting browser cookies.
+
+### E. Anti-Bot / Cloudflare Turnstile / Heavy JS SPAs
