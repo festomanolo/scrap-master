@@ -14,6 +14,8 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Callable, List, Optional
 
+from scrap_master.utils.filetypes import resolve, sources_for, types_from_text
+
 _DDG_RESULT_RE = re.compile(r'class="result__a" href="([^"]+)"')
 
 Log = Callable[[str], None]
