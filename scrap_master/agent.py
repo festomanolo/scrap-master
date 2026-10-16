@@ -19,6 +19,18 @@ _DDG_RESULT_RE = re.compile(r'class="result__a" href="([^"]+)"')
 Log = Callable[[str], None]
 
 
+def _unwrap(href: str) -> str:
+    href = href.replace("&amp;", "&")
+    qs = urllib.parse.parse_qs(urllib.parse.urlparse(href).query)
+    return qs.get("uddg", [href])[0]
+
+
+def _ddg_html(query: str) -> List[str]:
+    url = "https://html.duckduckgo.com/html/?" + urllib.parse.urlencode({"q": query})
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    with urllib.request.urlopen(req, timeout=25) as resp:
+        html = resp.read().decode("utf-8", errors="ignore")
+    return [_unwrap(h) for h in _DDG_RESULT_RE.findall(html)]
 def web_search(query: str, max_results: int = 8) -> List[str]:
     """Keyless web search via DuckDuckGo's HTML endpoint. Returns result URLs."""
     url = "https://html.duckduckgo.com/html/?" + urllib.parse.urlencode({"q": query})
