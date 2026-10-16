@@ -65,7 +65,7 @@ def main():
         epilog=__credits__,
     )
     parser.add_argument("-v", "--verbose", action="store_true", help="Show debug logs")
-    parser.add_argument("--version", action="version", version=f"MANOLO Scrap v{__version__}")
+    parser.add_argument("--version", action="version", version=f"MANOLO Scrap v{__version__}\n{__credits__}")
     sub = parser.add_subparsers(dest="command", help="Available commands")
 
     # ── setup ──
