@@ -6,7 +6,8 @@ Whenever a page is a scanned camera/scanner image (like `ICS-F2-2025.pdf` where
 digital text is empty or only contains a watermark footer), it renders the scanned
 pages to PNG and runs a single batch OCR invocation using:
   1. macOS Native Apple Vision (`VNRecognizeTextRequest` compiled via `swiftc` and
-     cached at `~/.scrap-master/bin/vision_ocr`) — zero third-party OCR install needed!
+     cached at `~/.scrap-master/bin/vision_ocr_batch`) — processes all images in
+     a single process to avoid macOS `mediaanalysisd` XPC deadlocks!
   2. `tesseract` CLI fallback (if installed on Linux/Windows/macOS).
 """
 
