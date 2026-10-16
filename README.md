@@ -1,4 +1,4 @@
-<h1 align="center">Scrap Master</h1>
+# MANOLO Scrap
 
 <p align="center">
   <strong>One toolkit to read, search and scrape data from the entire internet</strong>
