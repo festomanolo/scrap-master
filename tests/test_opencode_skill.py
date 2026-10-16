@@ -65,7 +65,7 @@ def test_install_skill_discovers_opencode_global_directory(tmp_path: Path):
 
     installed = skill_parent / "scrap-master" / "SKILL.md"
     assert installed.is_file()
-    assert "Scrap Master" in installed.read_text(encoding="utf-8")
+    assert "MANOLO Scrap" in installed.read_text(encoding="utf-8")
 
 
 def test_uninstall_skill_removes_opencode_global_directory(tmp_path: Path):
