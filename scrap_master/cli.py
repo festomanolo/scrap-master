@@ -310,6 +310,12 @@ def main():
         _cmd_format(args)
     elif args.command == "transcribe":
         _cmd_transcribe(args)
+    elif args.command == "read-pdf":
+        _cmd_read_pdf(args)
+    elif args.command == "scribd":
+        _cmd_scribd(args)
+    elif args.command == "download":
+        _cmd_download(args)
 
 
 # ── Command handlers ────────────────────────────────
