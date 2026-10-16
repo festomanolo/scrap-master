@@ -73,12 +73,7 @@ scrap-master doctor                                                       # chan
 
 Web pages (with anti-bot fallbacks: direct HTML → Chrome-fingerprint TLS → headless browser), PDFs (digital + scanned), Scribd, Google Drive / Docs, YouTube, GitHub, RSS, Twitter/X, Reddit, Facebook, Instagram, LinkedIn.
 
-```bash
-scrap-master install --env=auto --dry-run            # preview only
-scrap-master install --env=auto --system             # install core dependencies
-scrap-master install --system --channels=twitter,reddit,bilibili
-scrap-master install --system --channels=all         # everything
-```
+### Platform setup notes
 
 Use `--env=server` on a headless machine (desktop-only channels are skipped) and `--env=local` on a desktop.
 
