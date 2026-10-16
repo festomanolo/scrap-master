@@ -142,7 +142,6 @@ def extract_pdf_text(
     pdf_path: Union[str, Path],
     ocr_fallback: bool = True,
     dpi: int = 150,
-    max_workers: int = 8,
     max_pages: Optional[int] = None,
 ) -> Dict:
     """Extract text from a digital or scanned PDF in parallel, returning structured dict & Markdown."""
