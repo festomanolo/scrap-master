@@ -4,6 +4,7 @@
 Each channel knows how to check itself. Doctor just collects the results.
 """
 
+from concurrent.futures import ThreadPoolExecutor
 from typing import Dict
 
 from rich.markup import escape
