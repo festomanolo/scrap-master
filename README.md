@@ -18,10 +18,8 @@ scrap            # opens the TUI
 Development:
 
 ```bash
-git clone https://github.com/festomanolo/scrap-master.git
-cd scrap-master
-pip install -e ".[dev]"
-pytest
+git clone https://github.com/festomanolo/scrap-master.git && cd scrap-master
+pip install -e ".[all,dev]" && pytest
 ```
 
 ---
