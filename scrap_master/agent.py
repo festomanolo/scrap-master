@@ -201,6 +201,15 @@ def run_job(
     return project
 
 
+DEFAULT_SEED_SITES = ["https://maktaba.tetea.org/", "https://msomibora.com/", "https://learninghubtz.co.tz/"]
+
+
+def seed_sites() -> List[str]:
+    from scrap_master.config import Config
+
+    raw = Config().get("seed_sites")
+    if raw is None:
+        return list(DEFAULT_SEED_SITES)
 def _safe_search(q: str) -> List[str]:
     try:
         return web_search(q)
