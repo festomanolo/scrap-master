@@ -37,6 +37,24 @@ for path in args {
         output[path] = ""
         continue
     }
+    let handler = VNImageRequestHandler(cgImage: cgImg, options: [:])
+    do {
+        try handler.perform([req])
+        var lines: [String] = []
+        for obs in req.results ?? [] {
+            if let top = obs.topCandidates(1).first {
+                lines.append(top.string)
+            }
+        }
+        output[path] = lines.joined(separator: "\\n")
+    } catch {
+        output[path] = ""
+    }
+}
+
+if let data = try? JSONSerialization.data(withJSONObject: output, options: []),
+   let str = String(data: data, encoding: .utf8) {
+    print(str)
 }
 """
 
