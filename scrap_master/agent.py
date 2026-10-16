@@ -135,6 +135,12 @@ def run_job(
             results.extend(u for u in urls if u not in results)
     (data / "search_results.json").write_text(json.dumps(results, indent=2), encoding="utf-8")
 
+    fallback_seeds = False
+    if not results:
+        results = seed_sites()
+        fallback_seeds = bool(results)
+        log(f"⚠ Search returned nothing — crawling your favourite sites: {', '.join(results) or 'none set'}")
+
     exts = tuple(e.lower() for e in plan["file_types"])
     direct = [u for u in results if classify_link(u, exts)]
     pages = [u for u in results if u not in direct]
