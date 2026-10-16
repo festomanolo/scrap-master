@@ -124,6 +124,8 @@ Reply with ONLY a JSON object:
 
 
 def plan_job(request: str) -> dict:
+    from scrap_master.utils.filetypes import resolve
+
     reply = chat(
         [{"role": "system", "content": PLAN_PROMPT}, {"role": "user", "content": request}],
         json_mode=True,
