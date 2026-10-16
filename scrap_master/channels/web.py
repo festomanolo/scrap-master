@@ -163,7 +163,14 @@ class WebChannel(Channel):
                     return md
             except Exception:
                 pass
-            # Fallback 2: Local headless Playwright Chromium browser
+            # Fallback 2: Chrome TLS fingerprint impersonation (optional curl_cffi)
+            try:
+                md = _read_via_curl_cffi(url)
+                if len(md) > 200:
+                    return md
+            except Exception:
+                pass
+            # Fallback 3: Local headless Playwright Chromium browser
             try:
                 md = _read_via_playwright(url)
                 if md.strip():
