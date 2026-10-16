@@ -324,7 +324,7 @@ def main():
         sys.exit(0)
 
     if args.command == "version":
-        print(f"MANOLO Scrap v{__version__}")
+        print(f"MANOLO Scrap v{__version__}\n{__credits__}")
         sys.exit(0)
 
     if args.command == "doctor":
