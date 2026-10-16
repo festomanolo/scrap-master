@@ -90,14 +90,17 @@ def ocr_image_batch(image_paths: Sequence[Union[str, Path]], timeout: int = 120)
 
     vision_bin = _get_macos_vision_batch_binary()
     if vision_bin:
-        r = subprocess.run(
-            [str(vision_bin), img_str],
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-        )
-        if r.returncode == 0 and r.stdout.strip():
-            return r.stdout.strip()
+        try:
+            r = subprocess.run(
+                [str(vision_bin), *paths_str],
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+            )
+            if r.returncode == 0 and r.stdout.strip():
+                return json.loads(r.stdout.strip())
+        except Exception:
+            pass
 
     tesseract_bin = shutil.which("tesseract")
     if tesseract_bin:
