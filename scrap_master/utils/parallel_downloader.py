@@ -70,3 +70,39 @@ def download_one(
         attempts=retries + 1,
         elapsed_sec=round(time.monotonic() - t0, 3),
         error=last_err,
+    )
+
+
+def download_batch_parallel(
+    items: Iterable[Tuple[str, Union[str, Path]]],
+    max_workers: int = 12,
+    timeout: int = 20,
+    retries: int = 3,
+    verify_pdf: bool = False,
+    headers: Optional[Dict[str, str]] = None,
+) -> List[DownloadResult]:
+    """Download multiple (url, destination_path) pairs concurrently using a thread pool."""
+    item_list = list(items)
+    if not item_list:
+        return []
+
+    results: List[Optional[DownloadResult]] = [None] * len(item_list)
+    workers = max(1, min(max_workers, len(item_list)))
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        future_to_idx = {
+            pool.submit(
+                download_one,
+                url,
+                dest,
+                timeout=timeout,
+                retries=retries,
+                verify_pdf=verify_pdf,
+                headers=headers,
+            ): idx
+            for idx, (url, dest) in enumerate(item_list)
+        }
+        for fut in as_completed(future_to_idx):
+            idx = future_to_idx[fut]
+            results[idx] = fut.result()
+
+    return [r for r in results if r is not None]
