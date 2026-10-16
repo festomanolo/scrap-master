@@ -201,6 +201,8 @@ def download_batch_parallel(
     timeout: int = 25,
     retries: int = 3,
     verify_pdf: bool = False,
+    chunks_per_file: int = 8,
+    min_chunk_size_bytes: int = 256 * 1024,
     headers: Optional[Dict[str, str]] = None,
 ) -> List[DownloadResult]:
     """Download multiple (url, destination_path) pairs concurrently using a thread pool."""
