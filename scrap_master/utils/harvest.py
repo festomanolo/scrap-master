@@ -173,3 +173,39 @@ def harvest(
     for it, res in zip(file_items, download_batch_parallel(pairs, max_workers=workers, chunks_per_file=chunks)):
         it.ok, it.size_bytes, it.error = res.ok, res.size_bytes, res.error
 
+    # Scribd documents are extracted directly to Markdown
+    scribd_items = [i for i in report.items if i.kind == "scribd"]
+
+    def _scribd(it: HarvestItem):
+        try:
+            doc = ScribdChannel().extract_document(it.url)
+            p = out / f"scribd_{extract_scribd_id(it.url)}.md"
+            p.write_text(doc["markdown"], encoding="utf-8")
+            it.path = it.text_path = str(p)
+            it.ok, it.size_bytes = True, p.stat().st_size
+        except Exception as e:
+            it.error = f"{type(e).__name__}: {e}"
+
+    if scribd_items:
+        with ThreadPoolExecutor(max_workers=min(4, len(scribd_items))) as pool:
+            list(pool.map(_scribd, scribd_items))
+
+    if extract_text:
+        _extract_texts([i for i in file_items if i.ok and i.path.lower().endswith(".pdf")], ocr)
+
+    (out / "harvest_manifest.json").write_text(report.to_json(), encoding="utf-8")
+    return report
+
+
+def _extract_texts(items: List[HarvestItem], ocr: bool) -> None:
+    from scrap_master.utils.pdf_reader import extract_pdf_text
+
+    # OCR runs a single native batch process per PDF, so extract PDFs one at a time.
+    for it in items:
+        try:
+            res = extract_pdf_text(it.path, ocr_fallback=ocr)
+            p = Path(it.path).with_suffix(".md")
+            p.write_text(res["markdown"], encoding="utf-8")
+            it.text_path = str(p)
+        except Exception as e:
+            it.error = f"text extraction failed: {type(e).__name__}: {e}"
