@@ -22,7 +22,7 @@ git clone https://github.com/festomanolo/scrap-master.git && cd scrap-master
 pip install -e ".[all,dev]" && pytest
 ```
 
----
+## The TUI (`scrap`)
 
 ## How to use it
 
