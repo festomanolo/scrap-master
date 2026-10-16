@@ -138,3 +138,38 @@ def harvest(
     depth: int = 0,
     exts=_DEFAULT_EXTS,
     pattern: Optional[str] = None,
+    extract_text: bool = False,
+    ocr: bool = True,
+    workers: int = 12,
+    chunks: int = 8,
+    max_pages: int = 50,
+    limit: Optional[int] = None,
+) -> HarvestReport:
+    """Discover, download and (optionally) extract every document linked from the start pages."""
+    from scrap_master.channels.gdrive import extract_gdrive_id, get_direct_gdrive_url
+    from scrap_master.channels.scribd import ScribdChannel, extract_scribd_id
+    from scrap_master.utils.parallel_downloader import download_batch_parallel
+
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    report = discover(start_urls, depth=depth, exts=exts, pattern=pattern, max_pages=max_pages)
+    if limit is not None:
+        report.items = report.items[:limit]
+
+    # Binary downloads (direct files + Google Drive exports)
+    file_items = [i for i in report.items if i.kind in ("file", "gdrive")]
+    pairs, used = [], set()
+    for idx, it in enumerate(file_items, 1):
+        if it.kind == "gdrive":
+            fid, _ = extract_gdrive_id(it.url)
+            url, name = get_direct_gdrive_url(it.url), f"gdrive_{fid}.pdf"
+        else:
+            url, name = it.url, _safe_name(it.url, idx)
+        while name in used:
+            name = f"{idx}_{name}"
+        used.add(name)
+        it.path = str(out / name)
+        pairs.append((url, out / name))
+    for it, res in zip(file_items, download_batch_parallel(pairs, max_workers=workers, chunks_per_file=chunks)):
+        it.ok, it.size_bytes, it.error = res.ok, res.size_bytes, res.error
+
