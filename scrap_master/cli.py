@@ -60,7 +60,7 @@ def main():
     _ensure_utf8_console()
 
     parser = argparse.ArgumentParser(
-        prog="scrap-master",
+        prog="nolo-scrap",
         description="One toolkit to read, search and scrape data from the entire internet",
     )
     parser.add_argument("-v", "--verbose", action="store_true", help="Show debug logs")
