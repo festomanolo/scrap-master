@@ -71,7 +71,7 @@ scrap-master doctor                                                       # chan
 
 ## What it can read
 
-`install` is read-only by default. It checks your machine and changes nothing until you pass `--system`.
+Web pages (with anti-bot fallbacks: direct HTML → Chrome-fingerprint TLS → headless browser), PDFs (digital + scanned), Scribd, Google Drive / Docs, YouTube, GitHub, RSS, Twitter/X, Reddit, Facebook, Instagram, LinkedIn.
 
 ```bash
 scrap-master install --env=auto --dry-run            # preview only
