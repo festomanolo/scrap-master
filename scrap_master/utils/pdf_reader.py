@@ -176,15 +176,10 @@ def extract_pdf_text(
                 pix.save(str(img_file))
                 img_paths[pnum] = img_file
 
-            workers = max(1, min(max_workers, len(scanned_pages)))
-            with ThreadPoolExecutor(max_workers=workers) as pool:
-                fut_to_pnum = {
-                    pool.submit(ocr_image_file, img_paths[pnum]): pnum
-                    for pnum in scanned_pages
-                }
-                for fut in as_completed(fut_to_pnum):
-                    pnum = fut_to_pnum[fut]
-                    pages_ocr[pnum] = fut.result()
+            ordered_paths = [str(img_paths[pnum]) for pnum in scanned_pages]
+            batch_out = ocr_image_batch(ordered_paths, timeout=max(60, len(scanned_pages) * 15))
+            for pnum in scanned_pages:
+                pages_ocr[pnum] = batch_out.get(str(img_paths[pnum]), "")
 
     doc.close()
 
