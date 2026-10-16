@@ -170,7 +170,8 @@ def harvest(
                       sources=sources)
     if limit is not None:
         report.items = report.items[:limit]
-    return fetch(report, out_dir, extract_text=extract_text, ocr=ocr, workers=workers, chunks=chunks)
+    return fetch(report, out_dir, extract_text=extract_text, ocr=ocr, workers=workers, chunks=chunks,
+                 organize=organize)
 
 
 def fetch(
@@ -183,6 +184,7 @@ def fetch(
     scribd_dir=None,
     text_dir=None,
     manifest_dir=None,
+    organize: bool = False,
 ) -> HarvestReport:
     """Download / extract every item in ``report`` and write a JSON manifest."""
     from scrap_master.channels.gdrive import extract_gdrive_id, get_direct_gdrive_url
