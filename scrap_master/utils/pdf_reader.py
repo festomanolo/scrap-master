@@ -75,7 +75,7 @@ def _get_macos_vision_batch_binary() -> Optional[Path]:
             ["swiftc", "-O", str(src_path), "-o", str(bin_path)],
             check=True,
             capture_output=True,
-            timeout=60,
+            timeout=90,
         )
         return bin_path if bin_path.exists() else None
     except Exception:
