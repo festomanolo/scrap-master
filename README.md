@@ -1,8 +1,6 @@
 # MANOLO Scrap
 
-<p align="center">
-  <strong>One toolkit to read, search and scrape data from the entire internet</strong>
-</p>
+**Tell it what you want. It finds, downloads, reads and files it.**
 
 <p align="center">
   For each platform, Scrap Master picks the most reliable access path, installs it, health-checks it, and falls back to the next one when it breaks.
