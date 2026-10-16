@@ -35,6 +35,7 @@ class TestCLI:
              patch("sys.stdout.isatty", return_value=True), \
              patch("scrap_master.tui.main") as tui_main:
             with pytest.raises(SystemExit) as exc_info:
+                main()
 
     def test_doctor_runs(self, capsys):
         with patch(
