@@ -112,6 +112,7 @@ Web pages (with anti-bot fallbacks: direct HTML → Chrome-fingerprint TLS → h
 - **Twitter/X:** cookies saved with `scrap-master configure twitter-cookies` are only used by `doctor`. Before calling `twitter` directly, set `TWITTER_AUTH_TOKEN` and `TWITTER_CT0` in that process's environment.
 - **LinkedIn:** full profiles/jobs need the `mcp-server-linkedin` MCP server (see `scrap-master doctor`).
 
+## Made by
 ## License
 
 MIT © festomanolo
