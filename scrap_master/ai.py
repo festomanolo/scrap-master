@@ -70,8 +70,9 @@ def chat(messages: List[Dict[str, str]], json_mode: bool = False, timeout: int =
                     return content
             except (AIError, KeyError, IndexError, TypeError) as e:
                 # 402 no credits / 429 rate limit / 404 retired model -> try the next free model
-            {"Authorization": f"Bearer {key}", "X-Title": "MANOLO Scrap"},
-            timeout,
+                last = e
+        raise AIError(
+            f"OpenRouter failed ({last}). 402 = no credits: use a ':free' model or add credits at openrouter.ai."
         )
         try:
             return data["choices"][0]["message"]["content"]
