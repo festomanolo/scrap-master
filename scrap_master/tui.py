@@ -191,7 +191,8 @@ class ManoloScrap(App):
         yield Input(value=c.get("ollama_model") or ai.DEFAULT_OLLAMA_MODEL, id="s-ollama-model")
         yield Label("OpenRouter API key", classes="field-label")
         yield Input(value=c.get("openrouter_api_key") or "", password=True, placeholder="sk-or-…", id="s-or-key")
-        yield Label("OpenRouter model", classes="field-label")
+        yield Label("OpenRouter model  — 'free' auto-picks a no-cost model; or e.g. google/gemma-4-31b-it:free",
+                    classes="field-label")
         yield Input(value=c.get("openrouter_model") or ai.DEFAULT_OPENROUTER_MODEL, id="s-or-model")
         from scrap_master.agent import seed_sites
 
