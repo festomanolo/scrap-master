@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """MANOLO Scrap — One toolkit to read, search and scrape data from the entire internet."""
 
-__version__ = "1.5.1"
+__version__ = "1.5.2"
 __author__ = "festomanolo"
 __credits__ = "Made by festomanolo · github.com/festomanolo · festomanolo.com"
 
