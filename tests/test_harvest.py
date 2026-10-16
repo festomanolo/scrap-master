@@ -7,3 +7,4 @@ def test_extract_links_dedupes_markdown_and_bare_urls():
 
 
 def test_classify_link_kinds():
+    assert classify_link("https://x.org/My%20Paper.PDF") == "file"
