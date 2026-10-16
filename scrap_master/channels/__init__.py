@@ -11,6 +11,7 @@ from .bilibili import BilibiliChannel
 from .boss import BossChannel
 from .exa_search import ExaSearchChannel
 from .facebook import FacebookChannel
+from .gdrive import GoogleDriveChannel
 from .github import GitHubChannel
 from .instagram import InstagramChannel
 from .linkedin import LinkedInChannel
