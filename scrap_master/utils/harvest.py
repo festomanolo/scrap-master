@@ -64,9 +64,10 @@ def classify_link(url: str, exts=_DEFAULT_EXTS, pattern: Optional[re.Pattern] = 
     from scrap_master.channels.scribd import extract_scribd_id
 
     host = urllib.parse.urlparse(url).netloc.lower()
-    if "scribd.com" in host and extract_scribd_id(url):
+    if "scribd" in sources and "scribd.com" in host and extract_scribd_id(url):
         return "scribd"
-    if ("drive.google.com" in host or "docs.google.com" in host) and extract_gdrive_id(url):
+    if "gdrive" in sources and ("drive.google.com" in host or "docs.google.com" in host) \
+            and extract_gdrive_id(url):
         return "gdrive"
     path = urllib.parse.unquote(urllib.parse.urlparse(url).path).lower()
     if any(path.endswith(e) for e in exts):
