@@ -26,4 +26,4 @@ class TestScrapMaster:
     def test_doctor_report(self, eyes):
         report = eyes.doctor_report()
         assert isinstance(report, str)
-        assert "Scrap Master" in report
+        assert "MANOLO Scrap" in report
