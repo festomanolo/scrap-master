@@ -88,12 +88,3 @@ def isolated_home(tmp_path, monkeypatch):
     return home
 
 
-@pytest.fixture(autouse=True)
-def isolated_xueqiu_cookie_jar(monkeypatch):
-    """Prevent the module-level Xueqiu session from leaking between tests."""
-    from scrap_master.channels import xueqiu
-
-    xueqiu._cookie_jar.clear()
-    monkeypatch.setattr(xueqiu, "_cookies_initialized", False)
-    yield
-    xueqiu._cookie_jar.clear()

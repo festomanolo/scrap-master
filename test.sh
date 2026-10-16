@@ -1,5 +1,5 @@
 #!/bin/bash
-# Scrap Master clean-environment integration test.
+# MANOLO Scrap clean-environment integration test.
 # Creates an isolated venv, installs this checkout, runs a read-only doctor,
 # then executes the repository test suite.
 
@@ -67,4 +67,4 @@ python -c 'import json,sys; data=json.load(open(sys.argv[1], encoding="utf-8"));
 echo "[5/5] Running repository tests"
 pytest "$REPO_ROOT/tests" -q
 
-echo "Scrap Master integration test passed"
+echo "MANOLO Scrap integration test passed"
