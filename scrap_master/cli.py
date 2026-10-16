@@ -204,6 +204,12 @@ def main():
     p_hv.add_argument("--depth", type=int, default=0, help="Follow same-site links this many levels (default: 0)")
     p_hv.add_argument("--ext", action="append", default=None,
                       help="File extension to collect, repeatable (default: .pdf)")
+    p_hv.add_argument("--only", action="append", default=None, metavar="TYPES",
+                      help="What to collect: pdf, docs, slides, sheets, ebooks, images, audio, video, "
+                           "archives, code, data, office, media, all (comma list, repeatable)")
+    p_hv.add_argument("--no-scribd", action="store_true", help="Skip Scribd links")
+    p_hv.add_argument("--no-drive", action="store_true", help="Skip Google Drive links")
+    p_hv.add_argument("--organize", action="store_true", help="File downloads into <type>/ folders")
     p_hv.add_argument("--match", default=None, help="Also collect links matching this regex")
     p_hv.add_argument("--limit", type=int, default=None, help="Maximum number of documents")
     p_hv.add_argument("--max-pages", type=int, default=50, help="Maximum pages to crawl (default: 50)")
