@@ -218,3 +218,40 @@ class ScribdChannel(Channel):
                     pool.submit(_fetch_one, pnum, jurl)
                     for pnum, jurl in jsonp_tasks.items()
                 ]
+                for fut in as_completed(futures):
+                    pnum, (txt, imgs) = fut.result()
+                    if txt or not pages_text.get(pnum):
+                        pages_text[pnum] = txt
+                    if imgs:
+                        pages_images[pnum] = imgs
+
+        sorted_pages = sorted(set(pages_text.keys()) | set(pages_images.keys()))
+        markdown_sections = []
+        title = metadata.get("title") or f"Scribd Document {doc_id}"
+        markdown_sections.append(f"# {title}\n")
+        if metadata.get("author_name"):
+            markdown_sections.append(f"**Author:** {metadata['author_name']}  ")
+        markdown_sections.append(
+            f"**Document ID:** `{doc_id}` | **Pages Extracted:** {len(sorted_pages)}\n"
+        )
+
+        for pnum in sorted_pages:
+            markdown_sections.append(f"\n---\n## Page {pnum}\n")
+            if pages_text.get(pnum):
+                markdown_sections.append(pages_text[pnum])
+            for img in pages_images.get(pnum, []):
+                markdown_sections.append(f"\n![Page {pnum} Image]({img})")
+
+        return {
+            "doc_id": doc_id,
+            "title": title,
+            "author": metadata.get("author_name"),
+            "page_count": len(sorted_pages),
+            "pages": {p: pages_text.get(p, "") for p in sorted_pages},
+            "images": {p: pages_images.get(p, []) for p in sorted_pages},
+            "markdown": "\n".join(markdown_sections),
+        }
+
+    def read(self, url: str) -> str:
+        """Read a Scribd document URL and return its full Markdown text."""
+        return self.extract_document(url)["markdown"]
