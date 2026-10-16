@@ -1,6 +1,5 @@
 # Video & Podcasts
 
-Subtitles and transcripts for YouTube, Bilibili, and Xiaoyuzhou Podcast.
 
 ## YouTube (yt-dlp)
 
@@ -76,15 +75,6 @@ scrap-master transcribe ./local_audio.mp3 -o /tmp/transcript.txt
 > may be processed by both Groq and OpenAI (potentially incurring OpenAI costs). Use only
 > when you have confirmed the content is safe to share with both providers.
 
-## Bilibili (bili-cli primary, OpenCLI for subtitles)
-
-> ⚠️ **Do not use yt-dlp for Bilibili**: Bilibili's rate-limiting blocks yt-dlp with 412
-> across the board (verified with latest version, direct/proxy/with cookie — all fail).
-> yt-dlp is for YouTube only.
-
-### Video detail / search / trending / rankings (bili-cli, read-only, no login)
-
-```bash
 # Video detail (title / uploader / duration / view+engagement data / subtitle availability)
 bili video BVxxx
 
@@ -103,34 +93,21 @@ bili audio BVxxx
 
 ```bash
 # Subtitles with per-sentence timestamps
-opencli bilibili subtitle BVxxx
 
 # OpenCLI can also search / read video metadata (fallback)
-opencli bilibili search "query" -f yaml
-opencli bilibili video BVxxx -f yaml
 ```
 
 ### Zero-config fallback: direct search API
 
 ```bash
 UA="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
-curl -s -c /tmp/bili_ck.txt -o /dev/null -A "$UA" "https://www.bilibili.com/"
-curl -s -b /tmp/bili_ck.txt -A "$UA" -e "https://www.bilibili.com/" \
-  "https://api.bilibili.com/x/web-interface/search/all/v2?keyword=QUERY&page=1"
 ```
 
-> **Install bili-cli**: `pipx install bilibili-cli` (upstream unmaintained since March 2026
 > but verified healthy; read-only use requires no login — `bili login` QR scan unlocks
 > feeds, favorites, and personal features).
 
-## Xiaoyuzhou Podcast
-
-### Transcribe a single episode (optionally add --polish for improved punctuation)
-
-```bash
 # Output a Markdown file to /tmp/. --polish uses Llama 3.3 70B on Groq to add
 # Chinese punctuation and sensible paragraph breaks.
-~/.scrap-master/tools/xiaoyuzhou/transcribe.sh --polish "https://www.xiaoyuzhoufm.com/episode/EPISODE_ID"
 ```
 
 > The transcription prompt already asks Whisper for Chinese punctuation. If punctuation
@@ -142,7 +119,6 @@ curl -s -b /tmp/bili_ck.txt -A "$UA" -e "https://www.bilibili.com/" \
 1. **ffmpeg**: `brew install ffmpeg`
 2. **Groq API key** (free): https://console.groq.com/keys
 3. **Configure the key**: `scrap-master configure groq-key` (hidden input)
-4. **First-time setup**: `scrap-master install --env=auto --system --channels=xiaoyuzhou` (requires explicit user approval)
 
 ### Check status
 
@@ -157,7 +133,3 @@ scrap-master doctor
 | Scenario | Recommended tool |
 |----------|-----------------|
 | YouTube subtitles | yt-dlp; on failure: OpenCLI (up to 3 retries) → scrap-master transcribe |
-| Bilibili video detail / search | bili-cli |
-| Bilibili subtitles | opencli bilibili subtitle |
-| Podcast transcription | Xiaoyuzhou transcribe.sh |
-| Audio/video without subtitles | scrap-master transcribe (Bilibili audio: `bili audio` first) |

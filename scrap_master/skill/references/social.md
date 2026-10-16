@@ -1,86 +1,46 @@
 # Social Media & Communities
 
-XiaoHongShu, Twitter/X, Bilibili, V2EX, Reddit, Facebook, Instagram.
 
-## XiaoHongShu (multi-backend)
-
-XiaoHongShu has three backends. **Run `scrap-master doctor --json` first to check which `active_backend` is serving xiaohongshu**, then use the matching command group.
-
-### Backend A: OpenCLI (preferred on desktop)
-
-```bash
 # Search notes
-opencli xiaohongshu search "query" -f yaml
 
 # Read a note's full content + engagement data (use the complete URL from search results, including xsec_token)
-opencli xiaohongshu note "NOTE_URL" -f yaml
 
 # Comments (including nested replies)
-opencli xiaohongshu comments NOTE_ID -f yaml
 
 # Home feed
-opencli xiaohongshu feed -f yaml
 
 # Public notes on a user's profile
-opencli xiaohongshu user USER_ID -f yaml
 ```
 
 > Requires Chrome open with the OpenCLI extension installed. OpenCLI may only
 > use an existing Chrome session explicitly controlled by the user.
-> Scrap Master never logs the user in or reads browser cookies.
-> `scrap-master configure xhs-cookies` does not inject cookies into OpenCLI or Chrome.
+> MANOLO Scrap never logs the user in or reads browser cookies.
 > If no existing session is present, do not automate login; switch to backends B/C
 > and follow the Cookie-Editor manual export process.
 
-### Backend B: xiaohongshu-mcp (server environments)
-
-```bash
 # Have the user manually export cookies via Cookie-Editor first, then import explicitly
-scrap-master configure xhs-cookies
 
 # Read-only status check
-mcporter call xiaohongshu.check_login_status --timeout 120000
 
 # Search
-mcporter call xiaohongshu.search_feeds keyword="query" --timeout 120000
 
 # Note detail + comments (get feed_id and xsec_token from search results)
-mcporter call xiaohongshu.get_feed_detail feed_id="..." xsec_token="..." --timeout 120000
 ```
 
 > The first call automatically downloads ~150 MB of a headless browser — use `--timeout 120000`.
 > Authentication only goes through a manual Cookie-Editor export; after importing, run
 > `check_login_status` first. This explicit command saves/imports the user-provided
-> xiaohongshu.com-domain Cookie set; the user should confirm the scope.
-> Cookies from domains other than xiaohongshu.com are ignored.
-
-### Backend C: xhs-cli (legacy fallback — upstream unmaintained since March 2026)
-
-```bash
-xhs search "query"          # search
-xhs read NOTE_ID_OR_URL     # read note (must use the URL/ID from search results, not a bare note_id)
-xhs comments NOTE_ID_OR_URL # comments
-xhs hot                     # trending
-xhs feed                    # recommended feed
-```
-
-> Known instability: `xhs user` / `xhs user-posts` / `xhs favorites` may return API errors
-> (upstream unmaintained, no fixes). New users should go straight to backends A/B.
 
 ### General Notes
 
-> **Authentication boundary**: Scrap Master must not log the user in to XiaoHongShu or read
 > browser cookies. OpenCLI may only use an existing, explicitly user-controlled Chrome session.
-> xiaohongshu-mcp / legacy tools use a manual Cookie-Editor export.
 >
-> **xsec_token requirement**: XiaoHongShu enforces the xsec_token mechanism.
 > **Do not fetch directly with a bare note_id.** The correct flow: search/feed first
 > to get results, then use the complete URL/ID from those results. All three backends work the same way.
 >
 > **Rate limiting**: High-frequency requests (bulk search, deep comment pagination) trigger
 > CAPTCHAs — platform limits cannot be bypassed. Space operations 2-3 seconds apart.
 >
-> **Write operations (posting/commenting/liking)**: Read-only is recommended. xhs-cli v0.6.x
 > write operations may return 406 due to signature issues.
 
 ## Twitter/X (twitter-cli)
@@ -150,65 +110,17 @@ twitter likes
 >
 > **Output format**: Use `--yaml` or `--json` for structured output — more AI-agent-friendly.
 
-## Bilibili
-
-> ⚠️ **Do not use yt-dlp for Bilibili** (Bilibili rate-limits block yt-dlp 412 universally — verified with latest version, direct/proxy/with cookie, all fail). Use bili-cli / OpenCLI.
-
-```bash
-# Search / trending / video detail (bili-cli, read-only, no login needed)
-bili search "query" --type video -n 5
-bili hot -n 10
-bili video BVxxx
-
 # Subtitles (OpenCLI, requires desktop Chrome)
-opencli bilibili subtitle BVxxx
 ```
 
 > For detailed commands (audio transcription, API fallback), see [references/video.md](video.md).
 
-## V2EX (public API)
-
-No authentication required — call the public API directly.
-
-### Trending topics
-
-```bash
-curl -s "https://www.v2ex.com/api/topics/hot.json" -H "User-Agent: scrap-master/1.0"
-```
-
-### Node topics
-
-```bash
 # node_name examples: python, tech, jobs, qna, programmers
-curl -s "https://www.v2ex.com/api/topics/show.json?node_name=python&page=1" -H "User-Agent: scrap-master/1.0"
 ```
 
 ### Topic detail
 
 ```bash
-# topic_id from URL, e.g. https://www.v2ex.com/t/1234567
-curl -s "https://www.v2ex.com/api/topics/show.json?id=TOPIC_ID" -H "User-Agent: scrap-master/1.0"
-```
-
-### Topic replies
-
-```bash
-curl -s "https://www.v2ex.com/api/replies/show.json?topic_id=TOPIC_ID&page=1" -H "User-Agent: scrap-master/1.0"
-```
-
-### User profile
-
-```bash
-curl -s "https://www.v2ex.com/api/members/show.json?username=USERNAME" -H "User-Agent: scrap-master/1.0"
-```
-
-### Python example
-
-```python
-from scrap_master.channels.v2ex import V2EXChannel
-
-ch = V2EXChannel()
-
 # Get trending topics
 topics = ch.get_hot_topics(limit=10)
 for t in topics:
@@ -225,7 +137,6 @@ print(topic["title"], "—", topic["author"])
 user = ch.get_user("Livid")
 ```
 
-> **Node list**: https://www.v2ex.com/planes
 
 ## Reddit (multi-backend, login required)
 
