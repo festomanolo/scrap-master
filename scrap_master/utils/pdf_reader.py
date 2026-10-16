@@ -103,6 +103,7 @@ def ocr_image_batch(image_paths: Sequence[Union[str, Path]], timeout: int = 120)
             pass
 
     tesseract_bin = shutil.which("tesseract")
+    results: Dict[str, str] = {}
     if tesseract_bin:
         r = subprocess.run(
             [tesseract_bin, img_str, "stdout"],
