@@ -227,6 +227,7 @@ def _safe_search(q: str) -> List[str]:
         return []
 
 
+
 def _material(project: Path, report) -> str:
     parts = ["## Documents"]
     for it in report.items:
