@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Scrap Master CLI — installer, doctor, and configuration tool.
+MANOLO Scrap CLI — installer, doctor, and configuration tool.
 
 Usage:
     scrap-master install --env=auto
@@ -19,15 +19,6 @@ from scrap_master import __version__
 
 # Pinned to the 0.4.2 state — PyPI still only has 0.4.1 (upstream issue #10).
 _RDT_GIT_SOURCE = "git+https://github.com/public-clis/rdt-cli.git@5e4fb3720d5c174e976cd425ccc3b879d52cac66"
-# boss-agent-cli PRs #403-#407 are all merged into upstream master. Pin to a fixed
-# upstream commit that contains strict CDP, JobItem.lid, job_card_browser(), and the
-# throttle progress feedback. Never point the installer at a moving branch. Once an
-# upstream release containing #403/#404/#406 ships, switch to a version specifier.
-_BOSS_AGENT_CLI_PR_COMMIT = "4c991b77086a203173bf08a4cb64a23af6514fe6"
-_BOSS_AGENT_CLI_SOURCE = (
-    "git+https://github.com/can4hou6joeng4/boss-agent-cli.git@"
-    + _BOSS_AGENT_CLI_PR_COMMIT
-)
 _MAX_CONFIGURE_VALUE_CHARS = 1024 * 1024
 _SENSITIVE_CONFIG_KEYS = {
     "proxy",
@@ -35,7 +26,7 @@ _SENSITIVE_CONFIG_KEYS = {
     "groq-key",
     "openai-key",
     "twitter-cookies",
-    "xhs-cookies",
+    "openrouter-key",
 }
 
 
@@ -73,7 +64,7 @@ def main():
         description="One toolkit to read, search and scrape data from the entire internet",
     )
     parser.add_argument("-v", "--verbose", action="store_true", help="Show debug logs")
-    parser.add_argument("--version", action="version", version=f"Scrap Master v{__version__}")
+    parser.add_argument("--version", action="version", version=f"MANOLO Scrap v{__version__}")
     sub = parser.add_subparsers(dest="command", help="Available commands")
 
     # ── setup ──
@@ -101,15 +92,14 @@ def main():
                            help="Show what would be done without making any changes")
     p_install.add_argument("--channels", default="",
                            help="Comma-separated optional channels to install "
-                                "(twitter,xiaoyuzhou,xueqiu,xiaohongshu,"
-                                "reddit,facebook,instagram,bilibili,linkedin,boss,all)")
+                                "(twitter,reddit,facebook,instagram,linkedin,all)")
 
     # ── configure ──
     p_conf = sub.add_parser("configure", help="Set a config value or auto-extract from browser")
     p_conf.add_argument("key", nargs="?", default=None,
                         choices=["proxy", "github-token", "groq-key", "openai-key",
                                  "twitter-cookies", "youtube-cookies",
-                                 "xhs-cookies"],
+                                 "openrouter-key", "ollama-model"],
                         help="What to configure (omit if using --from-browser)")
     p_conf.add_argument("value", nargs="*", help="The value(s) to set")
     p_conf.add_argument(
@@ -123,7 +113,7 @@ def main():
                         help="Extract cookies for one explicitly selected platform")
     p_conf.add_argument(
         "--platform",
-        choices=["twitter", "xiaohongshu", "bilibili", "xueqiu"],
+        choices=["twitter"],
         help="Platform to import (required with --from-browser)",
     )
     p_conf.add_argument(
@@ -142,7 +132,7 @@ def main():
                           help="Output machine-readable JSON instead of the text report")
 
     # ── uninstall ──
-    p_uninstall = sub.add_parser("uninstall", help="Remove all Scrap Master config, tokens, and skill files")
+    p_uninstall = sub.add_parser("uninstall", help="Remove all MANOLO Scrap config, tokens, and skill files")
     p_uninstall.add_argument("--dry-run", action="store_true",
                              help="Show what would be removed without making any changes")
     p_uninstall.add_argument("--keep-config", action="store_true",
@@ -155,10 +145,6 @@ def main():
                                help="Install SKILL.md to agent skill directories")
     p_skill_group.add_argument("--uninstall", action="store_true",
                                help="Remove SKILL.md from agent skill directories")
-
-    # ── format ──
-    p_format = sub.add_parser("format", help="Clean and format platform API output")
-    p_format.add_argument("platform", choices=["xhs"], help="Platform to format (xhs)")
 
     # ── check-update ──
     # ── transcribe ──
@@ -268,7 +254,6 @@ def main():
             p_conf.error("--platform is required with --from-browser")
         manual_keys = {
             "twitter": "twitter-cookies",
-            "xiaohongshu": "xhs-cookies",
         }
         if args.platform in manual_keys:
             p_conf.error(
@@ -306,7 +291,7 @@ def main():
         sys.exit(0)
 
     if args.command == "version":
-        print(f"Scrap Master v{__version__}")
+        print(f"MANOLO Scrap v{__version__}")
         sys.exit(0)
 
     if args.command == "doctor":
@@ -325,8 +310,6 @@ def main():
         _cmd_uninstall(args)
     elif args.command == "skill":
         _cmd_skill(args)
-    elif args.command == "format":
-        _cmd_format(args)
     elif args.command == "transcribe":
         _cmd_transcribe(args)
     elif args.command == "read-pdf":
@@ -355,18 +338,13 @@ def _cmd_install(args):
     # Validate channel names before constructing config or changing the system.
     CHANNEL_INSTALLERS = {
         "twitter":     _install_twitter_deps,
-        "xiaoyuzhou":  _install_xiaoyuzhou_deps,
-        "xiaohongshu": _install_xhs_deps,
         "reddit":      _install_reddit_deps,
         "facebook":    _install_opencli_deps,
         "instagram":   _install_opencli_deps,
-        "bilibili":    _install_bili_deps,
-        "boss":        _install_boss_deps,
         "opencli":     _install_opencli_deps,  # cross-channel backend, desktop only
-        # xueqiu: cookie-only, no install step
         # linkedin: manual setup, no auto-install
     }
-    supported_channels = set(CHANNEL_INSTALLERS) | {"xueqiu", "linkedin"}
+    supported_channels = set(CHANNEL_INSTALLERS) | {"linkedin"}
     raw_channels = [
         channel.strip().lower()
         for channel in args.channels.split(",")
@@ -390,7 +368,7 @@ def _cmd_install(args):
 
     config = Config(read_only=dry_run or safe_mode)
     print()
-    print("Scrap Master Installer")
+    print("MANOLO Scrap Installer")
     print("=" * 40)
 
     if dry_run:
@@ -405,8 +383,8 @@ def _cmd_install(args):
         tools_dir = os.path.expanduser("~/.scrap-master/tools")
         os.makedirs(tools_dir, exist_ok=True)
 
-    DESKTOP_ONLY_CHANNELS = {"opencli", "facebook", "instagram", "boss"}
-    COOKIE_CHANNELS = {"twitter", "xueqiu", "bilibili", "xiaohongshu"}
+    DESKTOP_ONLY_CHANNELS = {"opencli", "facebook", "instagram"}
+    COOKIE_CHANNELS = {"twitter"}
 
     # Auto-detect environment
     env = args.env
@@ -431,7 +409,6 @@ def _cmd_install(args):
             print(f"[{mode}] Would save network proxy")
         else:
             config.set("proxy", args.proxy)
-            config.set("bilibili_proxy", args.proxy)  # legacy key
             print("✅ Proxy saved (used by Agent when accessing restricted networks)")
 
     # ── Install core system dependencies (lightweight, always) ──
@@ -487,8 +464,6 @@ def _cmd_install(args):
         for channel in sorted(requested_channels & COOKIE_CHANNELS):
             if channel == "twitter":
                 print("  scrap-master configure twitter-cookies")
-            elif channel == "xiaohongshu":
-                print("  scrap-master configure xhs-cookies")
             else:
                 print(
                     "  scrap-master configure --from-browser chrome "
@@ -543,7 +518,7 @@ def _cmd_install(args):
                 # First install — hint about optional channels
                 print()
                 print("More channels available! Use --channels to install:")
-                print("   scrap-master install --system --channels=twitter,xiaohongshu,reddit,facebook,instagram,...")
+                print("   scrap-master install --system --channels=twitter,reddit,facebook,instagram,...")
                 print("   scrap-master install --system --channels=all  (install everything)")
 
             if not install_ok:
@@ -554,7 +529,7 @@ def _cmd_install(args):
 
 
 def _install_skill(force: bool = True):
-    """Install Scrap Master as an agent skill for supported agent clients."""
+    """Install MANOLO Scrap as an agent skill for supported agent clients."""
     import importlib.resources
     import os
     import shutil
@@ -697,28 +672,6 @@ def _cmd_skill(args):
             raise SystemExit(1)
     elif args.uninstall:
         _uninstall_skill()
-
-
-def _cmd_format(args):
-    """Clean and format platform API output from stdin."""
-    import json
-    import sys
-
-    if args.platform == "xhs":
-        from scrap_master.channels.xiaohongshu import format_xhs_result
-
-        raw = sys.stdin.read().strip()
-        if not raw:
-            print("Error: no input on stdin", file=sys.stderr)
-            sys.exit(1)
-        try:
-            data = json.loads(raw)
-        except json.JSONDecodeError as e:
-            print(f"Error: invalid JSON: {e}", file=sys.stderr)
-            sys.exit(1)
-
-        cleaned = format_xhs_result(data)
-        print(json.dumps(cleaned, ensure_ascii=False, indent=2))
 
 
 def _install_system_deps():
@@ -963,61 +916,10 @@ def _install_system_deps():
                     "(YouTube may not work)"
                 )
 
-    # NOTE: twitter-cli, xiaoyuzhou, xhs-cli etc. are optional.
+    # NOTE: twitter-cli etc. are optional.
     # They are installed via --channels flag, not here.
     # See CHANNEL_INSTALLERS in _cmd_install().
     return system_install_ok
-
-
-def _install_xiaoyuzhou_deps():
-    """Install Xiaoyuzhou podcast transcription script."""
-    import shutil
-
-    from scrap_master.config import Config
-    from scrap_master.utils.paths import PrivatePathError, atomic_write_private_text
-
-    config = Config()
-    print("Setting up Xiaoyuzhou podcast transcription...")
-
-    tools_dir = os.path.expanduser("~/.scrap-master/tools/xiaoyuzhou")
-    script_dst = os.path.join(tools_dir, "transcribe.sh")
-
-    script_src = os.path.join(
-        os.path.dirname(__file__),
-        "scripts",
-        "transcribe_xiaoyuzhou.sh",
-    )
-    script_ok = False
-    if os.path.isfile(script_src):
-        existed = os.path.isfile(script_dst)
-        try:
-            with open(script_src, encoding="utf-8") as source:
-                script_text = source.read()
-            atomic_write_private_text(script_dst, script_text)
-            os.chmod(script_dst, 0o700)
-            action = "updated" if existed else "installed"
-            print(f"  ✅ Xiaoyuzhou transcription script {action}")
-            script_ok = True
-        except (OSError, UnicodeError, PrivatePathError) as exc:
-            print(f"  [!]  Failed to install script: {exc}")
-    else:
-        print("  [!]  Script source not found in package")
-
-    # Check ffmpeg
-    ffmpeg_ok = bool(shutil.which("ffmpeg"))
-    if ffmpeg_ok:
-        print("  ✅ ffmpeg available")
-    else:
-        print("  -- ffmpeg not found. Install: apt install -y ffmpeg (or brew install ffmpeg)")
-
-    # Check GROQ_API_KEY
-    has_key = bool(os.environ.get("GROQ_API_KEY")) or bool(config.get("groq_api_key"))
-    if has_key:
-        print("  ✅ Groq API key configured")
-    else:
-        print("  -- Groq API key not set. Get free key at https://console.groq.com")
-        print("     Then run: scrap-master configure groq-key (hidden input)")
-    return script_ok and ffmpeg_ok
 
 
 def _install_twitter_deps():
@@ -1047,75 +949,6 @@ def _install_twitter_deps():
                 pass
     print("  [!]  twitter-cli install failed. Run: pipx install twitter-cli")
     return False
-
-
-def _install_boss_deps():
-    """Install the strict-CDP boss-agent-cli build required by the Boss channel.
-
-    Upstream boss-agent-cli PRs #403-#407 are all merged into master; the source is
-    pinned to a fixed upstream commit containing those five PRs. Force-installing is
-    intentional: PyPI 1.18.0 exposes the ``boss`` executable but lacks the public
-    strict-CDP APIs required by this channel.
-    """
-    import shutil
-    import subprocess
-
-    print("Setting up Boss Zhipin (boss-agent-cli upstream pinned commit)...")
-    for tool, args in [
-        ("pipx", ["install", "--force", _BOSS_AGENT_CLI_SOURCE]),
-        ("uv", ["tool", "install", "--force", _BOSS_AGENT_CLI_SOURCE]),
-    ]:
-        tool_cmd = shutil.which(tool)
-        if not tool_cmd:
-            continue
-        try:
-            result = subprocess.run(
-                [tool_cmd, *args],
-                capture_output=True,
-                encoding="utf-8",
-                errors="replace",
-                timeout=300,
-            )
-            if result.returncode == 0 and shutil.which("boss"):
-                print("  ✅ boss-agent-cli installed from pinned upstream commit")
-                print("  Next step: launch the dedicated Chrome, have the user log in to zhipin.com manually, then run scrap-master doctor")
-                return True
-        except (OSError, subprocess.TimeoutExpired):
-            pass
-
-    print("  [!]  boss-agent-cli install failed. Install pipx or uv, then retry:")
-    print(f"       pipx install --force '{_BOSS_AGENT_CLI_SOURCE}'")
-    return False
-
-
-def _install_xhs_deps():
-    """Set up XiaoHongShu — backend depends on environment.
-
-    Desktop: OpenCLI (reuses the browser session, zero config).
-    Server: xiaohongshu-mcp guide with an explicit Cookie-Editor export;
-    we don't manage long-running services, so guide only.
-    xhs-cli is no longer installed by default — upstream unmaintained
-    since 2026-03; existing installs keep working as a fallback backend.
-    """
-    import shutil
-
-    print("Setting up XiaoHongShu...")
-    if _detect_environment() == "server":
-        print("  Recommended for server environments: xiaohongshu-mcp:")
-        print("    1. Download binary: https://github.com/xpzouying/xiaohongshu-mcp/releases")
-        print("       (recommended location: ~/.scrap-master/tools/)")
-        print("    2. Start the service (first run downloads ~150MB headless browser — wait for it)")
-        print("    3. Explicitly export cookies from xiaohongshu.com via Cookie-Editor")
-        print("       scrap-master configure xhs-cookies (paste into the hidden input prompt)")
-        print("    4. Connect: mcporter config add xiaohongshu http://localhost:18060/mcp --scope home")
-        print("    5. Verify: scrap-master doctor")
-        return False
-
-    opencli_ok = _install_opencli_deps()
-    xhs_ok = bool(shutil.which("xhs"))
-    if xhs_ok:
-        print("  ✅ Existing xhs-cli detected and will continue to work as a fallback backend")
-    return opencli_ok or xhs_ok
 
 
 def _install_opencli_deps():
@@ -1218,35 +1051,6 @@ def _install_rdt_cli():
             except (OSError, subprocess.TimeoutExpired):
                 pass
     print(f"  [!]  rdt-cli install failed. Run: pipx install '{_RDT_GIT_SOURCE}'")
-    return False
-
-
-def _install_bili_deps():
-    """Install bili-cli for Bilibili hot/rank/search."""
-    import shutil
-    import subprocess
-
-    print("Setting up Bilibili (bili-cli)...")
-    if shutil.which("bili"):
-        print("  ✅ bili-cli already installed")
-        return True
-    for tool, args in [
-        ("pipx", ["install", "bilibili-cli"]),
-        ("uv", ["tool", "install", "bilibili-cli"]),
-    ]:
-        tool_cmd = shutil.which(tool)
-        if tool_cmd:
-            try:
-                result = subprocess.run(
-                    [tool_cmd, *args], capture_output=True, encoding="utf-8",
-                    errors="replace", timeout=120,
-                )
-                if result.returncode == 0 and shutil.which("bili"):
-                    print("  ✅ bili-cli installed")
-                    return True
-            except (OSError, subprocess.TimeoutExpired):
-                pass
-    print("  [!]  bili-cli install failed. Run: pipx install bilibili-cli")
     return False
 
 
@@ -1380,7 +1184,6 @@ def _install_mcporter():
         print("  [!]  Could not configure Exa. Run manually: mcporter config add exa https://mcp.exa.ai/mcp --scope home")
         return False
 
-    # NOTE: xhs-cli is now optional, installed via --channels=xiaohongshu
 
 
 def _install_mcporter_safe():
@@ -1494,7 +1297,7 @@ def _cmd_configure(args):
         from scrap_master.cookie_extract import configure_from_browser
 
         browser = args.from_browser
-        platform = "xhs" if args.platform == "xiaohongshu" else args.platform
+        platform = args.platform
         print(f"Extracting {args.platform} cookies from {browser}...")
         print()
 
@@ -1548,7 +1351,7 @@ def _cmd_configure(args):
         print("   Omit the value to enter it through a hidden prompt.")
         print(
             "   or: scrap-master configure --from-browser chrome "
-            "--platform xueqiu"
+            "--platform twitter"
         )
         return
 
@@ -1561,11 +1364,9 @@ def _cmd_configure(args):
         # Generic network proxy for restricted environments. Nothing reads
         # this key at runtime — agents read it back and export HTTP(S)_PROXY
         # before invoking upstream tools (see docs/install.md). The legacy
-        # bilibili_proxy key is kept in sync for older configs.
+        #
         config.set("proxy", value)
-        config.set("bilibili_proxy", value)
         print("✅ Proxy saved (Agent will set HTTP_PROXY/HTTPS_PROXY when accessing Reddit/Twitter and other networks requiring a proxy)")
-        print("  Note: Bilibili uses bili-cli; no proxy needed on mainland China networks.")
 
     elif args.key == "twitter-cookies":
         # Accept two formats:
@@ -1610,7 +1411,7 @@ def _cmd_configure(args):
                 )
             else:
                 print(
-                    "  Note: the standalone `twitter` command does not read Scrap Master config; "
+                    "  Note: the standalone `twitter` command does not read MANOLO Scrap config; "
                     "set TWITTER_AUTH_TOKEN/TWITTER_CT0 explicitly when calling it directly."
                 )
         else:
@@ -1626,9 +1427,13 @@ def _cmd_configure(args):
         print(f"✅ YouTube cookie source configured: {value}")
         print("   yt-dlp will use cookies from this browser for age-restricted/member videos.")
 
-    elif args.key == "xhs-cookies":
-        if not _configure_xhs_cookies(value):
-            raise SystemExit(1)
+    elif args.key == "openrouter-key":
+        config.set("openrouter_api_key", value)
+        print("✅ OpenRouter API key saved")
+
+    elif args.key == "ollama-model":
+        config.set("ollama_model", value)
+        print(f"✅ Ollama model set: {value}")
 
     elif args.key == "github-token":
         config.set("github_token", value)
@@ -1692,244 +1497,8 @@ def _parse_twitter_cookie_input(value: str):
     return auth_token, ct0
 
 
-def _configure_xhs_cookies(value) -> bool:
-    """Import cookies into xiaohongshu-mcp Docker container.
-
-    Accepts two formats:
-    1. Cookie-Editor JSON export (array of cookie objects)
-    2. Header String: "name1=value1; name2=value2; ..."
-
-    The xiaohongshu-mcp container stores cookies at $COOKIES_PATH
-    (default: /app/data/cookies.json or cookies.json in workdir).
-    Format: JSON array of {name, value, domain, path, expires, httpOnly, secure, sameSite}.
-    """
-    import json
-    import os
-    import shutil
-    import subprocess
-
-    value = value.strip()
-    if not value:
-        print("[X] Missing cookie value.")
-        print("   Run `scrap-master configure xhs-cookies` and paste the Cookie-Editor export.")
-        print("   For automation, pass the same value through --stdin.")
-        return False
-
-    # Detect format and parse
-    cookies_json = None
-
-    # Try JSON format first (Cookie-Editor JSON export)
-    if value.startswith("["):
-        try:
-            parsed = json.loads(value)
-            if isinstance(parsed, list) and parsed:
-                from scrap_master.utils.url import domain_matches
-
-                valid_cookies = []
-                ignored_domains = 0
-                ignored_invalid = 0
-                for cookie in parsed:
-                    if (
-                        not isinstance(cookie, dict)
-                        or not isinstance(cookie.get("name"), str)
-                        or not cookie["name"]
-                        or not isinstance(cookie.get("value"), str)
-                    ):
-                        ignored_invalid += 1
-                        continue
-                    if not domain_matches(
-                        cookie.get("domain", ""),
-                        "xiaohongshu.com",
-                    ):
-                        ignored_domains += 1
-                        continue
-                    valid_cookies.append(cookie)
-
-                if ignored_domains:
-                    print(
-                        f"  [!] Ignored {ignored_domains} cookie(s) from non-xiaohongshu.com domains"
-                    )
-                if ignored_invalid:
-                    print(
-                        f"  [!] Ignored {ignored_invalid} cookie(s) with invalid format"
-                    )
-                if not valid_cookies:
-                    print(
-                        "[X] No valid xiaohongshu.com domain cookies found in the Cookie-Editor JSON"
-                    )
-                    return False
-                cookies_json = json.dumps(valid_cookies)
-                print(
-                    f"  Parsed {len(valid_cookies)} "
-                    "xiaohongshu.com cookies from JSON format"
-                )
-            else:
-                print("[X] Empty or invalid JSON array")
-                return False
-        except json.JSONDecodeError as e:
-            print(f"[X] Invalid JSON: {e}")
-            return False
-
-    # Header String format: "key1=val1; key2=val2; ..."
-    if cookies_json is None and "=" in value:
-        cookies = []
-        for part in value.split(";"):
-            part = part.strip()
-            if "=" not in part:
-                continue
-            name, val = part.split("=", 1)
-            name = name.strip()
-            val = val.strip()
-            if name:
-                cookies.append({
-                    "name": name,
-                    "value": val,
-                    "domain": ".xiaohongshu.com",
-                    "path": "/",
-                    "expires": -1,
-                    "size": len(name) + len(val),
-                    "httpOnly": False,
-                    "secure": False,
-                    "session": True,
-                    "sameSite": "Lax",
-                })
-        if cookies:
-            cookies_json = json.dumps(cookies)
-            print(f"  Parsed {len(cookies)} cookies from Header String format")
-        else:
-            print("[X] Could not parse any cookies from input")
-            return False
-
-    if not cookies_json:
-        print("[X] Could not parse cookies. Accepted formats:")
-        print('   1. JSON array: \'[{"name":"x","value":"y","domain":".xiaohongshu.com",...}]\'')
-        print('   2. Header String: "key1=val1; key2=val2; ..."')
-        return False
-
-    # Find the container
-    docker = shutil.which("docker")
-    if not docker:
-        # No Docker - write to a local file for manual import.
-        from scrap_master.utils.paths import (
-            PrivatePathError,
-            atomic_write_private_text,
-            home_dir,
-        )
-
-        cookie_path = home_dir() / ".scrap-master" / "xhs-cookies.json"
-        try:
-            atomic_write_private_text(cookie_path, cookies_json)
-        except (OSError, PrivatePathError) as exc:
-            print(f"[X] Could not save cookies safely: {exc}")
-            return False
-        print(f"  Cookies saved to {cookie_path}")
-        print("  Docker not found. Copy manually:")
-        print(f"  docker cp {cookie_path} xiaohongshu-mcp:/app/data/cookies.json")
-        return True
-
-    # Check if xiaohongshu-mcp container is running
-    try:
-        result = subprocess.run(
-            [docker, "ps", "--filter", "name=xiaohongshu-mcp", "--format", "{{.Names}}"],
-            capture_output=True, encoding="utf-8", timeout=5,
-        )
-        container_name = result.stdout.strip()
-        if not container_name:
-            print("[X] xiaohongshu-mcp container is not running.")
-            print("   Start it first:")
-            print("   docker run -d --name xiaohongshu-mcp -p 18060:18060 xpzouying/xiaohongshu-mcp")
-            return False
-    except Exception as e:
-        print(f"[X] Could not check Docker: {e}")
-        return False
-
-    # Find the cookies path inside the container
-    try:
-        result = subprocess.run(
-            [docker, "exec", container_name, "printenv", "COOKIES_PATH"],
-            capture_output=True, encoding="utf-8", timeout=5,
-        )
-        cookie_path_in_container = result.stdout.strip()
-        if not cookie_path_in_container:
-            cookie_path_in_container = "/app/cookies.json"  # fallback: absolute path in workdir
-    except Exception:
-        cookie_path_in_container = "/app/cookies.json"
-
-    # Write cookies into the container
-    tmp_path = None
-    try:
-        # Write to temp file then docker cp
-        import tempfile
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
-            f.write(cookies_json)
-            tmp_path = f.name
-
-        result = subprocess.run(
-            [docker, "cp", tmp_path, f"{container_name}:{cookie_path_in_container}"],
-            capture_output=True, encoding="utf-8", timeout=10,
-        )
-
-        if result.returncode != 0:
-            print(f"[X] Failed to copy cookies: {result.stderr}")
-            return False
-
-        print(f"✅ Cookies written to {container_name}:{cookie_path_in_container}")
-        # Restart container so it reloads cookies from disk
-        print("  Restarting container to reload cookies...", end=" ", flush=True)
-        try:
-            restart = subprocess.run(
-                [docker, "restart", container_name],
-                capture_output=True, encoding="utf-8", timeout=30,
-            )
-            if restart.returncode != 0:
-                detail = (
-                    (restart.stderr or "").strip()[:200]
-                    or f"exit {restart.returncode}"
-                )
-                print(f"\n  [!] Could not restart container: {detail}")
-                print(f"  Restart manually: docker restart {container_name}")
-                return False
-            print("done")
-        except Exception as e:
-            print(f"\n  [!] Could not restart container: {e}")
-            print(f"  Restart manually: docker restart {container_name}")
-            return False
-    except Exception as e:
-        print(f"[X] Failed to write cookies: {e}")
-        return False
-    finally:
-        if tmp_path:
-            try:
-                os.unlink(tmp_path)
-            except FileNotFoundError:
-                pass
-            except OSError as e:
-                print(f"  [!] Could not remove temporary cookie file: {e}")
-
-    # Verify login status via mcporter
-    mcporter = shutil.which("mcporter")
-    if mcporter:
-        print("  Verifying login status...", end=" ")
-        try:
-            result = subprocess.run(
-                [mcporter, "call", "xiaohongshu.check_login_status()"],
-                capture_output=True, encoding="utf-8", errors="replace", timeout=15,
-            )
-            if "logged in" in result.stdout.lower() or "logged" in result.stdout.lower():
-                print("✅ Login verified!")
-            else:
-                print("[!] Login check returned unexpected result:")
-                print(f"  {result.stdout.strip()[:200]}")
-                print("  Cookies were written but login might not be valid. Try fresh cookies.")
-        except Exception as e:
-            print(f"[!] Could not verify: {e}")
-    else:
-        print("  (mcporter not found, skipping verification)")
-    return True
-
-
 def _cmd_uninstall(args):
-    """Remove all Scrap Master config, tokens, and skill files."""
+    """Remove all MANOLO Scrap config, tokens, and skill files."""
     import shutil
     import subprocess
 
@@ -1939,7 +1508,7 @@ def _cmd_uninstall(args):
     keep_config = args.keep_config
 
     print()
-    print("Scrap Master Uninstaller")
+    print("MANOLO Scrap Uninstaller")
     print("=" * 40)
 
     if dry_run:
@@ -2039,16 +1608,16 @@ def _cmd_uninstall(args):
             mcporter_cleanup_skipped = True
             print(
                 "  [!] mcporter config source cannot be verified safely; "
-                "exa/xiaohongshu entries will not be auto-deleted."
+                "exa entries will not be auto-deleted."
             )
         else:
-            for mcp_name in ("exa", "xiaohongshu"):
+            for mcp_name in ("exa",):
                 if mcp_name not in server_names:
                     continue
                 mcporter_cleanup_skipped = True
                 print(
                     f"  [!] mcporter entry {mcp_name} source cannot be proven to be managed by "
-                    "Scrap Master; it has been kept. If you no longer need it, remove it manually."
+                    "MANOLO Scrap; it has been kept. If you no longer need it, remove it manually."
                 )
 
     # ── 4. Summary and optional steps ──
@@ -2058,17 +1627,17 @@ def _cmd_uninstall(args):
         print("Run without --dry-run to actually remove the above.")
     else:
         if removed_any:
-            print("Scrap Master data removed.")
+            print("MANOLO Scrap data removed.")
         elif mcporter_cleanup_skipped:
-            print("No proven Scrap Master-managed mcporter data was removed.")
+            print("No proven MANOLO Scrap-managed mcporter data was removed.")
         else:
             print("Nothing to remove — already clean.")
 
     print()
-    print("Optional: remove the Scrap Master Python package itself:")
+    print("Optional: remove the MANOLO Scrap Python package itself:")
     print("  pip uninstall scrap-master")
     print()
-    print("Optional: remove tools installed by Scrap Master:")
+    print("Optional: remove tools installed by MANOLO Scrap:")
     print("  npm uninstall -g mcporter")
     print("  pipx uninstall twitter-cli")
     print("  npm uninstall -g undici")
@@ -2100,7 +1669,7 @@ def _cmd_setup():
 
     config = Config()
     print()
-    print("Scrap Master Setup")
+    print("MANOLO Scrap Setup")
     print("=" * 40)
     print()
 
@@ -2299,7 +1868,7 @@ def _github_get_with_retry(url, timeout=10, retries=3, sleeper=time.sleep):
 #: agent through all three (docs/update.md); bare pip only updates the package.
 _UPDATE_INSTRUCTIONS = (
     "Update method (recommended — paste this to your AI Agent for a full update including upstream tools and skills):\n"
-    "  Update Scrap Master: https://raw.githubusercontent.com/festomanolo/scrap-master/main/docs/update.md\n"
+    "  Update MANOLO Scrap: https://raw.githubusercontent.com/festomanolo/scrap-master/main/docs/update.md\n"
     "Update the package only (without upstream tools and skills):\n"
     "  pip install --upgrade https://github.com/festomanolo/scrap-master/archive/main.zip"
 )
@@ -2429,10 +1998,10 @@ def _cmd_watch():
 
     # Output
     if not issues and not update_available:
-        print(f"Scrap Master: all good ({ok}/{total} channels available, v{__version__} is up to date)")
+        print(f"MANOLO Scrap: all good ({ok}/{total} channels available, v{__version__} is up to date)")
         return
 
-    print("Scrap Master health report")
+    print("MANOLO Scrap health report")
     print("=" * 40)
     print(f"Version: v{__version__}  |  Channels: {ok}/{total}")
 
@@ -2448,7 +2017,7 @@ def _cmd_watch():
             for line in release_body.strip().split("\n")[:10]:
                 print(f"    {line}")
         print("  Update (paste this to your Agent for a full update):")
-        print("    Update Scrap Master: https://raw.githubusercontent.com/festomanolo/scrap-master/main/docs/update.md")
+        print("    Update MANOLO Scrap: https://raw.githubusercontent.com/festomanolo/scrap-master/main/docs/update.md")
 
 
 def _cmd_read_pdf(args):
