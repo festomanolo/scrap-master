@@ -83,3 +83,10 @@ Instead of loading the bloated Scribd website (`https://www.scribd.com/document/
 - By fetching those `.jsonp` URLs directly in parallel:
   - Each `.jsonp` file wraps raw HTML/text or image references in `window.pageN_callback(["..."])`.
   - Unwrapping the JSONP callback and parsing the text/image nodes extracts **100% of the document's pages** without ever rendering CSS blur filters, executing paywall scripts, or loading ad trackers.
+
+---
+
+## 5. Making Scrap Master Significantly Faster (Parallel Execution Architecture)
+
+Yes—it is completely possible to make **Scrap Master** **5x to 15x faster** using parallel processes and threads. Here is where the bottlenecks were and how we parallelized them:
+
