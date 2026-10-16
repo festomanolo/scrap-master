@@ -243,6 +243,32 @@ def main():
         help="Verify %PDF magic header on downloaded files",
     )
 
+    p_dl.add_argument("--only", action="append", default=None, metavar="TYPES",
+                      help="Skip URLs that are not these types (see `scrap-master types`)")
+    p_dl.add_argument("--organize", action="store_true", help="File downloads into <type>/ folders")
+
+    # ── ask ──
+    p_ask = sub.add_parser("ask", help="Describe the data you want; AI plans, searches, downloads, reports")
+    p_ask.add_argument("request", nargs="+", help='e.g. "form 2 physics past papers, pdfs only"')
+    p_ask.add_argument("--only", action="append", default=None, metavar="TYPES",
+                       help="Force file types (pdf, docs, slides, …); overrides the AI plan")
+    p_ask.add_argument("--no-ai", action="store_true", help="Use the keyword plan, no LLM")
+    p_ask.add_argument("--no-organize", action="store_true", help="Keep all files in one folder")
+
+    # ── types / organize / bench ──
+    sub.add_parser("types", help="List file-type presets usable with --only")
+    p_org = sub.add_parser("organize", help="Sort a folder's files into <type>/ subfolders")
+    p_org.add_argument("folder", nargs="?", default=".")
+    p_org.add_argument("-r", "--recursive", action="store_true", help="Include files in subfolders")
+    p_bench = sub.add_parser("bench", help="Benchmark speed/filtering/organizing vs curl, wget, aria2c")
+    p_bench.add_argument("--files", type=int, default=20, help="Files in the mixed batch (default: 20)")
+    p_bench.add_argument("--size-kb", type=int, default=768, help="Size of each file (default: 768)")
+    p_bench.add_argument("--kbps", type=int, default=2048, help="Per-connection bandwidth cap (default: 2048)")
+    p_bench.add_argument("--latency-ms", type=int, default=60, help="Server latency (default: 60)")
+    p_bench.add_argument("--only", action="append", default=None, metavar="TYPES",
+                         help="Types to pick out of the mixed batch (default: pdf)")
+    p_bench.add_argument("--json", action="store_true", help="Print results as JSON")
+
     sub.add_parser("check-update", help="Check for new versions and changes")
 
     # ── watch ──
@@ -324,6 +350,14 @@ def main():
         _cmd_scribd(args)
     elif args.command == "harvest":
         _cmd_harvest(args)
+    elif args.command == "ask":
+        _cmd_ask(args)
+    elif args.command == "types":
+        _cmd_types()
+    elif args.command == "organize":
+        _cmd_organize(args)
+    elif args.command == "bench":
+        _cmd_bench(args)
     elif args.command == "download":
         _cmd_download(args)
 
