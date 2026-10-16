@@ -96,7 +96,7 @@ Yes—it is completely possible to make **Scrap Master** **5x to 15x faster** us
 
 ### Bottleneck 2: Sequential vs. File-Parallel vs. HTTP `Range` Chunk-Parallel PDF Downloading (Measured Live: 1,031s -> 193.51s -> 87.41s, **11.8x Faster**)
 
-- **Before (Sequential Single-Thread):**
+We benchmarked all three stages live across the exact same **27 NECTA FTNA Form 2 Computer Studies PDFs + Syllabus (`19,906 KB` total)** from `maktaba.tetea.org`:
   - Downloading the 27 NECTA FTNA Form 2 Computer Studies PDFs (~19.9 MB) sequentially took **17 minutes 11 seconds (1,031 seconds)** and **failed on 2 files** (`ICS-F2-2025.pdf` and `ICS-F2-2025-Solutions.pdf` with `_ssl.c:983: The handshake operation timed out`).
   - Why? The sum of individual download times across the 27 files is **1,021.7 seconds** because `maktaba.tetea.org` throttles per-connection bandwidth to **~20–23 KB/s per TCP stream**.
 - **After (`scrap_master/utils/parallel_downloader.py` with `max_workers=12`):**
