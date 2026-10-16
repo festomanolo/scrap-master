@@ -144,7 +144,7 @@ def extract_pdf_text(
     dpi: int = 150,
     max_pages: Optional[int] = None,
 ) -> Dict:
-    """Extract text from a digital or scanned PDF in parallel, returning structured dict & Markdown."""
+    """Extract text from a digital or scanned PDF, returning structured dict & Markdown."""
     path = Path(pdf_path)
     if not path.exists():
         raise FileNotFoundError(f"PDF file not found: {path}")
