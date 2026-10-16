@@ -108,7 +108,8 @@ We benchmarked all three stages live across the exact same **27 NECTA FTNA Form 
   - `maktaba.tetea.org` throttles individual TCP streams to **~20–23 KB/s**, which made the 4.4 MB Syllabus take `193.5s` and the 2.85 MB 2019 Exam take `146.4s` on a single connection.
   - By adding `_probe_range_support()` and `_fetch_byte_range()` in `scrap_master/utils/parallel_downloader.py`, any PDF larger than `512 KB` is automatically split into up to **8–12 concurrent byte-range chunks** (`HTTP 206 Partial Content`) and reassembled in memory before verifying the `%PDF` header:
     - **4.4 MB Syllabus (`Syllabus_-_Information_and_Computer_Studies_-_F1-F4_-_2005.pdf`)**: Dropped from **193.51s -> 54.53s** (3.55x faster on a single file!).
-    - When a server caps each TCP connection to ~22 KB/s (like `maktaba.tetea.org`), a single 4.4 MB file still takes 193s on one thread. To break through per-connection throttling on large files, use **multi-connection HTTP `Range: bytes=start-end` chunked downloading** (splitting each large PDF into 4–8 byte-range segments in parallel, or delegating to `aria2c -x 16 -s 16`).
+    - **2.85 MB 2019 Exam (`ICS-F2-2019.pdf`)**: Dropped from **146.44s -> 36.80s** (4.0x faster!).
+    - **Full 27-PDF Batch (`19,906 KB`)**: Dropped from **1,031s (17m 11s) -> 193.51s (3m 13s) -> 87.41s (1m 27s)** — an **11.8x end-to-end speedup** with **100% `%PDF` verification**.
 
 ### Bottleneck 3: Parallel `.jsonp` Page Fetching in Scribd Extraction
 - **Live Measured Result:** `ScribdChannel.extract_document()` extracted all **4 pages (3,864 characters)** of the *Form Two Pre-National Assessment 2025 Information and Computer Studies Marking Scheme* (`doc_id=970306842`), including OEmbed metadata, `/embeds/970306842/content` inline DOM layers, and parallel `.jsonp` decompression (`4-ed6a5a8fa6.jsonp`), in **37.46 seconds** on the current network connection.
