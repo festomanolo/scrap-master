@@ -103,3 +103,38 @@ def discover(
     frontier = list(dict.fromkeys(start_urls))
 
     for level in range(depth + 1):
+        batch = [u for u in frontier if u not in visited][: max(0, max_pages - len(visited))]
+        if not batch:
+            break
+        visited.update(batch)
+
+        def _read(u):
+            try:
+                return u, web.read(u)
+            except Exception:
+                return u, ""
+
+        next_frontier: List[str] = []
+        with ThreadPoolExecutor(max_workers=max(1, min(workers, len(batch)))) as pool:
+            for page_url, md in pool.map(_read, batch):
+                if not md:
+                    continue
+                report.pages_crawled.append(page_url)
+                for link in extract_links(md):
+                    kind = classify_link(link, exts, rx)
+                    if kind:
+                        found.setdefault(link, HarvestItem(url=link, kind=kind, source_page=page_url))
+                    elif level < depth and _same_site(link, page_url):
+                        next_frontier.append(link.split("#")[0])
+        frontier = next_frontier
+
+    report.items = list(found.values())
+    return report
+
+
+def harvest(
+    start_urls: List[str],
+    out_dir,
+    depth: int = 0,
+    exts=_DEFAULT_EXTS,
+    pattern: Optional[str] = None,
