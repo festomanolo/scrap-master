@@ -61,7 +61,9 @@ def chat(messages: List[Dict[str, str]], json_mode: bool = False, timeout: int =
             try:
                 data = _post(
                     OPENROUTER_URL,
-        data = _post(
+                    payload,
+                    {"Authorization": f"Bearer {key}", "X-Title": "MANOLO Scrap"},
+                    timeout,
             OPENROUTER_URL,
             payload,
             {"Authorization": f"Bearer {key}", "X-Title": "MANOLO Scrap"},
