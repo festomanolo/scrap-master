@@ -1,5 +1,5 @@
 [project]
-name = "scrap-master"
+name = "nolo-scrap"
 version = "1.5.0"
 description = "MANOLO Scrap — AI-driven TUI to search, scrape, download and extract data from the web."
 readme = "README.md"
