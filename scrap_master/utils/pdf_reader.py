@@ -118,7 +118,11 @@ def ocr_image_batch(image_paths: Sequence[Union[str, Path]], timeout: int = 120)
                 results[p] = ""
     return results
 
-    return ""
+
+def ocr_image_file(image_path: Union[str, Path], timeout: int = 45) -> str:
+    """Run OCR on a single image file."""
+    p_str = str(image_path)
+    return ocr_image_batch([p_str], timeout=timeout).get(p_str, "")
 
 
 def _is_watermark_only(text: str, min_meaningful_chars: int = 120) -> bool:
