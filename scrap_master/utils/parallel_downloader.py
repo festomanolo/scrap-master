@@ -131,6 +131,35 @@ def download_one(
                             s,
                             e,
                             req_headers,
+                            timeout,
+                            retries,
+                        )
+                        for s, e in ranges
+                    ]
+                    for f in as_completed(futs):
+                        s, chunk_bytes = f.result()
+                        parts[s] = chunk_bytes
+
+                data = b"".join(parts[s] for s, _ in ranges)
+                is_pdf = data[:4] == b"%PDF"
+                if verify_pdf and not is_pdf:
+                    raise ValueError("Range-assembled payload does not start with %PDF")
+                dest_path.write_bytes(data)
+                return DownloadResult(
+                    url=url,
+                    path=dest_path,
+                    ok=True,
+                    size_bytes=len(data),
+                    is_valid_pdf=is_pdf,
+                    attempts=1,
+                    chunks_used=num_chunks,
+                    elapsed_sec=round(time.monotonic() - t0, 3),
+                )
+        except Exception as e:  # noqa: BLE001
+            # Fall back transparently to full-stream download below
+            last_err = str(e)
+
+    # Standard single-stream download with retries
     for attempt in range(1, retries + 2):
         try:
             req = urllib.request.Request(url, headers=req_headers)
