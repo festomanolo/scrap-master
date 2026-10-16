@@ -62,8 +62,11 @@ With no AI available it still works: it uses a keyword plan and lists what it fo
 ## Command line (`scrap-master`)
 
 ```bash
-scrap-master doctor           # human-readable report
-scrap-master doctor --json    # machine-readable, includes the active backend per platform
+scrap-master harvest https://msomibora.com/ --depth 1 --extract -d out/   # crawl → download → extract
+scrap-master download URL [URL…] --verify-pdf                             # parallel, Range-chunked
+scrap-master scribd https://www.scribd.com/document/<id> -o doc.md
+scrap-master read-pdf exam.pdf -o exam.md                                 # PyMuPDF + OCR
+scrap-master doctor                                                       # channel health
 ```
 
 ### 2. Install optional channels
