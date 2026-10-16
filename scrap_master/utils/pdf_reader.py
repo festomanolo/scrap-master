@@ -82,10 +82,13 @@ def _get_macos_vision_batch_binary() -> Optional[Path]:
         return None
 
 
-def ocr_image_file(image_path: Union[str, Path], timeout: int = 30) -> str:
-    """Run OCR on a single image file using macOS Vision or Tesseract fallback."""
-    img_str = str(image_path)
-    vision_bin = _get_macos_vision_ocr_binary()
+def ocr_image_batch(image_paths: Sequence[Union[str, Path]], timeout: int = 120) -> Dict[str, str]:
+    """Run OCR on a batch of image files and return {str(path): text}."""
+    paths_str = [str(p) for p in image_paths]
+    if not paths_str:
+        return {}
+
+    vision_bin = _get_macos_vision_batch_binary()
     if vision_bin:
         r = subprocess.run(
             [str(vision_bin), img_str],
