@@ -115,6 +115,7 @@ def discover(
 
         def _read(u):
             # Direct HTML keeps every <a>/<iframe> link; Jina Reader often drops them,
+            # so use it (and its curl_cffi / Playwright fallbacks) only when direct fails.
             try:
                 return u, web.read(u)
             except Exception:
