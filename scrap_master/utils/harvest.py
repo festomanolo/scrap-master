@@ -119,6 +119,7 @@ def discover(
             try:
                 md = _read_via_direct_http(u)
                 if len(extract_links(md)) > 5:
+                    return u, md
             try:
                 return u, web.read(u)
             except Exception:
