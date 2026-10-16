@@ -70,19 +70,18 @@ SEARCH_BACKENDS = (_ddg_html, _ddg_lite, _bing_rss, _browser_ddg)
 
 
 def web_search(query: str, max_results: int = 8) -> List[str]:
-    """Keyless web search via DuckDuckGo's HTML endpoint. Returns result URLs."""
-    url = "https://html.duckduckgo.com/html/?" + urllib.parse.urlencode({"q": query})
-    req = urllib.request.Request(url, headers={"User-Agent": _UA})
-    with urllib.request.urlopen(req, timeout=20) as resp:
-        html = resp.read().decode("utf-8", errors="ignore")
-    results = []
-    for href in _DDG_RESULT_RE.findall(html):
-        href = href.replace("&amp;", "&")
-        qs = urllib.parse.parse_qs(urllib.parse.urlparse(href).query)
-        target = qs.get("uddg", [href])[0]
-        if target.startswith("http") and "duckduckgo.com" not in target and target not in results:
-            results.append(target)
-    return results[:max_results]
+    """Keyless web search. Tries DuckDuckGo HTML/Lite, Bing RSS, then a real browser."""
+    errors = []
+    for backend in SEARCH_BACKENDS:
+        try:
+            urls = [u for u in backend(query) if u.startswith("http") and "duckduckgo.com" not in u]
+            if urls:
+                return list(dict.fromkeys(urls))[:max_results]
+        except Exception as e:
+            errors.append(f"{backend.__name__}: {type(e).__name__}")
+    if errors:
+        raise RuntimeError("all search backends failed: " + ", ".join(errors))
+    return []
 
 
 def fallback_plan(request: str) -> dict:
