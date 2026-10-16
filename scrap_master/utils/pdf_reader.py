@@ -57,3 +57,63 @@ def _get_macos_vision_ocr_binary() -> Optional[Path]:
         subprocess.run(
             ["swiftc", "-O", str(src_path), "-o", str(bin_path)],
             check=True,
+            capture_output=True,
+            timeout=60,
+        )
+        return bin_path if bin_path.exists() else None
+    except Exception:
+        return None
+
+
+def ocr_image_file(image_path: Union[str, Path], timeout: int = 30) -> str:
+    """Run OCR on a single image file using macOS Vision or Tesseract fallback."""
+    img_str = str(image_path)
+    vision_bin = _get_macos_vision_ocr_binary()
+    if vision_bin:
+        r = subprocess.run(
+            [str(vision_bin), img_str],
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+        if r.returncode == 0 and r.stdout.strip():
+            return r.stdout.strip()
+
+    tesseract_bin = shutil.which("tesseract")
+    if tesseract_bin:
+        r = subprocess.run(
+            [tesseract_bin, img_str, "stdout"],
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+        if r.returncode == 0:
+            return r.stdout.strip()
+
+    return ""
+
+
+def _is_watermark_only(text: str, min_meaningful_chars: int = 120) -> bool:
+    """Return True if extracted digital text is empty or just a short footer/watermark."""
+    cleaned_lines = [
+        line.strip()
+        for line in text.splitlines()
+        if line.strip()
+        and "find this and other free resources at" not in line.lower()
+        and not line.strip().lower().startswith("page ")
+    ]
+    meaningful = " ".join(cleaned_lines)
+    return len(meaningful) < min_meaningful_chars
+
+
+def extract_pdf_text(
+    pdf_path: Union[str, Path],
+    ocr_fallback: bool = True,
+    dpi: int = 150,
+    max_workers: int = 8,
+    max_pages: Optional[int] = None,
+) -> Dict:
+    """Extract text from a digital or scanned PDF in parallel, returning structured dict & Markdown."""
+    path = Path(pdf_path)
+    if not path.exists():
+        raise FileNotFoundError(f"PDF file not found: {path}")
