@@ -32,7 +32,34 @@ pip install -e ".[all,dev]" && pytest
 | ⚙ **Settings** | AI provider (Ollama / OpenRouter), models, API key, favourite sites, workspace folder |
 | 🩺 **Health check** | Which channels are ready on this machine |
 
-### 1. Check the status of every platform
+**Keys:** `ctrl+a` Ask AI · `ctrl+t` Tools · `ctrl+s` Settings · `n` new folder · `f` new file · `r` rename · `del` delete · `o` open in Finder · `ctrl+e` edit/save · `ctrl+r` refresh · `ctrl+q` quit
+
+## Where results go
+
+```
+~/MANOLO-Scrap/
+├── projects/
+│   └── 2026-10-16_form-2-computer-exams/
+│       ├── pdfs/        downloaded PDFs & files
+│       ├── markdown/    text extracted from PDFs (incl. OCR)
+│       ├── scribd/      Scribd documents as Markdown
+│       ├── pages/       every crawled web page as Markdown
+│       ├── data/        plan.json, search_results.json, harvest_manifest.json
+│       └── report.md    AI summary of what was collected
+├── inbox/               one-off downloads from Tools
+└── logs/
+```
+
+Change the location in Settings.
+
+## AI: Ollama or OpenRouter
+
+- **Ollama (free, local):** install Ollama, `ollama pull llama3.1`, pick it in Settings.
+- **OpenRouter (cloud):** paste your key in Settings, or `scrap-master configure openrouter-key`.
+
+With no AI available it still works: it uses a keyword plan and lists what it found instead of writing an AI summary.
+
+## Command line (`scrap-master`)
 
 ```bash
 scrap-master doctor           # human-readable report
