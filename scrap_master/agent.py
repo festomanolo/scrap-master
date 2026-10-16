@@ -91,7 +91,7 @@ def fallback_plan(request: str) -> dict:
         "project_name": request[:40],
         "queries": [request, f"{request} pdf"],
         "urls": [u for u in re.findall(r"https?://\S+", request)],
-        "file_types": [".pdf"],
+        "file_types": list(types_from_text(request) or (".pdf",)),
         "depth": 0,
         "extract_text": True,
         "max_documents": 20,
@@ -103,6 +103,8 @@ def run_job(
     log: Log = print,
     use_ai: bool = True,
     plan: Optional[dict] = None,
+    only: Optional[List[str]] = None,
+    organize: bool = True,
 ) -> Path:
     """Run a full scraping job and return its project folder."""
     from scrap_master import ai
