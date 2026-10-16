@@ -92,7 +92,7 @@ Yes—it is completely possible to make **Scrap Master** **5x to 15x faster** us
 
 ### Bottleneck 1: `scrap-master doctor` Was Running Channels Sequentially
 - **Before:** `scrap_master/doctor.py` looped over `ALL_CHANNELS` one by one (`for ch in get_all_channels(): ch.check(config)`). Because several channels spawn subprocesses (`gh`, `yt-dlp`, `opencli`, `bili`, `twitter`) or make live HTTP API probes (`bilibili`, `v2ex`, `xueqiu`) with up to 10-second timeouts, sequential execution took the **sum** of all probes (up to 35+ seconds).
-- **After (Parallel `ThreadPoolExecutor`):** Because subprocess execution and HTTP socket I/O release Python's GIL, running all channel checks concurrently inside `concurrent.futures.ThreadPoolExecutor(max_workers=16)` reduces `scrap-master doctor` execution time to the duration of the **single slowest probe (~0.8–1.5 seconds)** while preserving the exact channel registry order.
+- **After (Parallel `ThreadPoolExecutor`):** Running all 17 channel checks concurrently inside `concurrent.futures.ThreadPoolExecutor(max_workers=len(channels))` in `scrap_master/doctor.py` completed in **10.07 seconds** (bounded solely by the single 10s timeout on `bilibili`/`xueqiu`, rather than summing across all 17 channels) while preserving exact registry order.
 
 ### Bottleneck 2: Sequential File & PDF Downloading (17 Minutes -> ~12 Seconds)
 - **Before:** Downloading 27 PDFs sequentially over HTTPS from Tanzania's Maktaba TETEA server took **17 minutes** because each file waited for a fresh TCP + TLS handshake and sequential download stream, and any transient SSL timeout aborted that file.
