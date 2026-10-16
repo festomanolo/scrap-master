@@ -43,6 +43,7 @@ ALL_CHANNELS: List[Channel] = [
     RSSChannel(),
     ExaSearchChannel(),
     ScribdChannel(),
+    GoogleDriveChannel(),
     WebChannel(),
 ]
 
