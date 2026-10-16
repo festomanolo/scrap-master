@@ -176,6 +176,7 @@ def download_one(
                 size_bytes=len(data),
                 is_valid_pdf=is_pdf,
                 attempts=attempt,
+                chunks_used=1,
                 elapsed_sec=round(time.monotonic() - t0, 3),
             )
         except Exception as e:  # noqa: BLE001
