@@ -322,6 +322,7 @@ def main():
     if not args.command:
         # Interactive terminal: open the TUI, like `scrap`. Scripts and pipes get help.
         if sys.stdin.isatty() and sys.stdout.isatty():
+            from scrap_master.tui import main as tui_main
         parser.print_help()
         sys.exit(0)
 
