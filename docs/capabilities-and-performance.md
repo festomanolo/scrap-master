@@ -98,7 +98,8 @@ Yes—it is completely possible to make **Scrap Master** **5x to 15x faster** us
 - **Before (Sequential Single-Thread):**
   - Downloading the 27 NECTA FTNA Form 2 Computer Studies PDFs (~19.9 MB) sequentially took **17 minutes 11 seconds (1,031 seconds)** and **failed on 2 files** (`ICS-F2-2025.pdf` and `ICS-F2-2025-Solutions.pdf` with `_ssl.c:983: The handshake operation timed out`).
   - Why? The sum of individual download times across the 27 files is **1,021.7 seconds** because `maktaba.tetea.org` throttles per-connection bandwidth to **~20–23 KB/s per TCP stream**.
-- **After (`scrap_master/utils/parallel_downloader.py`):**
+- **After (`scrap_master/utils/parallel_downloader.py` with `max_workers=12`):**
+  - **Live Measured Result:** All **27 / 27 PDFs (19,906 KB)** downloaded and passed `%PDF` magic-byte verification in **193.51 seconds (3 minutes 13 seconds)** with **0 failures** (`attempts=1` on all 27 files).
   - Uses `ThreadPoolExecutor(max_workers=12)` to run **12 concurrent download workers**.
   - Implements **automatic exponential backoff retries** (`retries=3`) on SSL handshake timeouts (`_ssl.c:983`), HTTP `429`/`5xx`, and incomplete reads.
   - Validates PDF magic bytes (`%PDF-`) on arrival so corrupted/HTML error responses are caught and retried automatically.
