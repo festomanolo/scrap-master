@@ -221,6 +221,8 @@ def download_batch_parallel(
                 timeout=timeout,
                 retries=retries,
                 verify_pdf=verify_pdf,
+                chunks_per_file=chunks_per_file,
+                min_chunk_size_bytes=min_chunk_size_bytes,
                 headers=headers,
             ): idx
             for idx, (url, dest) in enumerate(item_list)
