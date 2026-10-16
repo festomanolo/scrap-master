@@ -24,7 +24,13 @@ pip install -e ".[all,dev]" && pytest
 
 ## The TUI (`scrap`)
 
-## How to use it
+| Screen | What it does |
+|---|---|
+| 🧠 **Ask AI** | Describe the data you want in plain words. The AI plans searches, then MANOLO Scrap collects everything and writes `report.md`. |
+| 🛠 **Tools** | Harvest a site · Download URLs · Scribd → Markdown · Read PDF (OCR) · Read any page · Web search |
+| 📄 **File viewer** | Browse the workspace tree, render Markdown, view/edit text files |
+| ⚙ **Settings** | AI provider (Ollama / OpenRouter), models, API key, favourite sites, workspace folder |
+| 🩺 **Health check** | Which channels are ready on this machine |
 
 ### 1. Check the status of every platform
 
