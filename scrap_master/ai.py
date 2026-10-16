@@ -64,7 +64,9 @@ def chat(messages: List[Dict[str, str]], json_mode: bool = False, timeout: int =
                     payload,
                     {"Authorization": f"Bearer {key}", "X-Title": "MANOLO Scrap"},
                     timeout,
-            OPENROUTER_URL,
+                )
+                content = data["choices"][0]["message"]["content"]
+                if content:
             payload,
             {"Authorization": f"Bearer {key}", "X-Title": "MANOLO Scrap"},
             timeout,
