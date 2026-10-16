@@ -14,7 +14,6 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Callable, List, Optional
 
-_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
 _DDG_RESULT_RE = re.compile(r'class="result__a" href="([^"]+)"')
 
 Log = Callable[[str], None]
