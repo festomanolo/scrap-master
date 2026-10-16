@@ -108,5 +108,4 @@ Yes—it is completely possible to make **Scrap Master** **5x to 15x faster** us
     - When a server caps each TCP connection to ~22 KB/s (like `maktaba.tetea.org`), a single 4.4 MB file still takes 193s on one thread. To break through per-connection throttling on large files, use **multi-connection HTTP `Range: bytes=start-end` chunked downloading** (splitting each large PDF into 4–8 byte-range segments in parallel, or delegating to `aria2c -x 16 -s 16`).
 
 ### Bottleneck 3: Parallel `.jsonp` Page Fetching in Scribd Extraction
-- When a Scribd marking scheme has 15 pages, fetching 15 `.jsonp` page files sequentially takes `15 × 400ms = 6 seconds`.
 - Using `ThreadPoolExecutor(max_workers=10)` inside `ScribdChannel.extract_document()`, all `.jsonp` page slices are fetched concurrently in **< 0.8 seconds** and reassembled in page order.
