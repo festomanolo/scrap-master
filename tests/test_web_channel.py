@@ -159,7 +159,7 @@ def test_read_rejects_oversized_reader_response():
 
     with patch("urllib.request.urlopen", return_value=response):
         with pytest.raises(ValueError, match="response exceeds"):
-            channel.read("https://example.com/large")
+            channel.read("https://example.com/large", allow_fallback=False)
 
     response.__enter__.return_value.read.assert_called_once_with(
         _MAX_RESPONSE_BYTES + 1
@@ -189,7 +189,7 @@ def test_read_rejects_high_confidence_antibot_pages(body):
         "urllib.request.urlopen", return_value=_resp(body.encode("utf-8"))
     ) as mock_open:
         with pytest.raises(RuntimeError, match="anti-bot challenge page"):
-            channel.read("https://example.com/protected")
+            channel.read("https://example.com/protected", allow_fallback=False)
 
     mock_open.assert_called_once()
 
