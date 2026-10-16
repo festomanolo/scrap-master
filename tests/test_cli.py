@@ -36,6 +36,8 @@ class TestCLI:
              patch("scrap_master.tui.main") as tui_main:
             with pytest.raises(SystemExit) as exc_info:
                 main()
+        assert exc_info.value.code == 0
+        tui_main.assert_called_once()
 
     def test_doctor_runs(self, capsys):
         with patch(
