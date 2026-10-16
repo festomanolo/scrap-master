@@ -134,9 +134,7 @@ def plan_job(request: str) -> dict:
     plan.setdefault("project_name", request[:40])
     plan["queries"] = [q for q in plan.get("queries") or [] if isinstance(q, str)][:8] or [request]
     plan["urls"] = [u for u in plan.get("urls") or [] if isinstance(u, str) and u.startswith("http")]
-    plan["file_types"] = [
-        e if e.startswith(".") else f".{e}" for e in (plan.get("file_types") or [".pdf"])
-    ]
+    plan["file_types"] = list(resolve(plan.get("file_types") or ["pdf"]))
     plan["depth"] = 1 if plan.get("depth") else 0
     plan["extract_text"] = bool(plan.get("extract_text", True))
     plan["max_documents"] = max(1, min(int(plan.get("max_documents") or 20), 100))
