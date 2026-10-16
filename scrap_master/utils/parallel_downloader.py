@@ -34,3 +34,39 @@ def download_one(
     """Download a single file with exponential backoff retries and optional PDF magic-byte check."""
     dest_path = Path(dest)
     dest_path.parent.mkdir(parents=True, exist_ok=True)
+    req_headers = {"User-Agent": _DEFAULT_UA}
+    if headers:
+        req_headers.update(headers)
+
+    t0 = time.monotonic()
+    last_err = ""
+    for attempt in range(1, retries + 2):
+        try:
+            req = urllib.request.Request(url, headers=req_headers)
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                data = resp.read()
+            is_pdf = data[:4] == b"%PDF"
+            if verify_pdf and not is_pdf:
+                raise ValueError("Downloaded payload does not start with %PDF header")
+            dest_path.write_bytes(data)
+            return DownloadResult(
+                url=url,
+                path=dest_path,
+                ok=True,
+                size_bytes=len(data),
+                is_valid_pdf=is_pdf,
+                attempts=attempt,
+                elapsed_sec=round(time.monotonic() - t0, 3),
+            )
+        except Exception as e:  # noqa: BLE001
+            last_err = str(e)
+            if attempt <= retries:
+                time.sleep(0.5 * (2 ** (attempt - 1)))
+
+    return DownloadResult(
+        url=url,
+        path=dest_path,
+        ok=False,
+        attempts=retries + 1,
+        elapsed_sec=round(time.monotonic() - t0, 3),
+        error=last_err,
