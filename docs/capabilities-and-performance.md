@@ -106,7 +106,7 @@ We benchmarked all three stages live across the exact same **27 NECTA FTNA Form 
 
 - **Why the 2-Level Parallelism (`ThreadPoolExecutor` + HTTP `206 Partial Content` `Range: bytes=start-end`) Works So Well:**
   - `maktaba.tetea.org` throttles individual TCP streams to **~20–23 KB/s**, which made the 4.4 MB Syllabus take `193.5s` and the 2.85 MB 2019 Exam take `146.4s` on a single connection.
-    - The total wall-clock time (**193.51s**) was governed solely by the single largest file (`Syllabus_-_Information_and_Computer_Studies_-_F1-F4_-_2005.pdf`, **4,417 KB** at ~22.8 KB/s = `193.506s`), which started immediately in worker #1 and ran alongside all other 26 files!
+  - By adding `_probe_range_support()` and `_fetch_byte_range()` in `scrap_master/utils/parallel_downloader.py`, any PDF larger than `512 KB` is automatically split into up to **8–12 concurrent byte-range chunks** (`HTTP 206 Partial Content`) and reassembled in memory before verifying the `%PDF` header:
   - **How to Push Beyond Per-Connection Server Throttling (193s -> <25s):**
     - When a server caps each TCP connection to ~22 KB/s (like `maktaba.tetea.org`), a single 4.4 MB file still takes 193s on one thread. To break through per-connection throttling on large files, use **multi-connection HTTP `Range: bytes=start-end` chunked downloading** (splitting each large PDF into 4–8 byte-range segments in parallel, or delegating to `aria2c -x 16 -s 16`).
 
