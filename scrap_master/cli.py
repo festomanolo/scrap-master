@@ -2151,11 +2151,15 @@ def _cmd_harvest(args):
     """Crawl index pages, then download and extract every document they link to."""
     from scrap_master.utils.harvest import discover, harvest
 
-    exts = tuple(e if e.startswith(".") else f".{e}" for e in (args.ext or [".pdf"]))
-    exts = tuple(e.lower() for e in exts)
+    from scrap_master.utils.filetypes import resolve, sources_for
+
+    exts = resolve((args.only or []) + (args.ext or []) or ["pdf"])
+    sources = tuple(s for s in sources_for(exts)
+                    if not (s == "scribd" and args.no_scribd) and not (s == "gdrive" and args.no_drive))
+    print(f"Collecting: {' '.join(exts)}" + (f" + {'/'.join(sources)}" if sources else ""))
     if args.dry_run:
         report = discover(args.urls, depth=args.depth, exts=exts, pattern=args.match,
-                          max_pages=args.max_pages)
+                          max_pages=args.max_pages, sources=sources)
         print(f"Crawled {len(report.pages_crawled)} page(s), found {len(report.items)} document(s):")
         for it in report.items[: args.limit]:
             print(f"  [{it.kind}] {it.url}")
