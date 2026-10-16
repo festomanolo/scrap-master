@@ -177,6 +177,61 @@ def main():
     p_tr.add_argument("-o", "--output", default=None,
                       help="Write transcript to a file instead of stdout")
 
+    # ── read-pdf ──
+    p_pdf = sub.add_parser(
+        "read-pdf",
+        help="Extract digital and OCR text from a PDF file (PyMuPDF + macOS Vision / Tesseract)",
+    )
+    p_pdf.add_argument("source", help="Path to local PDF file")
+    p_pdf.add_argument(
+        "--no-ocr",
+        action="store_true",
+        help="Disable automatic OCR fallback on scanned pages",
+    )
+    p_pdf.add_argument(
+        "--max-pages",
+        type=int,
+        default=None,
+        help="Maximum number of pages to extract",
+    )
+    p_pdf.add_argument(
+        "-o", "--output", default=None, help="Write extracted Markdown to a file"
+    )
+
+    # ── scribd ──
+    p_scribd = sub.add_parser(
+        "scribd",
+        help="Extract full unblurred document/marking scheme from Scribd via API/JSONP",
+    )
+    p_scribd.add_argument("url_or_id", help="Scribd document URL or numeric ID")
+    p_scribd.add_argument(
+        "-o", "--output", default=None, help="Write extracted Markdown to a file"
+    )
+
+    # ── download ──
+    p_dl = sub.add_parser(
+        "download",
+        help="Download one or more URLs / Google Drive links in parallel with HTTP Range chunking",
+    )
+    p_dl.add_argument("urls", nargs="+", help="One or more URLs to download")
+    p_dl.add_argument(
+        "-d", "--dir", default=".", help="Destination directory (default: current dir)"
+    )
+    p_dl.add_argument(
+        "--workers", type=int, default=12, help="Parallel file workers (default: 12)"
+    )
+    p_dl.add_argument(
+        "--chunks",
+        type=int,
+        default=8,
+        help="Parallel HTTP Range byte chunks per file (default: 8)",
+    )
+    p_dl.add_argument(
+        "--verify-pdf",
+        action="store_true",
+        help="Verify %PDF magic header on downloaded files",
+    )
+
     sub.add_parser("check-update", help="Check for new versions and changes")
 
     # ── watch ──
