@@ -69,7 +69,7 @@ scrap-master read-pdf exam.pdf -o exam.md                                 # PyMu
 scrap-master doctor                                                       # channel health
 ```
 
-### 2. Install optional channels
+## What it can read
 
 `install` is read-only by default. It checks your machine and changes nothing until you pass `--system`.
 
