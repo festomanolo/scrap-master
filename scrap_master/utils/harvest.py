@@ -121,6 +121,7 @@ def discover(
                 if len(extract_links(md)) > 5:
                     return u, md
             except Exception:
+                pass
             try:
                 return u, web.read(u)
             except Exception:
