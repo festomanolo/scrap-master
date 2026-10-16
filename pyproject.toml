@@ -1,7 +1,7 @@
 [project]
 name = "scrap-master"
 version = "1.5.0"
-description = "One toolkit to read, search and scrape data from the entire internet. Search and read 16 platforms."
+description = "MANOLO Scrap — AI-driven TUI to search, scrape, download and extract data from the web."
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
@@ -10,7 +10,6 @@ keywords = [
     "ai-agent", "llm-tools", "agent-infrastructure", "mcp",
     "web-reader", "web-scraper", "search",
     "twitter-scraper", "reddit-scraper", "youtube-transcript",
-    "bilibili", "xiaohongshu",
     "ai-search", "cli", "automation",
     "claude-code", "cursor", "openai",
     "free-api", "no-api-key",
@@ -34,6 +33,8 @@ dependencies = [
     "loguru>=0.7",
     "pyyaml>=6.0",
     "rich>=13.0",
+    "textual>=0.80",
+    "beautifulsoup4>=4.12",
     "yt-dlp[default]>=2026.07.04",
 ]
 
@@ -52,6 +53,7 @@ dev = [
 
 [project.scripts]
 scrap-master = "scrap_master.cli:main"
+scrap = "scrap_master.tui:main"
 
 [project.urls]
 Homepage = "https://github.com/festomanolo/scrap-master"
