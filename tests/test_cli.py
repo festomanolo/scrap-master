@@ -31,6 +31,8 @@ class TestCLI:
 
     def test_no_command_opens_tui_in_terminal(self):
         with patch("sys.argv", ["nolo-scrap"]), \
+             patch("sys.stdin.isatty", return_value=True), \
+             patch("sys.stdout.isatty", return_value=True), \
 
     def test_doctor_runs(self, capsys):
         with patch(
