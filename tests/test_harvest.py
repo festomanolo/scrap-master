@@ -16,3 +16,9 @@ def test_classify_link_kinds():
 def test_same_site_ignores_www():
     assert _same_site("https://msomibora.com/", "https://www.msomibora.com/page/2/")
     assert not _same_site("https://a.com/", "https://b.com/")
+
+
+def test_classify_link_respects_sources_and_exts():
+    assert classify_link("https://www.scribd.com/document/843737831/Ics", sources=()) is None
+    assert classify_link("https://x.org/deck.pptx", (".pptx",)) == "file"
+    assert classify_link("https://x.org/a.pdf", (".pptx",)) is None
