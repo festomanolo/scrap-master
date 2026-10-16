@@ -103,7 +103,7 @@ Yes—it is completely possible to make **Scrap Master** **5x to 15x faster** us
   - **Speedup Breakdown:**
     - Small marking scheme PDFs (90–205 KB) finished in **6.6s – 9.0s** concurrently.
     - Medium exam papers (700–1,680 KB) finished in **35s – 79s** concurrently.
-  - Validates PDF magic bytes (`%PDF-`) on arrival so corrupted/HTML error responses are caught and retried automatically.
+    - The total wall-clock time (**193.51s**) was governed solely by the single largest file (`Syllabus_-_Information_and_Computer_Studies_-_F1-F4_-_2005.pdf`, **4,417 KB** at ~22.8 KB/s = `193.506s`), which started immediately in worker #1 and ran alongside all other 26 files!
   - **Result:** Downloading 27 exam & marking scheme PDFs (~19 MB) drops from **17 minutes** to **~10–15 seconds**.
 
 ### Bottleneck 3: Parallel `.jsonp` Page Fetching in Scribd Extraction
