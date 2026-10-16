@@ -241,7 +241,7 @@ def main():
     p_dl.add_argument(
         "--verify-pdf",
         action="store_true",
-        help="Verify %PDF magic header on downloaded files",
+        help="Verify %%PDF magic header on downloaded files",
     )
 
     p_dl.add_argument("--only", action="append", default=None, metavar="TYPES",
