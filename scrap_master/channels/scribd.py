@@ -34,3 +34,40 @@ _SCRIBD_URL_RE = re.compile(
 
 
 def extract_scribd_id(url_or_id: str) -> Optional[str]:
+    """Extract numeric Scribd document ID from a URL or raw ID string."""
+    s = url_or_id.strip()
+    if s.isdigit():
+        return s
+    m = _SCRIBD_URL_RE.search(s)
+    return m.group(1) if m else None
+
+
+def _decompress_jsonp_bytes(raw: bytes) -> str:
+    """Decompress Scribd .jsonp payload (raw UTF-8, gzip, or PK zip stream)."""
+    # 1. Try GZIP magic bytes (1f 8b)
+    gz_idx = raw.find(b"\x1f\x8b")
+    if gz_idx != -1:
+        try:
+            return gzip.decompress(raw[gz_idx:]).decode("utf-8", errors="ignore")
+        except Exception:
+            pass
+
+    # 2. Try ZIP archive (PK\x03\x04)
+    if raw[:2] == b"PK":
+        try:
+            with zipfile.ZipFile(io.BytesIO(raw)) as zf:
+                names = zf.namelist()
+                if names:
+                    return zf.read(names[0]).decode("utf-8", errors="ignore")
+        except Exception:
+            pass
+        # Raw deflate fallback after PK local header (30 bytes + filename len + extra len)
+        if len(raw) > 30:
+            import zlib
+            fname_len = int.from_bytes(raw[26:28], "little")
+            extra_len = int.from_bytes(raw[28:30], "little")
+            offset = 30 + fname_len + extra_len
+            try:
+                return zlib.decompress(raw[offset:], -zlib.MAX_WBITS).decode(
+                    "utf-8", errors="ignore"
+                )
