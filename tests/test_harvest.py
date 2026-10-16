@@ -13,3 +13,4 @@ def test_classify_link_kinds():
     assert classify_link("https://x.org/page/2/") is None
 
 
+def test_same_site_ignores_www():
