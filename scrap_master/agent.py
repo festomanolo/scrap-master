@@ -210,6 +210,16 @@ def seed_sites() -> List[str]:
     raw = Config().get("seed_sites")
     if raw is None:
         return list(DEFAULT_SEED_SITES)
+    return [u.strip() for u in str(raw).split(",") if u.strip().startswith("http")]
+
+
+def _relevant(items, request: str):
+    """Keep items whose URL or source page mentions a request keyword (all items if none match)."""
+    words = [w for w in re.findall(r"[a-z0-9]+", request.lower()) if len(w) > 3]
+    hits = [i for i in items if any(w in (i.url + " " + i.source_page).lower() for w in words)]
+    return hits or items
+
+
 def _safe_search(q: str) -> List[str]:
     try:
         return web_search(q)
