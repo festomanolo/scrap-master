@@ -118,6 +118,7 @@ def discover(
             # so use it (and its curl_cffi / Playwright fallbacks) only when direct fails.
             try:
                 md = _read_via_direct_http(u)
+                if len(extract_links(md)) > 5:
             try:
                 return u, web.read(u)
             except Exception:
