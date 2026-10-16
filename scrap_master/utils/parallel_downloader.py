@@ -205,7 +205,7 @@ def download_batch_parallel(
     min_chunk_size_bytes: int = 256 * 1024,
     headers: Optional[Dict[str, str]] = None,
 ) -> List[DownloadResult]:
-    """Download multiple (url, destination_path) pairs concurrently using a thread pool."""
+    """Download multiple (url, destination_path) pairs concurrently with optional HTTP Range chunking."""
     item_list = list(items)
     if not item_list:
         return []
