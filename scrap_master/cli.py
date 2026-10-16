@@ -2168,6 +2168,7 @@ def _cmd_harvest(args):
         args.urls, args.dir, depth=args.depth, exts=exts, pattern=args.match,
         extract_text=args.extract, ocr=not args.no_ocr, workers=args.workers,
         chunks=args.chunks, max_pages=args.max_pages, limit=args.limit,
+        sources=sources, organize=args.organize,
     )
     print(f"Crawled {len(report.pages_crawled)} page(s); "
           f"{report.ok_count}/{len(report.items)} document(s) saved to {args.dir}")
