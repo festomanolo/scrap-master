@@ -189,6 +189,7 @@ def download_one(
         path=dest_path,
         ok=False,
         attempts=retries + 1,
+        chunks_used=1,
         elapsed_sec=round(time.monotonic() - t0, 3),
         error=last_err,
     )
