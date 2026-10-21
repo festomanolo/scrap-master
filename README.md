@@ -37,6 +37,21 @@ pip install -e ".[all,dev]" && pytest
 | ⚙ **Settings** | AI provider (Ollama / OpenRouter), models, API key, favourite sites, workspace folder |
 | 🩺 **Health check** | Which channels are ready on this machine |
 
+## Structured data & hidden APIs
+
+```bash
+# Get validated records instead of Markdown (.json, .jsonl or .csv)
+scrap-master extract https://shop.example/books --fields "title, price:number, url:url" -o books.csv
+scrap-master extract --search "nairobi coworking spaces" --fields "name, address, price:number" --top 5
+
+# Record the JSON API a page calls and write a reusable Python client for it
+scrap-master reverse-api "https://hn.algolia.com/?q=python"   # → data/endpoints.json + data/api_client.py
+```
+
+Field types: `string`, `number`, `integer`, `boolean`, `list`, `url`; `--fields` also takes a JSON Schema file.
+Bad AI replies are retried with the validation errors fed back. `reverse-api` never saves cookies,
+auth headers or key/token query values.
+
 **Keys:** `ctrl+a` Ask AI · `ctrl+t` Tools · `ctrl+s` Settings · `n` new folder · `f` new file · `r` rename · `del` delete · `o` open in Finder · `ctrl+e` edit/save · `ctrl+r` refresh · `ctrl+q` quit
 
 ## Scrape only what you need
