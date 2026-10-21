@@ -89,3 +89,8 @@ def _scrub_url(url: str) -> str:
     query = urllib.parse.urlencode(scrub_params(dict(urllib.parse.parse_qsl(u.query, keep_blank_values=True))),
                                    safe="<>")
     return urllib.parse.urlunsplit(u._replace(query=query))
+
+
+def path_template(path: str) -> str:
+    """/api/items/12345/reviews -> /api/items/{id}/reviews"""
+    return "/".join("{id}" if _ID_SEGMENT.match(seg) else seg for seg in path.split("/"))
