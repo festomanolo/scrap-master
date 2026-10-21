@@ -48,3 +48,9 @@ def test_template_client_numbers_multiple_ids():
     eps = reverse_api.group_endpoints([{**CALLS[0], "url": "https://a.io/u/12/p/34"}])
     code = reverse_api.template_client(eps, "a.io")
     assert "def get_u_p(self, id, id2, **params)" in code and "/u/{id}/p/{id2}" in code
+
+
+def test_generate_client_falls_back_when_ai_returns_garbage(monkeypatch):
+    monkeypatch.setattr(reverse_api, "ai_client", lambda e, s: (_ for _ in ()).throw(SyntaxError()))
+    code = reverse_api.generate_client(reverse_api.group_endpoints(CALLS), "api.shop.io")
+    assert code.startswith('"""API client for api.shop.io')
