@@ -82,3 +82,10 @@ def capture(url: str, wait_ms: int = 6000, scrolls: int = 3) -> List[dict]:
         finally:
             browser.close()
     return calls
+
+
+def _scrub_url(url: str) -> str:
+    u = urllib.parse.urlsplit(scrub_url_credentials(url))
+    query = urllib.parse.urlencode(scrub_params(dict(urllib.parse.parse_qsl(u.query, keep_blank_values=True))),
+                                   safe="<>")
+    return urllib.parse.urlunsplit(u._replace(query=query))
