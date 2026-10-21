@@ -75,3 +75,7 @@ def test_secret_query_params_are_redacted():
     assert ep["params"] == {"x-algolia-api-key": "<redacted>", "access_token": "<redacted>", "page": "2"}
     code = reverse_api.template_client([ep], "a.io")
     assert "abc" not in code and "<redacted>" not in code
+
+
+def test_capture_url_scrubber_hides_secret_values():
+    assert "abc" not in reverse_api._scrub_url("https://a.io/q?apiKey=abc&page=1")
