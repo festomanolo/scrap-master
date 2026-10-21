@@ -20,3 +20,20 @@ def test_load_fields_from_file(tmp_path):
     p = tmp_path / "s.json"
     p.write_text('{"url": "link"}')
     assert extract.load_fields(str(p)) == {"url": "url"}
+
+
+@pytest.mark.parametrize("spec", ["", "price:money", "1bad"])
+def test_parse_fields_rejects_bad_specs(spec):
+    with pytest.raises(extract.ExtractError):
+        extract.parse_fields(spec)
+
+
+@pytest.mark.parametrize(("value", "typ", "want"), [
+    ("TSh 12,500.50", "number", 12500.5),
+    ("3 items", "integer", 3),
+    (4.0, "number", 4),
+    ("yes", "boolean", True),
+    ("a, b,", "list", ["a", "b"]),
+    (" https://x.org ", "url", "https://x.org"),
+    ("", "string", None),
+])
