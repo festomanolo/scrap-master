@@ -101,3 +101,26 @@ def coerce(value, typ: str):
             raise ExtractError(f"{value!r} is not an http(s) URL")
         return text
     raise ExtractError(f"unknown type {typ!r}")
+
+
+def validate(records, fields: Dict[str, str]) -> Tuple[List[dict], List[str]]:
+    """Keep only declared fields, coerce types, drop empty records. Returns (records, errors)."""
+    if isinstance(records, dict):
+        records = records.get("records", [records])
+    if not isinstance(records, list):
+        return [], ["reply must be a list of records"]
+    clean, errors = [], []
+    for i, rec in enumerate(records):
+        if not isinstance(rec, dict):
+            errors.append(f"record {i} is not an object")
+            continue
+        out = {}
+        for name, typ in fields.items():
+            try:
+                out[name] = coerce(rec.get(name), typ)
+            except ExtractError as e:
+                errors.append(f"record {i}.{name}: {e}")
+                out[name] = None
+        if any(v not in (None, []) for v in out.values()):
+            clean.append(out)
+    return clean, errors
