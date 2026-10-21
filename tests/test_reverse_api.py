@@ -79,3 +79,9 @@ def test_secret_query_params_are_redacted():
 
 def test_capture_url_scrubber_hides_secret_values():
     assert "abc" not in reverse_api._scrub_url("https://a.io/q?apiKey=abc&page=1")
+
+
+def test_post_endpoints_send_body_separately():
+    code = reverse_api.template_client(reverse_api.group_endpoints(CALLS), "s")
+    assert "def post_v1_search(self, body=None, **params)" in code
+    assert "params=query, json=body" in code
