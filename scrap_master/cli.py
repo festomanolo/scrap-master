@@ -375,6 +375,10 @@ def main():
         _cmd_harvest(args)
     elif args.command == "ask":
         _cmd_ask(args)
+    elif args.command == "extract":
+        _cmd_extract(args)
+    elif args.command == "reverse-api":
+        _cmd_reverse_api(args)
     elif args.command == "types":
         _cmd_types()
     elif args.command == "organize":
