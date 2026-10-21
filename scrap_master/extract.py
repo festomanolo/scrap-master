@@ -137,3 +137,11 @@ def chunks(text: str, size: int = CHUNK_CHARS, limit: int = MAX_CHUNKS) -> List[
     if buf.strip():
         parts.append(buf)
     return parts[:limit]
+
+
+EXTRACT_PROMPT = """You extract structured data from web page text.
+Task: {instruction}
+Return ONLY a JSON object: {{"records": [ ... ]}} where every record has exactly these fields:
+{schema}
+Use null when a value is missing. Do not invent data that is not in the text.
+If nothing matches, return {{"records": []}}."""
