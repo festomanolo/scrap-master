@@ -14,3 +14,5 @@ from pathlib import Path
 from typing import Callable, Dict, Iterable, List, Optional, Tuple
 
 from scrap_master import ai
+
+TYPES = ("string", "number", "integer", "boolean", "list", "url")
