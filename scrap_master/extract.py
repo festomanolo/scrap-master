@@ -184,3 +184,23 @@ def dedupe(records: Iterable[dict]) -> List[dict]:
             seen.add(key)
             out.append(rec)
     return out
+
+
+def extract_urls(urls: List[str], fields: Dict[str, str], instruction: str = "",
+                 reader: Optional[Callable[[str], str]] = None, **kw) -> List[dict]:
+    """Read each URL and extract records; each record gets a `source` field."""
+    if reader is None:
+        from scrap_master.channels.web import WebChannel
+
+        reader = WebChannel().read
+    out: List[dict] = []
+    for url in urls:
+        try:
+            text = reader(url)
+        except Exception as e:
+            print(f"  ✗ {url}: {e}")
+            continue
+        recs = extract_text(text, fields, instruction, **kw)
+        print(f"  ✓ {url}: {len(recs)} record(s)")
+        out += [{**r, "source": url} for r in recs]
+    return dedupe(out)
