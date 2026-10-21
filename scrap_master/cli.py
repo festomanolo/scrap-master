@@ -2215,6 +2215,48 @@ def _cmd_ask(args):
     print(f"\nDone → {project}")
 
 
+def _cmd_extract(args):
+    """Pull validated, structured records out of web pages."""
+    from scrap_master import extract, workspace
+
+    try:
+        fields = extract.load_fields(args.fields)
+    except (extract.ExtractError, ValueError) as e:
+        print(f"Bad --fields: {e}", file=sys.stderr)
+        sys.exit(2)
+    urls = list(args.urls)
+    if args.search:
+        from scrap_master.agent import web_search
+
+        urls += web_search(args.search, max_results=args.top)[: args.top]
+    if not urls:
+        print("Give at least one URL or --search QUERY", file=sys.stderr)
+        sys.exit(2)
+    records = extract.extract_urls(urls, fields, args.prompt or args.search or "")
+    if args.output:
+        out = Path(args.output)
+    else:
+        out = workspace.new_project(args.prompt or args.search or "extract") / "data" / "records.json"
+    extract.write_records(records, out)
+    print(f"\n{len(records)} record(s) → {out}")
+
+
+def _cmd_reverse_api(args):
+    """Record a page's JSON API traffic and write endpoints.json + api_client.py."""
+    from scrap_master import reverse_api, workspace
+
+    out = Path(args.output) if args.output else workspace.new_project(f"api {args.url}") / "data"
+    try:
+        reverse_api.run(args.url, out, use_ai=not args.no_ai, wait_ms=args.wait * 1000)
+    except ImportError:
+        print("Needs Playwright: pip install playwright && playwright install chromium", file=sys.stderr)
+        sys.exit(1)
+    except ValueError as e:
+        print(f"Bad URL: {e}", file=sys.stderr)
+        sys.exit(2)
+    print(f"\nDone → {out / 'api_client.py'}")
+
+
 def _cmd_types():
     from scrap_master.utils.filetypes import GROUPS, PRESETS
 
