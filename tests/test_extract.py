@@ -53,3 +53,9 @@ def test_validate_drops_unknown_fields_and_empty_records():
     recs, errors = extract.validate({"records": [{"name": "A", "price": "5", "x": 1}, {}, 7]}, fields)
     assert recs == [{"name": "A", "price": 5}]
     assert errors == ["record 2 is not an object"]
+
+
+def test_chunks_respects_size_and_limit():
+    text = "\n".join("x" * 50 for _ in range(100))
+    parts = extract.chunks(text, size=200, limit=3)
+    assert len(parts) == 3 and all(len(p) <= 200 for p in parts)
