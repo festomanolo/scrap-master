@@ -174,3 +174,13 @@ def extract_text(text: str, fields: Dict[str, str], instruction: str = "", retri
                           + "\n".join(errors[:10])}]
         records += got
     return dedupe(records)
+
+
+def dedupe(records: Iterable[dict]) -> List[dict]:
+    seen, out = set(), []
+    for rec in records:
+        key = json.dumps(rec, sort_keys=True, ensure_ascii=False)
+        if key not in seen:
+            seen.add(key)
+            out.append(rec)
+    return out
