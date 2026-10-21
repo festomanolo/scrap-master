@@ -150,3 +150,27 @@ If nothing matches, return {{"records": []}}."""
 def build_prompt(instruction: str, fields: Dict[str, str]) -> str:
     schema = "\n".join(f"- {k}: {v}" for k, v in fields.items())
     return EXTRACT_PROMPT.format(instruction=instruction or "Extract every matching item.", schema=schema)
+
+
+def extract_text(text: str, fields: Dict[str, str], instruction: str = "", retries: int = 2,
+                 chat: Optional[Callable] = None) -> List[dict]:
+    """Run the LLM over each chunk of `text` and return validated records."""
+    chat = chat or ai.chat
+    system = build_prompt(instruction, fields)
+    records: List[dict] = []
+    for part in chunks(text):
+        messages = [{"role": "system", "content": system},
+                    {"role": "user", "content": f"Page text:\n{part}"}]
+        for _ in range(retries + 1):
+            reply = chat(messages, json_mode=True)
+            try:
+                got, errors = validate(ai.parse_json(reply), fields)
+            except (ai.AIError, ValueError) as e:
+                got, errors = [], [str(e)]
+            if not errors:
+                break
+            messages += [{"role": "assistant", "content": reply},
+                         {"role": "user", "content": "Fix these problems and reply with JSON only:\n"
+                          + "\n".join(errors[:10])}]
+        records += got
+    return dedupe(records)
