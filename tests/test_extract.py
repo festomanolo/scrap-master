@@ -37,3 +37,9 @@ def test_parse_fields_rejects_bad_specs(spec):
     (" https://x.org ", "url", "https://x.org"),
     ("", "string", None),
 ])
+def test_coerce(value, typ, want):
+    assert extract.coerce(value, typ) == want
+
+
+@pytest.mark.parametrize(("value", "typ"), [("n/a", "number"), (True, "integer"),
+                                            ("maybe", "boolean"), ("x.org", "url")])
