@@ -35,3 +35,7 @@ def scrub_headers(headers: Dict[str, str]) -> Dict[str, str]:
 def scrub_params(params: Dict[str, str]) -> Dict[str, str]:
     """Blank out query values whose names look like credentials."""
     return {k: REDACTED if _SECRET_PARAM.search(k) else v for k, v in params.items()}
+
+
+def is_api_call(resource_type: str, content_type: str) -> bool:
+    return resource_type in ("xhr", "fetch") or "json" in (content_type or "").lower()
