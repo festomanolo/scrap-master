@@ -145,3 +145,8 @@ Return ONLY a JSON object: {{"records": [ ... ]}} where every record has exactly
 {schema}
 Use null when a value is missing. Do not invent data that is not in the text.
 If nothing matches, return {{"records": []}}."""
+
+
+def build_prompt(instruction: str, fields: Dict[str, str]) -> str:
+    schema = "\n".join(f"- {k}: {v}" for k, v in fields.items())
+    return EXTRACT_PROMPT.format(instruction=instruction or "Extract every matching item.", schema=schema)
