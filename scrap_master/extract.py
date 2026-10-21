@@ -20,3 +20,7 @@ _ALIASES = {"str": "string", "text": "string", "float": "number", "int": "intege
             "bool": "boolean", "array": "list", "link": "url"}
 CHUNK_CHARS = 12000
 MAX_CHUNKS = 8
+
+
+class ExtractError(ValueError):
+    pass
