@@ -118,3 +118,14 @@ def group_endpoints(calls: List[dict]) -> List[dict]:
             ep["params"].setdefault(k, v)
         ep["params"] = scrub_params(ep["params"])
     return sorted(endpoints.values(), key=lambda e: -e["hits"])
+
+
+def _func_name(ep: dict, used: set) -> str:
+    words = [w for w in re.split(r"[^A-Za-z0-9]+", ep["path"]) if w and w != "id" and not w.isdigit()]
+    stem = "_".join(words[-3:]).lower() or "root"
+    name = f"{ep['method'].lower()}_{stem}"
+    base, n = name, 2
+    while name in used:
+        name, n = f"{base}_{n}", n + 1
+    used.add(name)
+    return name
