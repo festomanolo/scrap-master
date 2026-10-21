@@ -20,3 +20,9 @@ def test_path_template_replaces_ids():
     assert reverse_api.path_template("/v1/items/123/reviews") == "/v1/items/{id}/reviews"
     assert reverse_api.path_template("/u/3f2a9c1e-1111-2222-3333-444455556666") == "/u/{id}"
     assert reverse_api.path_template("/v1/search") == "/v1/search"
+
+
+def test_is_api_call():
+    assert reverse_api.is_api_call("fetch", "text/html")
+    assert reverse_api.is_api_call("document", "application/json; charset=utf-8")
+    assert not reverse_api.is_api_call("image", "image/png")
