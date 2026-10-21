@@ -60,3 +60,10 @@ def test_ai_client_strips_fences_and_checks_syntax():
     eps = reverse_api.group_endpoints(CALLS)
     code = reverse_api.ai_client(eps, "s", chat=lambda m: "Sure!\n```python\nclass Client: pass\n```")
     assert code == "class Client: pass\n"
+
+
+def test_run_writes_outputs(tmp_path, monkeypatch):
+    monkeypatch.setattr(reverse_api, "capture", lambda url, wait_ms: CALLS)
+    out = reverse_api.run("https://shop.io", tmp_path, use_ai=False)
+    assert (out / "endpoints.json").is_file() and (out / "api_client.py").is_file()
+    assert "Cookie" not in (out / "endpoints.json").read_text()
