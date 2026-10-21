@@ -167,3 +167,11 @@ def template_client(endpoints: List[dict], site: str) -> str:
             lines.append(f"        r = self.s.request({ep['method']!r}, {url}, params=query)")
         lines += ["        r.raise_for_status()", "        return r.json()"]
     return "\n".join(lines) + "\n"
+
+
+CLIENT_PROMPT = """You write Python API clients from captured browser traffic.
+Write ONE self-contained Python module using `requests` with a `Client` class that has one
+clear, well-named method per endpoint below (path ids become arguments, query params become
+keyword arguments with the observed values as defaults). Infer pagination when you see
+page/offset/cursor params. Never hard-code cookies or auth tokens.
+Reply with ONLY the Python code."""
