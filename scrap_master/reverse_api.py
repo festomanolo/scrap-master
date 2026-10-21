@@ -22,3 +22,4 @@ SENSITIVE_HEADERS = ("cookie", "set-cookie", "authorization", "proxy-authorizati
 _KEEP_HEADERS = ("accept", "content-type", "x-requested-with", "referer", "origin")
 SAMPLE_CHARS = 1500
 _SECRET_PARAM = re.compile(r"key|token|secret|auth|sig|session|passw|csrf|xsrf", re.I)
+REDACTED = "<redacted>"
