@@ -94,3 +94,27 @@ def _scrub_url(url: str) -> str:
 def path_template(path: str) -> str:
     """/api/items/12345/reviews -> /api/items/{id}/reviews"""
     return "/".join("{id}" if _ID_SEGMENT.match(seg) else seg for seg in path.split("/"))
+
+
+def group_endpoints(calls: List[dict]) -> List[dict]:
+    """Collapse raw calls into unique endpoints with their query params and one sample."""
+    endpoints: Dict[tuple, dict] = {}
+    for c in calls:
+        u = urllib.parse.urlsplit(c["url"])
+        key = (c["method"], u.netloc, path_template(u.path))
+        ep = endpoints.setdefault(key, {
+            "method": c["method"],
+            "base": f"{u.scheme}://{u.netloc}",
+            "path": key[2],
+            "params": {},
+            "headers": c.get("headers", {}),
+            "body": c.get("post_data", ""),
+            "status": c.get("status"),
+            "sample": c.get("sample", ""),
+            "hits": 0,
+        })
+        ep["hits"] += 1
+        for k, v in urllib.parse.parse_qsl(u.query, keep_blank_values=True):
+            ep["params"].setdefault(k, v)
+        ep["params"] = scrub_params(ep["params"])
+    return sorted(endpoints.values(), key=lambda e: -e["hits"])
