@@ -23,3 +23,4 @@ _KEEP_HEADERS = ("accept", "content-type", "x-requested-with", "referer", "origi
 SAMPLE_CHARS = 1500
 _SECRET_PARAM = re.compile(r"key|token|secret|auth|sig|session|passw|csrf|xsrf", re.I)
 REDACTED = "<redacted>"
+_ID_SEGMENT = re.compile(r"^(?:\d+|[0-9a-f]{8}-[0-9a-f-]{27}|[0-9a-f]{16,}|[A-Za-z0-9_-]{22,})$", re.I)
