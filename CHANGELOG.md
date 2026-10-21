@@ -4,6 +4,11 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- `scrap-master extract`: AI extraction into typed, validated records (JSON / JSONL / CSV), from URLs or a web search.
+- `scrap-master reverse-api`: capture a page's JSON API calls and generate a Python client (AI or built-in template).
+
 ### Changed
 
 - Project renamed to **Scrap Master** (`scrap-master` CLI, `scrap_master` Python package, `~/.scrap-master` config directory, `SCRAP_MASTER_*` environment variables).
