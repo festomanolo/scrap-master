@@ -189,3 +189,12 @@ def ai_client(endpoints: List[dict], site: str, chat: Optional[Callable] = None)
     code = (m.group(1) if m else reply).strip() + "\n"
     compile(code, "api_client.py", "exec")  # reject replies that are not valid Python
     return code
+
+
+def generate_client(endpoints: List[dict], site: str, use_ai: bool = True) -> str:
+    if use_ai and endpoints:
+        try:
+            return ai_client(endpoints, site)
+        except Exception as e:
+            print(f"  AI client failed ({type(e).__name__}); using the template instead")
+    return template_client(endpoints, site)
