@@ -1,11 +1,11 @@
-# MANOLO Scrap — Update Guide
+# Scrap Master — Update Guide
 
 ## For Humans
 
 Copy this to your AI Agent:
 
 ```
-Update MANOLO Scrap: https://raw.githubusercontent.com/festomanolo/scrap-master/main/docs/update.md
+Update Scrap Master: https://raw.githubusercontent.com/festomanolo/scrap-master/main/docs/update.md
 ```
 
 ---
@@ -18,7 +18,7 @@ Update MANOLO Scrap: https://raw.githubusercontent.com/festomanolo/scrap-master/
 
 ### Goal
 
-Update MANOLO Scrap to the latest version, refresh upstream tools, migrate from retired backends, and verify everything works. The user should not need to do anything manually (except things only a human can do, like clicking a browser-extension install button).
+Update Scrap Master to the latest version, refresh upstream tools, migrate from retired backends, and verify everything works. The user should not need to do anything manually (except things only a human can do, like clicking a browser-extension install button).
 
 ### Step 1: Check current version
 
@@ -28,7 +28,7 @@ scrap-master check-update
 
 If it says "Already up to date", skip to Step 4 (verify). Otherwise continue.
 
-### Step 2: Update MANOLO Scrap package
+### Step 2: Update Scrap Master package
 
 ```bash
 pip install --upgrade https://github.com/festomanolo/scrap-master/archive/main.zip
@@ -71,7 +71,7 @@ extension click. If no, everything keeps working on existing backends.
 ### Step 4: Coexistence (DO NOT uninstall old tools)
 
 **Never uninstall tools the user already has.** Retired backends (e.g. yt-dlp
-working as fallbacks where they still function. MANOLO Scrap routes around
+working as fallbacks where they still function. Scrap Master routes around
 them automatically — removal is the user's call, not yours.
 
 ### Step 5: Verify
@@ -81,7 +81,7 @@ scrap-master version
 scrap-master doctor
 ```
 
-Running `scrap-master doctor` (text mode) also makes sure an MANOLO Scrap skill
+Running `scrap-master doctor` (text mode) also makes sure a Scrap Master skill
 exists in detected agent skill directories. If the user already has a skill
 there, doctor preserves it instead of overwriting local customizations. Use
 `scrap-master skill --install` when you explicitly want to refresh the bundled

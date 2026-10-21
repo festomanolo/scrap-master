@@ -66,7 +66,7 @@ def _name_msg(r: dict, escape) -> str:
 def format_report(results: Dict[str, dict]) -> str:
     """Format results as a readable text report (with Rich markup)."""
     lines = []
-    lines.append("[bold cyan]MANOLO Scrap Status[/bold cyan]")
+    lines.append("[bold cyan]Scrap Master Status[/bold cyan]")
     lines.append("[cyan]" + "=" * 40 + "[/cyan]")
     lines.append("Legend: [green]✅[/green] available  [yellow][!][/yellow] installed but needs config/login  [red][X][/red] not installed")
 

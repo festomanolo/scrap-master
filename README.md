@@ -1,8 +1,8 @@
-# MANOLO Scrap
+# Scrap Master
 
 **Tell it what you want. It finds, downloads, reads and files it.**
 
-Type `scrap`, write *"today I want to scrape Form 2 computer studies exams with marking schemes"*, and MANOLO Scrap plans the job with AI, searches the web, crawls the result pages, downloads every PDF / Google Drive / Scribd document in parallel, extracts the text (OCR for scanned pages), and writes a report — all filed in one tidy project folder.
+Type `scrap`, write *"today I want to scrape Form 2 computer studies exams with marking schemes"*, and Scrap Master plans the job with AI, searches the web, crawls the result pages, downloads every PDF / Google Drive / Scribd document in parallel, extracts the text (OCR for scanned pages), and writes a report — all filed in one tidy project folder.
 
 By **festomanolo** · MIT License
 
@@ -11,9 +11,9 @@ By **festomanolo** · MIT License
 ## Install
 
 ```bash
-pip install nolo-scrap            # installs the nolo-scrap command
-nolo-scrap --help         # every command
-nolo-scrap                # opens the TUI
+pip install "git+https://github.com/festomanolo/scrap-master.git"   # installs scrap-master + scrap
+scrap-master --help         # every command
+scrap-master                # opens the TUI
 
 # latest from source:
 pip install "https://github.com/festomanolo/scrap-master/archive/main.zip[all]"
@@ -31,7 +31,7 @@ pip install -e ".[all,dev]" && pytest
 
 | Screen | What it does |
 |---|---|
-| 🧠 **Ask AI** | Describe the data you want in plain words. The AI plans searches, then MANOLO Scrap collects everything and writes `report.md`. |
+| 🧠 **Ask AI** | Describe the data you want in plain words. The AI plans searches, then Scrap Master collects everything and writes `report.md`. |
 | 🛠 **Tools** | Harvest a site · Download URLs · Scribd → Markdown · Read PDF (OCR) · Read any page · Web search |
 | 📄 **File viewer** | Browse the workspace tree, render Markdown, view/edit text files |
 | ⚙ **Settings** | AI provider (Ollama / OpenRouter), models, API key, favourite sites, workspace folder |
@@ -57,13 +57,13 @@ Drive are only crawled when a document type is selected.
 ## Benchmark
 
 `scrap-master bench` serves a mixed batch from a local, bandwidth-capped server and races
-MANOLO Scrap against a plain Python loop, `curl`, `curl -Z`, `wget` and `aria2c` (whichever
+Scrap Master against a plain Python loop, `curl`, `curl -Z`, `wget` and `aria2c` (whichever
 are installed). Plain tools get a hand-filtered list; Scrap gets the full mixed list and must
 pick the right types itself. Score = 60% speed · 20% filtering · 10% folders · 10% integrity.
 
 ```
 #  Tool                      Time  ×naive   Files  Filter  Folders  Score
-1  MANOLO Scrap             0.23s   17.4×     8/8       ✔        ✔    100
+1  Scrap Master             0.23s   17.4×     8/8       ✔        ✔    100
 2  curl -Z (parallel)       1.09s    3.6×     8/8       ✘        ✘     23
 3  python loop (naive)      3.98s    1.0×     8/8       ✘        ✘     13
 ```
@@ -71,7 +71,7 @@ pick the right types itself. Score = 60% speed · 20% filtering · 10% folders �
 ## Where results go
 
 ```
-~/MANOLO-Scrap/
+~/Scrap-Master/
 ├── projects/
 │   └── 2026-10-16_form-2-computer-exams/
 │       ├── pdfs/        downloaded PDFs & files

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""MANOLO Scrap — terminal UI. Run with: scrap"""
+"""Scrap Master — terminal UI. Run with: scrap"""
 
 import shutil
 import subprocess
@@ -115,8 +115,8 @@ class Prompt(ModalScreen):
             self.dismiss(None)
 
 
-class ManoloScrap(App):
-    TITLE = "MANOLO Scrap"
+class ScrapMasterApp(App):
+    TITLE = "Scrap Master"
     SUB_TITLE = f"v{__version__}"
     CSS = CSS
     BINDINGS = [
@@ -480,7 +480,7 @@ class ManoloScrap(App):
         status = self.query_one("#s-status", Label)
         self.call_from_thread(status.update, "testing…")
         try:
-            reply = ai.chat([{"role": "user", "content": "Reply with exactly: MANOLO ready"}], timeout=60)
+            reply = ai.chat([{"role": "user", "content": "Reply with exactly: Scrap Master ready"}], timeout=60)
             self.call_from_thread(status.update, f"[green]✔ {ai.provider_info()['model']}: {reply.strip()[:80]}[/]")
         except Exception as e:
             self.call_from_thread(status.update, f"[red]✖ {e}[/]")
@@ -505,7 +505,7 @@ class ManoloScrap(App):
 
 
 def main() -> None:
-    ManoloScrap().run()
+    ScrapMasterApp().run()
 
 
 if __name__ == "__main__":

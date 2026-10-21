@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""LLM access for MANOLO Scrap — local Ollama or OpenRouter, plain HTTP, no SDKs."""
+"""LLM access for Scrap Master — local Ollama or OpenRouter, plain HTTP, no SDKs."""
 
 import json
 import re
@@ -62,7 +62,7 @@ def chat(messages: List[Dict[str, str]], json_mode: bool = False, timeout: int =
                 data = _post(
                     OPENROUTER_URL,
                     payload,
-                    {"Authorization": f"Bearer {key}", "X-Title": "MANOLO Scrap"},
+                    {"Authorization": f"Bearer {key}", "X-Title": "Scrap Master"},
                     timeout,
                 )
                 content = data["choices"][0]["message"]["content"]

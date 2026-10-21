@@ -1,7 +1,7 @@
 [project]
-name = "nolo-scrap"
+name = "scrap-master"
 version = "1.5.2"
-description = "MANOLO Scrap — AI-driven TUI to search, scrape, download and extract data from the web."
+description = "Scrap Master — AI-driven TUI to search, scrape, download and extract data from the web."
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
@@ -52,7 +52,6 @@ dev = [
 ]
 
 [project.scripts]
-nolo-scrap = "scrap_master.cli:main"
 scrap-master = "scrap_master.cli:main"
 scrap = "scrap_master.tui:main"
 

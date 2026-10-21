@@ -1,4 +1,4 @@
-"""Security boundaries for the optional MANOLO Scrap MCP server."""
+"""Security boundaries for the optional Scrap Master MCP server."""
 
 import asyncio
 from types import SimpleNamespace

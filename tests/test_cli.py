@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Tests for MANOLO Scrap CLI."""
+"""Tests for Scrap Master CLI."""
 
 import shutil
 import subprocess
@@ -21,7 +21,7 @@ class TestCLI:
                 main()
         assert exc_info.value.code == 0
         captured = capsys.readouterr()
-        assert "MANOLO Scrap v" in captured.out
+        assert "Scrap Master v" in captured.out
 
     def test_no_command_shows_help(self, capsys):
         with pytest.raises(SystemExit) as exc_info:
@@ -30,7 +30,7 @@ class TestCLI:
         assert exc_info.value.code == 0
 
     def test_no_command_opens_tui_in_terminal(self):
-        with patch("sys.argv", ["nolo-scrap"]), \
+        with patch("sys.argv", ["scrap-master"]), \
              patch("sys.stdin.isatty", return_value=True), \
              patch("sys.stdout.isatty", return_value=True), \
              patch("scrap_master.tui.main") as tui_main:
@@ -54,11 +54,11 @@ class TestCLI:
             },
         ), patch(
             "scrap_master.doctor.format_report",
-            return_value="MANOLO Scrap\n✅ Web available",
+            return_value="Scrap Master\n✅ Web available",
         ), patch("sys.argv", ["scrap-master", "doctor"]):
             main()
         captured = capsys.readouterr()
-        assert "MANOLO Scrap" in captured.out
+        assert "Scrap Master" in captured.out
         assert "✅" in captured.out
 
     def test_doctor_is_read_only_and_never_installs_skill(
@@ -67,7 +67,7 @@ class TestCLI:
         skill_dir = tmp_path / ".agents" / "skills" / "scrap-master"
         skill_dir.mkdir(parents=True)
         skill_file = skill_dir / "SKILL.md"
-        custom_content = "# custom MANOLO Scrap skill\n"
+        custom_content = "# custom Scrap Master skill\n"
         skill_file.write_text(custom_content, encoding="utf-8")
 
         monkeypatch.setattr(

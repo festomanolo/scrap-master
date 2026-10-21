@@ -134,7 +134,7 @@ def test_probe_never_executes_any_daemon_or_doctor_command():
 def test_opencli_probes_strip_deprecated_app_env_only_from_children(monkeypatch):
     """OpenCLIApp can inject a variable that makes every CLI command exit 78.
 
-    MANOLO Scrap must remove it from both read-only child probes without
+    Scrap Master must remove it from both read-only child probes without
     mutating the desktop app's parent environment.
     """
     monkeypatch.setenv("OPENCLI_DAEMON_PORT", "19825")

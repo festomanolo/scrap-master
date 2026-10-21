@@ -50,4 +50,4 @@ twitter check
 > in the process environment where you run this command.
 >
 > **Fallback:** If you have bird CLI installed (`npm install -g @steipete/bird`), it works
-> too. MANOLO Scrap automatically detects installed tools.
+> too. Scrap Master automatically detects installed tools.

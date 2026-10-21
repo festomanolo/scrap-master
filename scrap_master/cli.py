@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-MANOLO Scrap CLI — installer, doctor, and configuration tool.
+Scrap Master CLI — installer, doctor, and configuration tool.
 
 Usage:
     scrap-master install --env=auto
@@ -60,12 +60,12 @@ def main():
     _ensure_utf8_console()
 
     parser = argparse.ArgumentParser(
-        prog="nolo-scrap",
+        prog="scrap-master",
         description="One toolkit to read, search and scrape data from the entire internet",
         epilog=__credits__,
     )
     parser.add_argument("-v", "--verbose", action="store_true", help="Show debug logs")
-    parser.add_argument("--version", action="version", version=f"MANOLO Scrap v{__version__}\n{__credits__}")
+    parser.add_argument("--version", action="version", version=f"Scrap Master v{__version__}\n{__credits__}")
     sub = parser.add_subparsers(dest="command", help="Available commands")
 
     # ── setup ──
@@ -133,7 +133,7 @@ def main():
                           help="Output machine-readable JSON instead of the text report")
 
     # ── uninstall ──
-    p_uninstall = sub.add_parser("uninstall", help="Remove all MANOLO Scrap config, tokens, and skill files")
+    p_uninstall = sub.add_parser("uninstall", help="Remove all Scrap Master config, tokens, and skill files")
     p_uninstall.add_argument("--dry-run", action="store_true",
                              help="Show what would be removed without making any changes")
     p_uninstall.add_argument("--keep-config", action="store_true",
@@ -330,7 +330,7 @@ def main():
         sys.exit(0)
 
     if args.command == "version":
-        print(f"MANOLO Scrap v{__version__}\n{__credits__}")
+        print(f"Scrap Master v{__version__}\n{__credits__}")
         sys.exit(0)
 
     if args.command == "doctor":
@@ -415,7 +415,7 @@ def _cmd_install(args):
 
     config = Config(read_only=dry_run or safe_mode)
     print()
-    print("MANOLO Scrap Installer")
+    print("Scrap Master Installer")
     print("=" * 40)
 
     if dry_run:
@@ -576,7 +576,7 @@ def _cmd_install(args):
 
 
 def _install_skill(force: bool = True):
-    """Install MANOLO Scrap as an agent skill for supported agent clients."""
+    """Install Scrap Master as an agent skill for supported agent clients."""
     import importlib.resources
     import os
     import shutil
@@ -1458,7 +1458,7 @@ def _cmd_configure(args):
                 )
             else:
                 print(
-                    "  Note: the standalone `twitter` command does not read MANOLO Scrap config; "
+                    "  Note: the standalone `twitter` command does not read Scrap Master config; "
                     "set TWITTER_AUTH_TOKEN/TWITTER_CT0 explicitly when calling it directly."
                 )
         else:
@@ -1545,7 +1545,7 @@ def _parse_twitter_cookie_input(value: str):
 
 
 def _cmd_uninstall(args):
-    """Remove all MANOLO Scrap config, tokens, and skill files."""
+    """Remove all Scrap Master config, tokens, and skill files."""
     import shutil
     import subprocess
 
@@ -1555,7 +1555,7 @@ def _cmd_uninstall(args):
     keep_config = args.keep_config
 
     print()
-    print("MANOLO Scrap Uninstaller")
+    print("Scrap Master Uninstaller")
     print("=" * 40)
 
     if dry_run:
@@ -1664,7 +1664,7 @@ def _cmd_uninstall(args):
                 mcporter_cleanup_skipped = True
                 print(
                     f"  [!] mcporter entry {mcp_name} source cannot be proven to be managed by "
-                    "MANOLO Scrap; it has been kept. If you no longer need it, remove it manually."
+                    "Scrap Master; it has been kept. If you no longer need it, remove it manually."
                 )
 
     # ── 4. Summary and optional steps ──
@@ -1674,17 +1674,17 @@ def _cmd_uninstall(args):
         print("Run without --dry-run to actually remove the above.")
     else:
         if removed_any:
-            print("MANOLO Scrap data removed.")
+            print("Scrap Master data removed.")
         elif mcporter_cleanup_skipped:
-            print("No proven MANOLO Scrap-managed mcporter data was removed.")
+            print("No proven Scrap Master-managed mcporter data was removed.")
         else:
             print("Nothing to remove — already clean.")
 
     print()
-    print("Optional: remove the MANOLO Scrap Python package itself:")
+    print("Optional: remove the Scrap Master Python package itself:")
     print("  pip uninstall scrap-master")
     print()
-    print("Optional: remove tools installed by MANOLO Scrap:")
+    print("Optional: remove tools installed by Scrap Master:")
     print("  npm uninstall -g mcporter")
     print("  pipx uninstall twitter-cli")
     print("  npm uninstall -g undici")
@@ -1716,7 +1716,7 @@ def _cmd_setup():
 
     config = Config()
     print()
-    print("MANOLO Scrap Setup")
+    print("Scrap Master Setup")
     print("=" * 40)
     print()
 
@@ -1915,7 +1915,7 @@ def _github_get_with_retry(url, timeout=10, retries=3, sleeper=time.sleep):
 #: agent through all three (docs/update.md); bare pip only updates the package.
 _UPDATE_INSTRUCTIONS = (
     "Update method (recommended — paste this to your AI Agent for a full update including upstream tools and skills):\n"
-    "  Update MANOLO Scrap: https://raw.githubusercontent.com/festomanolo/scrap-master/main/docs/update.md\n"
+    "  Update Scrap Master: https://raw.githubusercontent.com/festomanolo/scrap-master/main/docs/update.md\n"
     "Update the package only (without upstream tools and skills):\n"
     "  pip install --upgrade https://github.com/festomanolo/scrap-master/archive/main.zip"
 )
@@ -2045,10 +2045,10 @@ def _cmd_watch():
 
     # Output
     if not issues and not update_available:
-        print(f"MANOLO Scrap: all good ({ok}/{total} channels available, v{__version__} is up to date)")
+        print(f"Scrap Master: all good ({ok}/{total} channels available, v{__version__} is up to date)")
         return
 
-    print("MANOLO Scrap health report")
+    print("Scrap Master health report")
     print("=" * 40)
     print(f"Version: v{__version__}  |  Channels: {ok}/{total}")
 
@@ -2064,7 +2064,7 @@ def _cmd_watch():
             for line in release_body.strip().split("\n")[:10]:
                 print(f"    {line}")
         print("  Update (paste this to your Agent for a full update):")
-        print("    Update MANOLO Scrap: https://raw.githubusercontent.com/festomanolo/scrap-master/main/docs/update.md")
+        print("    Update Scrap Master: https://raw.githubusercontent.com/festomanolo/scrap-master/main/docs/update.md")
 
 
 def _cmd_read_pdf(args):

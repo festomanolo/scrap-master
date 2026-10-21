@@ -1,6 +1,6 @@
-# Contributing to MANOLO Scrap
+# Contributing to Scrap Master
 
-Thank you for your interest in contributing to MANOLO Scrap! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to Scrap Master! This document provides guidelines and instructions for contributing.
 
 ## Getting Started
 
@@ -15,8 +15,8 @@ Thank you for your interest in contributing to MANOLO Scrap! This document provi
 
 ```bash
 # Clone your fork
-git clone https://github.com/YOUR_USERNAME/Scrap-Master.git
-cd Scrap-Master
+git clone https://github.com/YOUR_USERNAME/scrap-master.git
+cd scrap-master
 
 # Install in development mode
 pip install -e ".[dev]"
@@ -49,7 +49,7 @@ pytest
 
 ## Adding New Channels
 
-MANOLO Scrap uses a unified channel interface. To add a new platform:
+Scrap Master uses a unified channel interface. To add a new platform:
 
 1. Create a new file in `scrap_master/channels/`
 2. Implement the channel contract (see existing channels for examples)
@@ -81,4 +81,4 @@ Feel free to open an issue for questions or join discussions.
 
 ---
 
-Thank you for contributing to MANOLO Scrap! See the guidelines above.
+Thank you for contributing to Scrap Master! See the guidelines above.

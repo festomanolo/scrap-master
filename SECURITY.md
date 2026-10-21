@@ -8,7 +8,7 @@
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in Scrap-Master, please report 
+If you discover a security vulnerability in Scrap Master, please report 
 it responsibly by using GitHub's private security advisory feature:
 
 👉 **[Report a vulnerability](https://github.com/festomanolo/scrap-master/security/advisories/new)**

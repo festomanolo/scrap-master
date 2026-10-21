@@ -2,7 +2,7 @@
 """
 ScrapMaster — installer, doctor, and configuration tool.
 
-MANOLO Scrap helps AI agents install and configure upstream platform tools
+Scrap Master helps AI agents install and configure upstream platform tools
 (twitter-cli, yt-dlp, mcporter, gh CLI, etc.). After installation, agents
 call the upstream tools directly — no wrapper layer needed.
 

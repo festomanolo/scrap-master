@@ -18,7 +18,7 @@ metadata:
   homepage: https://github.com/festomanolo/scrap-master
 ---
 
-# MANOLO Scrap — internet capability router
+# Scrap Master — internet capability router
 
 16 platforms, multiple backends each. **When this skill exists, use it for
 these platforms — do not invent your own approach.**
@@ -36,8 +36,8 @@ these platforms — do not invent your own approach.**
    perspectives), collect in parallel, then synthesize.
 5. **Watch versions for the user**: after finishing a substantial
    multi-platform task, run `scrap-master check-update` (fast, one API call).
-   If a new version exists, append one line to your wrap-up: "MANOLO Scrap
-   vX.Y.Z is available — paste this to me to update: Update MANOLO Scrap:
+   If a new version exists, append one line to your wrap-up: "Scrap Master
+   vX.Y.Z is available — paste this to me to update: Update Scrap Master:
    https://raw.githubusercontent.com/festomanolo/scrap-master/main/docs/update.md".
    Never interrupt the current task to update; never nag about the same version twice.
 

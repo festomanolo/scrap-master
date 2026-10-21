@@ -141,7 +141,7 @@ class TestSkillCommand(unittest.TestCase):
                     # Verify content is non-empty
                     with open(os.path.join(dirpath, "SKILL.md"), encoding="utf-8") as f:
                         content = f.read()
-                    self.assertIn("MANOLO Scrap", content)
+                    self.assertIn("Scrap Master", content)
             # _install_skill may or may not find dirs depending on mock; just ensure no crash
             # The important test is that the function runs without error
 
@@ -187,7 +187,7 @@ class TestSkillCommand(unittest.TestCase):
             self.assertTrue(os.path.exists(target))
             with open(target, encoding="utf-8") as f:
                 content = f.read()
-            self.assertIn("MANOLO Scrap", content)
+            self.assertIn("Scrap Master", content)
 
 
 if __name__ == "__main__":

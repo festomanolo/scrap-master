@@ -1,16 +1,16 @@
-# MANOLO Scrap — Installation Guide
+# Scrap Master — Installation Guide
 
 ## For Humans
 
 Copy this to your AI Agent:
 
 ```
-Install MANOLO Scrap: https://raw.githubusercontent.com/festomanolo/scrap-master/main/docs/install.md
+Install Scrap Master: https://raw.githubusercontent.com/festomanolo/scrap-master/main/docs/install.md
 ```
 
 > 🛡️ **Safe by default:** `scrap-master install` only checks the machine and lists missing dependencies:
 > ```
-> Safely check and install MANOLO Scrap: https://raw.githubusercontent.com/festomanolo/scrap-master/main/docs/install.md
+> Safely check and install Scrap Master: https://raw.githubusercontent.com/festomanolo/scrap-master/main/docs/install.md
 > ```
 > Only use `--system` after the user explicitly approves system-level installs and configuration writes.
 
@@ -34,7 +34,7 @@ When fixing issues, stay within these limits:
 
 ### 📁 Directory Rules
 
-All MANOLO Scrap files go in dedicated directories — **never in the agent workspace**:
+All Scrap Master files go in dedicated directories — **never in the agent workspace**:
 
 | Purpose | Directory | Example |
 |---------|-----------|---------|
@@ -81,7 +81,7 @@ The default command checks core infrastructure (gh CLI, Node.js, mcporter, Exa s
 
 
 > 💡 **macOS / Homebrew Python showing `externally-managed-environment`?**
-> This is PEP 668 protection — not an MANOLO Scrap issue. Use `pipx install ...` first, or create a `venv` before installing.
+> This is PEP 668 protection — not a Scrap Master issue. Use `pipx install ...` first, or create a `venv` before installing.
 
 **Install modes:**
 
@@ -160,7 +160,7 @@ twitter search "query" -n 10
 > **What the Agent needs to do:**
 > 1. Confirm the user has a proxy configured: `scrap-master configure proxy` (hidden input)
 > 2. Set environment variables: `export HTTP_PROXY="..." HTTPS_PROXY="..."`
-> 3. MANOLO Scrap handles the rest automatically — no additional action needed from the user
+> 3. Scrap Master handles the rest automatically — no additional action needed from the user
 >
 > If the user reports "fetch failed", see [troubleshooting.md](troubleshooting.md)
 
@@ -234,7 +234,7 @@ scrap-master install --system --channels facebook,instagram
 
 
 
-The transcription script is automatically installed with MANOLO Scrap; the user only needs to provide a key:
+The transcription script is automatically installed with Scrap Master; the user only needs to provide a key:
 
 ```bash
 scrap-master configure groq-key
@@ -323,7 +323,7 @@ Run `scrap-master doctor` one final time and report the results to your user.
 
 If you are running inside **OpenClaw**, ask your user:
 
-> "MANOLO Scrap is set up! Would you like me to create a daily automated check task? It will monitor these channels and check for new versions — only notifying you when something is wrong or an update is available."
+> "Scrap Master is set up! Would you like me to create a daily automated check task? It will monitor these channels and check for new versions — only notifying you when something is wrong or an update is available."
 
 If the user agrees, create a **cron job** (daily, `sessionTarget: "isolated"`, `delivery: "announce"`) with this task:
 
@@ -331,7 +331,7 @@ If the user agrees, create a **cron job** (daily, `sessionTarget: "isolated"`, `
 Run the scrap-master watch command.
 If the output contains "all good", do not notify the user — finish silently.
 If the output contains issues (❌ ⚠) or a new version (🆕), send the full report to the user with suggested fixes.
-If a new version is available, ask the user whether to upgrade (paste this to the user's Agent for a full update: Update MANOLO Scrap: https://raw.githubusercontent.com/festomanolo/scrap-master/main/docs/update.md).
+If a new version is available, ask the user whether to upgrade (paste this to the user's Agent for a full update: Update Scrap Master: https://raw.githubusercontent.com/festomanolo/scrap-master/main/docs/update.md).
 ```
 
 If the user wants a different agent to handle it, let them choose.

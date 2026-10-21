@@ -1,12 +1,12 @@
-# MANOLO Scrap — Capability Benchmark, Limitations, Scribd API Extraction & Parallel Speedup Architecture
+# Scrap Master — Capability Benchmark, Limitations, Scribd API Extraction & Parallel Speedup Architecture
 
-Based on our live benchmark scraping **Tanzania Form Two National Assessment (FTNA — Subject Code `036`: Information and Computer Studies / Computer Science)** examination papers and marking schemes—and inspecting the architecture of **MANOLO Scrap**—this document provides:
+Based on our live benchmark scraping **Tanzania Form Two National Assessment (FTNA — Subject Code `036`: Information and Computer Studies / Computer Science)** examination papers and marking schemes—and inspecting the architecture of **Scrap Master**—this document provides:
 
-1. **Where MANOLO Scrap Succeeds (Core Abilities)**
-2. **Where MANOLO Scrap Fails (Limitations & Blind Spots)**
+1. **Where Scrap Master Succeeds (Core Abilities)**
+2. **Where Scrap Master Fails (Limitations & Blind Spots)**
 3. **Summary Verdict Matrix**
 4. **How Scribd API / Embed Extraction Works (Bypassing the Web UI & Paywall Blur)**
-5. **How to Make MANOLO Scrap Significantly Faster (Parallel Execution & Async Batch Downloading)**
+5. **How to Make Scrap Master Significantly Faster (Parallel Execution & Async Batch Downloading)**
 
 ---
 
@@ -27,7 +27,7 @@ Based on our live benchmark scraping **Tanzania Form Two National Assessment (FT
 ## 2. Where It Fails (Limitations & Blind Spots)
 
 ### A. It Was Not Originally a File Downloader or Bulk Crawler
-- **What happened in our test:** MANOLO Scrap's `web` channel (`r.jina.ai`) could read the Maktaba index page and give us the 65 `.pdf` URLs, **but MANOLO Scrap previously had no built-in parallel PDF/file downloader or retry queue**.
+- **What happened in our test:** Scrap Master's `web` channel (`r.jina.ai`) could read the Maktaba index page and give us the 65 `.pdf` URLs, **but Scrap Master previously had no built-in parallel PDF/file downloader or retry queue**.
 - Sequential `urllib.request` downloads took ~17 minutes for 27 files because of slow single-threaded TCP/SSL handshakes (`_ssl.c:983: The handshake operation timed out` on `ICS-F2-2025.pdf`).
 - **Fix Implemented:** We added parallel `ThreadPoolExecutor` execution to `doctor.py` and a high-speed concurrent downloader (`scrap_master/utils/parallel_downloader.py`) with automatic exponential backoff retries and connection pooling.
 
@@ -37,7 +37,7 @@ Based on our live benchmark scraping **Tanzania Form Two National Assessment (FT
 - **Fix Implemented:** See **Section 4** below and `scrap_master/channels/scribd.py` for direct Scribd API / Embed (`content/embed` + `.jsonp` page asset manifest + mobile API token) extraction.
 
 ### C. No Built-In PDF/Binary OCR Inside `scrap-master`
-- MANOLO Scrap has `transcribe.py` for audio/video (via Whisper), but scanned camera/scanner image PDFs (like `ICS-F2-2025.pdf`) contain only image streams plus a watermark footer (`Find this and other free resources at: https://maktaba.tetea.org`).
+- Scrap Master has `transcribe.py` for audio/video (via Whisper), but scanned camera/scanner image PDFs (like `ICS-F2-2025.pdf`) contain only image streams plus a watermark footer (`Find this and other free resources at: https://maktaba.tetea.org`).
 - Without a vision model or OCR pipeline (`pypdf`/`pdfplumber` + `tesseract` or multimodal LLM vision), a plain-text scraper gets blank pages on scanned exams.
 
 ### D. Heavy Dependency on External Tools & Browser Sessions
@@ -85,9 +85,9 @@ Instead of loading the bloated Scribd website (`https://www.scribd.com/document/
 
 ---
 
-## 5. Making MANOLO Scrap Significantly Faster (Parallel Execution Architecture)
+## 5. Making Scrap Master Significantly Faster (Parallel Execution Architecture)
 
-Yes—it is completely possible to make **MANOLO Scrap** **5x to 15x faster** using parallel processes and threads. Here is where the bottlenecks were and how we parallelized them:
+Yes—it is completely possible to make **Scrap Master** **5x to 15x faster** using parallel processes and threads. Here is where the bottlenecks were and how we parallelized them:
 
 ### Bottleneck 1: `scrap-master doctor` Was Running Channels Sequentially
 

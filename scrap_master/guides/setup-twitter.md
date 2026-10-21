@@ -60,7 +60,7 @@ scrap-master configure twitter-cookies --sync-legacy-twitter
 `scrap-master uninstall` will mention these legacy copies but will not auto-delete them.
 When cleaning up, confirm with the user first, then delete those two files manually.
 
-`twitter` is a standalone upstream command that does not read MANOLO Scrap config files.
+`twitter` is a standalone upstream command that does not read Scrap Master config files.
 When running `twitter status/search/read/...` directly, you must explicitly set
 `TWITTER_AUTH_TOKEN` and `TWITTER_CT0` in the current shell or subprocess environment.
 Do not rely on automatic browser cookie reads.
@@ -103,6 +103,6 @@ proxychains twitter search "test" -n 1
 ## Fallback: bird CLI
 
 If you have [bird CLI](https://www.npmjs.com/package/@steipete/bird) installed
-(`npm install -g @steipete/bird`), it also works. MANOLO Scrap automatically detects
+(`npm install -g @steipete/bird`), it also works. Scrap Master automatically detects
 and uses installed bird. Both tools have similar functionality; twitter-cli is the
 current recommended option.

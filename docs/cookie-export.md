@@ -25,7 +25,7 @@ Both commands use a hidden prompt. For non-interactive automation, send the
 same exported value through stdin and add `--stdin`; never place cookies in
 the process arguments.
 
-Twitter values saved by MANOLO Scrap are used by `scrap-master doctor` only to
+Twitter values saved by Scrap Master are used by `scrap-master doctor` only to
 check whether explicit credentials are present. Doctor does not run
 `twitter status`. Direct `twitter` commands still require
 `TWITTER_AUTH_TOKEN` and `TWITTER_CT0` in their process environment.

@@ -1,4 +1,4 @@
-"""Offline benchmark: MANOLO Scrap vs. common download tools on the same simulated network.
+"""Offline benchmark: Scrap Master vs. common download tools on the same simulated network.
 
 A local HTTP server serves a mixed batch of files (PDFs, slides, sheets, images, …) with
 per-connection bandwidth caps and latency, like a real slow host. Every contender downloads
@@ -189,9 +189,9 @@ def run(
         f"{latency_ms} ms latency · want: {' '.join(exts)} ({len(wanted)} files)")
 
     # Fair work: every tool moves the same bytes. Plain tools get a hand-filtered URL list;
-    # MANOLO Scrap gets the full mixed list and must pick the right types itself.
+    # Scrap Master gets the full mixed list and must pick the right types itself.
     picked = [u for u in urls if u.rsplit("/", 1)[-1] in wanted]
-    contenders = _contenders() + [("MANOLO Scrap", lambda u, o: _scrap(u, o, exts), True)]
+    contenders = _contenders() + [("Scrap Master", lambda u, o: _scrap(u, o, exts), True)]
     if tools:
         contenders = [c for c in contenders if any(t.lower() in c[0].lower() for t in tools)]
     results: List[BenchResult] = []

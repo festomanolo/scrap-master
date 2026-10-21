@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Tests for MANOLO Scrap config module."""
+"""Tests for Scrap Master config module."""
 
 import pytest
 

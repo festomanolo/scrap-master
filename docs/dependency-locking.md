@@ -1,6 +1,6 @@
 # Dependency Locking Guide
 
-MANOLO Scrap uses `constraints.txt` as a reproducible dependency baseline.
+Scrap Master uses `constraints.txt` as a reproducible dependency baseline.
 
 ## Why
 

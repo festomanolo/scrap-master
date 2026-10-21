@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""MANOLO Scrap workspace — one predictable folder layout for every scraping job.
+"""Scrap Master workspace — one predictable folder layout for every scraping job.
 
-~/MANOLO-Scrap/
+~/Scrap-Master/
 ├── projects/<YYYY-MM-DD>_<slug>/
 │   ├── pdfs/        downloaded PDFs and other binaries
 │   ├── markdown/    text extracted from PDFs (PyMuPDF + OCR)
@@ -23,7 +23,10 @@ PROJECT_DIRS = ("pdfs", "markdown", "scribd", "pages", "data")
 def workspace_root() -> Path:
     from scrap_master.config import Config
 
-    root = Config().get("workspace") or str(Path.home() / "MANOLO-Scrap")
+    root = Config().get("workspace")
+    if not root:
+        legacy = Path.home() / "MANOLO-Scrap"  # pre-rebrand location; keep existing data
+        root = str(legacy if legacy.is_dir() else Path.home() / "Scrap-Master")
     path = Path(root).expanduser()
     for sub in ("projects", "inbox", "logs"):
         (path / sub).mkdir(parents=True, exist_ok=True)

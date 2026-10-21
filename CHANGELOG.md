@@ -6,7 +6,7 @@ All notable changes to this project are documented in this file.
 
 ### Changed
 
-- Project renamed to **MANOLO Scrap** (`scrap-master` CLI, `scrap_master` Python package, `~/.scrap-master` config directory, `SCRAP_MASTER_*` environment variables).
+- Project renamed to **Scrap Master** (`scrap-master` CLI, `scrap_master` Python package, `~/.scrap-master` config directory, `SCRAP_MASTER_*` environment variables).
 - All documentation, CLI output, skill files, scripts and tests are now in English only.
 - README rewritten around what the tool does and how to use it.
 

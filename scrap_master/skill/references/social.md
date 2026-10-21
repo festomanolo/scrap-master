@@ -14,7 +14,7 @@
 
 > Requires Chrome open with the OpenCLI extension installed. OpenCLI may only
 > use an existing Chrome session explicitly controlled by the user.
-> MANOLO Scrap never logs the user in or reads browser cookies.
+> Scrap Master never logs the user in or reads browser cookies.
 > If no existing session is present, do not automate login; switch to backends B/C
 > and follow the Cookie-Editor manual export process.
 
