@@ -63,3 +63,41 @@ def _norm_type(typ: str) -> str:
     if typ not in TYPES:
         raise ExtractError(f"unknown type {typ!r} (use one of: {', '.join(TYPES)})")
     return typ
+
+
+def coerce(value, typ: str):
+    """Convert a model value to the declared type; raise ExtractError when impossible."""
+    if value is None or value == "":
+        return None
+    if typ == "string":
+        return str(value).strip()
+    if typ in ("number", "integer"):
+        if isinstance(value, bool):
+            raise ExtractError(f"{value!r} is not a {typ}")
+        if isinstance(value, (int, float)):
+            num = float(value)
+        else:
+            m = re.search(r"-?\d[\d,]*(?:\.\d+)?", str(value))
+            if not m:
+                raise ExtractError(f"{value!r} is not a {typ}")
+            num = float(m.group(0).replace(",", ""))
+        return int(num) if typ == "integer" or num.is_integer() else num
+    if typ == "boolean":
+        if isinstance(value, bool):
+            return value
+        text = str(value).strip().lower()
+        if text in ("true", "yes", "y", "1"):
+            return True
+        if text in ("false", "no", "n", "0"):
+            return False
+        raise ExtractError(f"{value!r} is not a boolean")
+    if typ == "list":
+        if isinstance(value, list):
+            return [v for v in value if v not in (None, "")]
+        return [s.strip() for s in str(value).split(",") if s.strip()]
+    if typ == "url":
+        text = str(value).strip()
+        if not re.match(r"https?://", text):
+            raise ExtractError(f"{value!r} is not an http(s) URL")
+        return text
+    raise ExtractError(f"unknown type {typ!r}")
