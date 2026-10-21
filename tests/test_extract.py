@@ -82,3 +82,14 @@ def test_extract_urls_adds_source_and_skips_failures():
     recs = extract.extract_urls(["https://a.org", "https://bad.org"], {"name": "string"},
                                 reader=reader, chat=lambda m, json_mode=False: '{"records":[{"name":"A"}]}')
     assert recs == [{"name": "A", "source": "https://a.org"}]
+
+
+def test_write_records_formats(tmp_path):
+    recs = [{"name": "A", "tags": ["x", "y"]}, {"name": "B", "tags": []}]
+    assert json.loads(extract.write_records(recs, tmp_path / "r.json").read_text()) == recs
+    lines = extract.write_records(recs, tmp_path / "r.jsonl").read_text().splitlines()
+    assert [json.loads(line) for line in lines] == recs
+    rows = list(csv.DictReader(extract.write_records(recs, tmp_path / "r.csv").open()))
+    assert rows[0] == {"name": "A", "tags": "x; y"}
+    with pytest.raises(extract.ExtractError):
+        extract.write_records(recs, tmp_path / "r.xml")
