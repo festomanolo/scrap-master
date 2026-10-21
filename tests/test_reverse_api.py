@@ -54,3 +54,9 @@ def test_generate_client_falls_back_when_ai_returns_garbage(monkeypatch):
     monkeypatch.setattr(reverse_api, "ai_client", lambda e, s: (_ for _ in ()).throw(SyntaxError()))
     code = reverse_api.generate_client(reverse_api.group_endpoints(CALLS), "api.shop.io")
     assert code.startswith('"""API client for api.shop.io')
+
+
+def test_ai_client_strips_fences_and_checks_syntax():
+    eps = reverse_api.group_endpoints(CALLS)
+    code = reverse_api.ai_client(eps, "s", chat=lambda m: "Sure!\n```python\nclass Client: pass\n```")
+    assert code == "class Client: pass\n"
