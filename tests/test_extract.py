@@ -46,3 +46,10 @@ def test_coerce(value, typ, want):
 def test_coerce_rejects(value, typ):
     with pytest.raises(extract.ExtractError):
         extract.coerce(value, typ)
+
+
+def test_validate_drops_unknown_fields_and_empty_records():
+    fields = {"name": "string", "price": "number"}
+    recs, errors = extract.validate({"records": [{"name": "A", "price": "5", "x": 1}, {}, 7]}, fields)
+    assert recs == [{"name": "A", "price": 5}]
+    assert errors == ["record 2 is not an object"]
