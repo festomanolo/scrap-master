@@ -14,3 +14,9 @@ def test_scrub_headers_drops_secrets():
     got = reverse_api.scrub_headers({"Cookie": "s=1", "Authorization": "Bearer x",
                                      "Accept": "application/json", "X-Api-Key": "k"})
     assert got == {"accept": "application/json"}
+
+
+def test_path_template_replaces_ids():
+    assert reverse_api.path_template("/v1/items/123/reviews") == "/v1/items/{id}/reviews"
+    assert reverse_api.path_template("/u/3f2a9c1e-1111-2222-3333-444455556666") == "/u/{id}"
+    assert reverse_api.path_template("/v1/search") == "/v1/search"
