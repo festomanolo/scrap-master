@@ -8,3 +8,9 @@ CALLS = [
     {"method": "POST", "url": "https://api.shop.io/v1/search",
      "status": 200, "headers": {}, "post_data": '{"q":"x"}', "sample": "[]"},
 ]
+
+
+def test_scrub_headers_drops_secrets():
+    got = reverse_api.scrub_headers({"Cookie": "s=1", "Authorization": "Bearer x",
+                                     "Accept": "application/json", "X-Api-Key": "k"})
+    assert got == {"accept": "application/json"}
