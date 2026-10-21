@@ -24,3 +24,9 @@ SAMPLE_CHARS = 1500
 _SECRET_PARAM = re.compile(r"key|token|secret|auth|sig|session|passw|csrf|xsrf", re.I)
 REDACTED = "<redacted>"
 _ID_SEGMENT = re.compile(r"^(?:\d+|[0-9a-f]{8}-[0-9a-f-]{27}|[0-9a-f]{16,}|[A-Za-z0-9_-]{22,})$", re.I)
+
+
+def scrub_headers(headers: Dict[str, str]) -> Dict[str, str]:
+    """Keep only harmless, useful request headers."""
+    return {k.lower(): v for k, v in (headers or {}).items()
+            if k.lower() in _KEEP_HEADERS and k.lower() not in SENSITIVE_HEADERS}
