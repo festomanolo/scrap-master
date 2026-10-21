@@ -204,3 +204,26 @@ def extract_urls(urls: List[str], fields: Dict[str, str], instruction: str = "",
         print(f"  ✓ {url}: {len(recs)} record(s)")
         out += [{**r, "source": url} for r in recs]
     return dedupe(out)
+
+
+def write_records(records: List[dict], path: Path, fmt: str = "") -> Path:
+    """Write records as .json, .jsonl or .csv (format taken from the suffix unless given)."""
+    path = Path(path)
+    fmt = (fmt or path.suffix.lstrip(".") or "json").lower()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if fmt == "jsonl":
+        path.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in records),
+                        encoding="utf-8")
+    elif fmt == "csv":
+        cols = list(dict.fromkeys(k for r in records for k in r))
+        with path.open("w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=cols)
+            w.writeheader()
+            for r in records:
+                w.writerow({k: "; ".join(map(str, v)) if isinstance(v, list) else v
+                            for k, v in r.items()})
+    elif fmt == "json":
+        path.write_text(json.dumps(records, indent=2, ensure_ascii=False), encoding="utf-8")
+    else:
+        raise ExtractError(f"unknown format {fmt!r} (json, jsonl, csv)")
+    return path
