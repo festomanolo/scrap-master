@@ -24,3 +24,26 @@ MAX_CHUNKS = 8
 
 class ExtractError(ValueError):
     pass
+
+
+def parse_fields(spec: str) -> Dict[str, str]:
+    """Parse "name, price:number, tags:list" (or a JSON object / JSON Schema) into {field: type}."""
+    spec = (spec or "").strip()
+    if not spec:
+        raise ExtractError("no fields given")
+    if spec.startswith("{"):
+        data = json.loads(spec)
+        props = data.get("properties", data)
+        return {k: _norm_type(v.get("type", "string") if isinstance(v, dict) else v)
+                for k, v in props.items()}
+    fields: Dict[str, str] = {}
+    for part in re.split(r"[,\n]", spec):
+        part = part.strip()
+        if not part:
+            continue
+        name, _, typ = part.partition(":")
+        name = name.strip()
+        if not re.fullmatch(r"[A-Za-z_][\w ]*", name):
+            raise ExtractError(f"bad field name: {name!r}")
+        fields[name.replace(" ", "_")] = _norm_type(typ.strip() or "string")
+    return fields
