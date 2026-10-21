@@ -47,3 +47,11 @@ def parse_fields(spec: str) -> Dict[str, str]:
             raise ExtractError(f"bad field name: {name!r}")
         fields[name.replace(" ", "_")] = _norm_type(typ.strip() or "string")
     return fields
+
+
+def load_fields(spec: str) -> Dict[str, str]:
+    """Like parse_fields, but also accepts a path to a .json schema file."""
+    path = Path(spec).expanduser()
+    if spec.endswith(".json") and path.is_file():
+        return parse_fields(path.read_text(encoding="utf-8"))
+    return parse_fields(spec)
