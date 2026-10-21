@@ -19,3 +19,4 @@ TYPES = ("string", "number", "integer", "boolean", "list", "url")
 _ALIASES = {"str": "string", "text": "string", "float": "number", "int": "integer",
             "bool": "boolean", "array": "list", "link": "url"}
 CHUNK_CHARS = 12000
+MAX_CHUNKS = 8
