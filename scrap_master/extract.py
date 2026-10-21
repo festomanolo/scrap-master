@@ -124,3 +124,16 @@ def validate(records, fields: Dict[str, str]) -> Tuple[List[dict], List[str]]:
         if any(v not in (None, []) for v in out.values()):
             clean.append(out)
     return clean, errors
+
+
+def chunks(text: str, size: int = CHUNK_CHARS, limit: int = MAX_CHUNKS) -> List[str]:
+    """Split text on line boundaries into at most `limit` chunks of about `size` chars."""
+    parts, buf = [], ""
+    for line in text.splitlines(keepends=True):
+        if buf and len(buf) + len(line) > size:
+            parts.append(buf)
+            buf = ""
+        buf += line[:size]
+    if buf.strip():
+        parts.append(buf)
+    return parts[:limit]
