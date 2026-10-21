@@ -71,3 +71,14 @@ def test_extract_text_retries_with_error_feedback():
 
     assert extract.extract_text("page", {"price": "number"}, chat=chat) == [{"price": 0}]
     assert "Fix these problems" in seen[1][-1]["content"]
+
+
+def test_extract_urls_adds_source_and_skips_failures():
+    def reader(url):
+        if "bad" in url:
+            raise OSError("down")
+        return "Item A"
+
+    recs = extract.extract_urls(["https://a.org", "https://bad.org"], {"name": "string"},
+                                reader=reader, chat=lambda m, json_mode=False: '{"records":[{"name":"A"}]}')
+    assert recs == [{"name": "A", "source": "https://a.org"}]
