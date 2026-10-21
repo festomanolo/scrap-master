@@ -175,3 +175,17 @@ clear, well-named method per endpoint below (path ids become arguments, query pa
 keyword arguments with the observed values as defaults). Infer pagination when you see
 page/offset/cursor params. Never hard-code cookies or auth tokens.
 Reply with ONLY the Python code."""
+
+
+def ai_client(endpoints: List[dict], site: str, chat: Optional[Callable] = None) -> str:
+    from scrap_master import ai
+
+    chat = chat or ai.chat
+    brief = json.dumps([{k: ep[k] for k in ("method", "base", "path", "params", "body", "sample")}
+                        for ep in endpoints[:25]], indent=1, ensure_ascii=False)
+    reply = chat([{"role": "system", "content": CLIENT_PROMPT},
+                  {"role": "user", "content": f"Site: {site}\nEndpoints:\n{brief}"}])
+    m = re.search(r"```(?:python)?\n(.*?)```", reply, re.S)
+    code = (m.group(1) if m else reply).strip() + "\n"
+    compile(code, "api_client.py", "exec")  # reject replies that are not valid Python
+    return code
