@@ -257,6 +257,21 @@ def main():
     p_ask.add_argument("--no-ai", action="store_true", help="Use the keyword plan, no LLM")
     p_ask.add_argument("--no-organize", action="store_true", help="Keep all files in one folder")
 
+    p_ex = sub.add_parser("extract", help="Extract structured records (JSON/CSV) from pages with AI")
+    p_ex.add_argument("urls", nargs="*", help="Pages to extract from")
+    p_ex.add_argument("--fields", required=True,
+                      help='e.g. "name, price:number, tags:list" or a .json schema file')
+    p_ex.add_argument("--prompt", default="", help="What to extract, in plain words")
+    p_ex.add_argument("--search", metavar="QUERY", help="Search the web and extract from the top results")
+    p_ex.add_argument("--top", type=int, default=5, help="Results to use with --search (default 5)")
+    p_ex.add_argument("-o", "--output", help="Output file (.json, .jsonl, .csv); default: new project")
+
+    p_ra = sub.add_parser("reverse-api", help="Capture a page's JSON API calls and generate a Python client")
+    p_ra.add_argument("url", help="Page to load in a headless browser")
+    p_ra.add_argument("--wait", type=int, default=6, help="Seconds to keep recording (default 6)")
+    p_ra.add_argument("--no-ai", action="store_true", help="Use the built-in client template, no LLM")
+    p_ra.add_argument("-o", "--output", help="Output folder; default: new project data/ folder")
+
     # ── types / organize / bench ──
     sub.add_parser("types", help="List file-type presets usable with --only")
     p_org = sub.add_parser("organize", help="Sort a folder's files into <type>/ subfolders")
