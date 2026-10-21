@@ -67,3 +67,11 @@ def test_run_writes_outputs(tmp_path, monkeypatch):
     out = reverse_api.run("https://shop.io", tmp_path, use_ai=False)
     assert (out / "endpoints.json").is_file() and (out / "api_client.py").is_file()
     assert "Cookie" not in (out / "endpoints.json").read_text()
+
+
+def test_secret_query_params_are_redacted():
+    calls = [{**CALLS[1], "url": "https://a.io/q?x-algolia-api-key=abc&access_token=t&page=2"}]
+    ep = reverse_api.group_endpoints(calls)[0]
+    assert ep["params"] == {"x-algolia-api-key": "<redacted>", "access_token": "<redacted>", "page": "2"}
+    code = reverse_api.template_client([ep], "a.io")
+    assert "abc" not in code and "<redacted>" not in code
