@@ -59,3 +59,15 @@ def test_chunks_respects_size_and_limit():
     text = "\n".join("x" * 50 for _ in range(100))
     parts = extract.chunks(text, size=200, limit=3)
     assert len(parts) == 3 and all(len(p) <= 200 for p in parts)
+
+
+def test_extract_text_retries_with_error_feedback():
+    replies = iter(['{"records": [{"price": "free"}]}', '{"records": [{"price": 0}]}'])
+    seen = []
+
+    def chat(messages, json_mode=False):
+        seen.append(messages)
+        return next(replies)
+
+    assert extract.extract_text("page", {"price": "number"}, chat=chat) == [{"price": 0}]
+    assert "Fix these problems" in seen[1][-1]["content"]
