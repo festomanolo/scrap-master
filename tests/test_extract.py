@@ -14,3 +14,9 @@ def test_parse_fields_inline_spec():
 def test_parse_fields_json_schema():
     spec = json.dumps({"properties": {"title": {"type": "string"}, "year": {"type": "integer"}}})
     assert extract.parse_fields(spec) == {"title": "string", "year": "integer"}
+
+
+def test_load_fields_from_file(tmp_path):
+    p = tmp_path / "s.json"
+    p.write_text('{"url": "link"}')
+    assert extract.load_fields(str(p)) == {"url": "url"}
