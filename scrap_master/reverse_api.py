@@ -19,3 +19,4 @@ from scrap_master.utils.text import scrub_url_credentials
 
 SENSITIVE_HEADERS = ("cookie", "set-cookie", "authorization", "proxy-authorization",
                      "x-csrf-token", "x-xsrf-token", "x-api-key", "x-auth-token")
+_KEEP_HEADERS = ("accept", "content-type", "x-requested-with", "referer", "origin")
