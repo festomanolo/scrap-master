@@ -39,3 +39,46 @@ def scrub_params(params: Dict[str, str]) -> Dict[str, str]:
 
 def is_api_call(resource_type: str, content_type: str) -> bool:
     return resource_type in ("xhr", "fetch") or "json" in (content_type or "").lower()
+
+
+def capture(url: str, wait_ms: int = 6000, scrolls: int = 3) -> List[dict]:
+    """Load `url` in headless Chromium and return the JSON API calls it makes."""
+    from playwright.sync_api import sync_playwright
+
+    from scrap_master.channels.web import _UA, launch_browser
+    from scrap_master.utils.url import normalize_public_http_url
+
+    url = normalize_public_http_url(url)
+    calls: List[dict] = []
+
+    def on_response(resp):
+        req = resp.request
+        ctype = resp.headers.get("content-type", "")
+        if not is_api_call(req.resource_type, ctype) or "json" not in ctype.lower():
+            return
+        try:
+            body = resp.text()
+        except Exception:
+            body = ""
+        calls.append({
+            "method": req.method,
+            "url": _scrub_url(req.url),
+            "status": resp.status,
+            "headers": scrub_headers(req.headers),
+            "post_data": (req.post_data or "")[:SAMPLE_CHARS],
+            "content_type": ctype,
+            "sample": body[:SAMPLE_CHARS],
+        })
+
+    with sync_playwright() as p:
+        browser = launch_browser(p)
+        try:
+            page = browser.new_context(user_agent=_UA).new_page()
+            page.on("response", on_response)
+            page.goto(url, wait_until="domcontentloaded", timeout=30000)
+            for _ in range(scrolls):
+                page.mouse.wheel(0, 4000)
+                page.wait_for_timeout(wait_ms // max(scrolls, 1))
+        finally:
+            browser.close()
+    return calls
