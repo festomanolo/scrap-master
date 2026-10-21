@@ -30,3 +30,8 @@ def scrub_headers(headers: Dict[str, str]) -> Dict[str, str]:
     """Keep only harmless, useful request headers."""
     return {k.lower(): v for k, v in (headers or {}).items()
             if k.lower() in _KEEP_HEADERS and k.lower() not in SENSITIVE_HEADERS}
+
+
+def scrub_params(params: Dict[str, str]) -> Dict[str, str]:
+    """Blank out query values whose names look like credentials."""
+    return {k: REDACTED if _SECRET_PARAM.search(k) else v for k, v in params.items()}
