@@ -16,3 +16,6 @@ from pathlib import Path
 from typing import Callable, Dict, List, Optional
 
 from scrap_master.utils.text import scrub_url_credentials
+
+SENSITIVE_HEADERS = ("cookie", "set-cookie", "authorization", "proxy-authorization",
+                     "x-csrf-token", "x-xsrf-token", "x-api-key", "x-auth-token")
