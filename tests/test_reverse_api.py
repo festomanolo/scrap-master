@@ -42,3 +42,9 @@ def test_template_client_is_valid_python_with_methods():
     client = ns["Client"]
     assert hasattr(client, "get_v1_items_reviews") and hasattr(client, "post_v1_search")
     assert 'f"https://api.shop.io/v1/items/{id}/reviews"' in code
+
+
+def test_template_client_numbers_multiple_ids():
+    eps = reverse_api.group_endpoints([{**CALLS[0], "url": "https://a.io/u/12/p/34"}])
+    code = reverse_api.template_client(eps, "a.io")
+    assert "def get_u_p(self, id, id2, **params)" in code and "/u/{id}/p/{id2}" in code
