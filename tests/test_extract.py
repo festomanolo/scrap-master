@@ -43,3 +43,6 @@ def test_coerce(value, typ, want):
 
 @pytest.mark.parametrize(("value", "typ"), [("n/a", "number"), (True, "integer"),
                                             ("maybe", "boolean"), ("x.org", "url")])
+def test_coerce_rejects(value, typ):
+    with pytest.raises(extract.ExtractError):
+        extract.coerce(value, typ)
