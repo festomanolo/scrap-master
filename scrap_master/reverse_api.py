@@ -198,3 +198,17 @@ def generate_client(endpoints: List[dict], site: str, use_ai: bool = True) -> st
         except Exception as e:
             print(f"  AI client failed ({type(e).__name__}); using the template instead")
     return template_client(endpoints, site)
+
+
+def run(url: str, out_dir: Path, use_ai: bool = True, wait_ms: int = 6000) -> Path:
+    """Capture, group, and write endpoints.json + api_client.py into out_dir."""
+    calls = capture(url, wait_ms=wait_ms)
+    endpoints = group_endpoints(calls)
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / "endpoints.json").write_text(json.dumps(endpoints, indent=2, ensure_ascii=False),
+                                            encoding="utf-8")
+    site = urllib.parse.urlsplit(url if "://" in url else f"https://{url}").netloc
+    (out_dir / "api_client.py").write_text(generate_client(endpoints, site, use_ai), encoding="utf-8")
+    print(f"  {len(calls)} JSON call(s) → {len(endpoints)} endpoint(s)")
+    return out_dir
