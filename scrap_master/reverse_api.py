@@ -21,3 +21,4 @@ SENSITIVE_HEADERS = ("cookie", "set-cookie", "authorization", "proxy-authorizati
                      "x-csrf-token", "x-xsrf-token", "x-api-key", "x-auth-token")
 _KEEP_HEADERS = ("accept", "content-type", "x-requested-with", "referer", "origin")
 SAMPLE_CHARS = 1500
+_SECRET_PARAM = re.compile(r"key|token|secret|auth|sig|session|passw|csrf|xsrf", re.I)
