@@ -55,3 +55,11 @@ def load_fields(spec: str) -> Dict[str, str]:
     if spec.endswith(".json") and path.is_file():
         return parse_fields(path.read_text(encoding="utf-8"))
     return parse_fields(spec)
+
+
+def _norm_type(typ: str) -> str:
+    typ = str(typ).lower().strip()
+    typ = _ALIASES.get(typ, typ)
+    if typ not in TYPES:
+        raise ExtractError(f"unknown type {typ!r} (use one of: {', '.join(TYPES)})")
+    return typ
