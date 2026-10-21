@@ -26,3 +26,10 @@ def test_is_api_call():
     assert reverse_api.is_api_call("fetch", "text/html")
     assert reverse_api.is_api_call("document", "application/json; charset=utf-8")
     assert not reverse_api.is_api_call("image", "image/png")
+
+
+def test_group_endpoints_merges_same_route():
+    eps = reverse_api.group_endpoints(CALLS)
+    assert [(e["method"], e["path"], e["hits"]) for e in eps] == [
+        ("GET", "/v1/items/{id}/reviews", 2), ("POST", "/v1/search", 1)]
+    assert eps[0]["params"] == {"page": "1", "sort": "new"}
