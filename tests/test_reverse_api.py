@@ -33,3 +33,12 @@ def test_group_endpoints_merges_same_route():
     assert [(e["method"], e["path"], e["hits"]) for e in eps] == [
         ("GET", "/v1/items/{id}/reviews", 2), ("POST", "/v1/search", 1)]
     assert eps[0]["params"] == {"page": "1", "sort": "new"}
+
+
+def test_template_client_is_valid_python_with_methods():
+    code = reverse_api.template_client(reverse_api.group_endpoints(CALLS), "api.shop.io")
+    ns = {}
+    exec(compile(code, "client", "exec"), ns)
+    client = ns["Client"]
+    assert hasattr(client, "get_v1_items_reviews") and hasattr(client, "post_v1_search")
+    assert 'f"https://api.shop.io/v1/items/{id}/reviews"' in code
