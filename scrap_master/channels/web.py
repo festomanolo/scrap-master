@@ -118,6 +118,13 @@ def _read_via_obscura(url: str) -> str:
     if not binary:
         raise RuntimeError("obscura binary not found")
     md = ""
+    for wait_until, timeout in (("domcontentloaded", 45), ("networkidle0", 60)):
+        proc = subprocess.run(
+            [binary, "fetch", "--stealth", "--wait-until", wait_until, "--timeout", str(timeout),
+             "--dump", "html", url],
+            capture_output=True, text=True, timeout=timeout + 15, check=False,
+        )
+        if proc.returncode != 0 or _is_challenge_html(proc.stdout):
 def _read_via_curl_cffi(url: str, timeout: int = 20) -> str:
     """Fetch with a real Chrome TLS/HTTP2 fingerprint (curl_cffi) to pass fingerprint-based bot walls."""
     from curl_cffi import requests as cffi_requests
