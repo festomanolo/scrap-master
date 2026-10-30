@@ -78,7 +78,7 @@ def capture(url: str, wait_ms: int = 6000, scrolls: int = 3, engine: str = "chro
                 context = browser.new_context(user_agent=_UA)
             page = context.new_page()
             page.on("response", on_response)
-            page.goto(url, wait_until="domcontentloaded", timeout=30000)
+            page.goto(url, wait_until="domcontentloaded", timeout=60000 if engine == "obscura" else 30000)
             for _ in range(scrolls):
                 page.mouse.wheel(0, 4000)
                 page.wait_for_timeout(wait_ms // max(scrolls, 1))
