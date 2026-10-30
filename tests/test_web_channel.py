@@ -236,3 +236,10 @@ def test_obscura_tier_used_before_playwright_when_installed():
          patch("scrap_master.channels.web._read_via_obscura", return_value="rendered") as obs, \
          patch("scrap_master.channels.web._read_via_playwright") as pw:
         assert channel.read("https://example.com") == "rendered"
+    obs.assert_called_once()
+    pw.assert_not_called()
+
+
+def test_obscura_tier_skipped_when_not_installed():
+    channel = WebChannel()
+    with patch("urllib.request.urlopen", side_effect=OSError("boom")), \
