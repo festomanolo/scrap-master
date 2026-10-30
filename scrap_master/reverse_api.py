@@ -45,7 +45,7 @@ def capture(url: str, wait_ms: int = 6000, scrolls: int = 3, engine: str = "chro
     """Load `url` in headless Chromium (or Obscura with engine=\"obscura\") and return the JSON API calls it makes."""
     from playwright.sync_api import sync_playwright
 
-    from scrap_master.channels.web import _UA, launch_browser
+    from scrap_master.channels.web import _UA, open_browser
     from scrap_master.utils.url import normalize_public_http_url
 
     url = normalize_public_http_url(url)
