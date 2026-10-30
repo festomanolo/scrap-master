@@ -223,3 +223,9 @@ def test_antibot_detection_has_a_fixed_scan_window():
 
     with patch("urllib.request.urlopen", return_value=_resp(body.encode("utf-8"))):
         assert channel.read("https://example.com/long-article") == body
+
+
+# --- optional Obscura tier ---
+
+def test_obscura_tier_used_before_playwright_when_installed():
+    channel = WebChannel()
