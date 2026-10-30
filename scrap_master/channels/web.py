@@ -4,6 +4,7 @@
 import contextlib
 import os
 import shutil
+import socket
 import subprocess
 import urllib.request
 from pathlib import Path
