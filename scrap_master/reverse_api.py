@@ -71,9 +71,12 @@ def capture(url: str, wait_ms: int = 6000, scrolls: int = 3, engine: str = "chro
         })
 
     with sync_playwright() as p:
-        browser = launch_browser(p)
-        try:
-            page = browser.new_context(user_agent=_UA).new_page()
+        with open_browser(p, engine) as browser:
+            if engine == "obscura":
+                context = browser.contexts[0] if browser.contexts else browser.new_context()
+            else:
+                context = browser.new_context(user_agent=_UA)
+            page = context.new_page()
             page.on("response", on_response)
             page.goto(url, wait_until="domcontentloaded", timeout=30000)
             for _ in range(scrolls):
