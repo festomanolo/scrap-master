@@ -7,6 +7,7 @@ import subprocess
 import urllib.request
 from pathlib import Path
 
+from scrap_master.utils.paths import home_dir
 from scrap_master.utils.url import normalize_public_http_url
 
 from .base import Channel
