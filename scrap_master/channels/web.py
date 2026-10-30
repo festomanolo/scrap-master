@@ -105,6 +105,13 @@ def find_obscura() -> str:
     for c in candidates:
         if c and Path(c).is_file() and os.access(c, os.X_OK):
             return c
+    return shutil.which("obscura") or ""
+
+
+def _read_via_obscura(url: str) -> str:
+    """Render a JS page with Obscura (lightweight Rust/V8 headless browser) and convert to Markdown.
+
+    DOMContentLoaded first (the default `load` waits on every tracker and stalls); a thin result is
 def _read_via_curl_cffi(url: str, timeout: int = 20) -> str:
     """Fetch with a real Chrome TLS/HTTP2 fingerprint (curl_cffi) to pass fingerprint-based bot walls."""
     from curl_cffi import requests as cffi_requests
