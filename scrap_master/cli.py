@@ -2249,7 +2249,7 @@ def _cmd_reverse_api(args):
 
     out = Path(args.output) if args.output else workspace.new_project(f"api {args.url}") / "data"
     try:
-        reverse_api.run(args.url, out, use_ai=not args.no_ai, wait_ms=args.wait * 1000)
+        reverse_api.run(args.url, out, use_ai=not args.no_ai, wait_ms=args.wait * 1000, engine=args.browser)
     except ImportError:
         print("Needs Playwright: pip install playwright && playwright install chromium", file=sys.stderr)
         sys.exit(1)
