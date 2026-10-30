@@ -165,6 +165,7 @@ class WebChannel(Channel):
         "Jina Reader",
         "Direct HTTP + BeautifulSoup",
         "curl_cffi Chrome TLS impersonation",
+        "Obscura headless browser (optional)",
         "Playwright Headless Chromium",
     ]
     tier = 0
