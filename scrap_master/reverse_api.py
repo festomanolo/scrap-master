@@ -201,7 +201,7 @@ def generate_client(endpoints: List[dict], site: str, use_ai: bool = True) -> st
     return template_client(endpoints, site)
 
 
-def run(url: str, out_dir: Path, use_ai: bool = True, wait_ms: int = 6000) -> Path:
+def run(url: str, out_dir: Path, use_ai: bool = True, wait_ms: int = 6000, engine: str = "chromium") -> Path:
     """Capture, group, and write endpoints.json + api_client.py into out_dir."""
     calls = capture(url, wait_ms=wait_ms)
     endpoints = group_endpoints(calls)
