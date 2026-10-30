@@ -75,6 +75,45 @@ def launch_browser(p):
         return p.chromium.launch(headless=True, channel="chrome")
 
 
+@contextlib.contextmanager
+def open_browser(p, engine: str = "chromium"):
+    """Yield a Playwright browser: Chromium by default, or Obscura driven over CDP (`engine="obscura"`)."""
+    if engine != "obscura":
+        browser = launch_browser(p)
+        try:
+            yield browser
+        finally:
+            browser.close()
+        return
+    binary = find_obscura()
+    if not binary:
+        raise RuntimeError("obscura binary not found (see SCRAP_OBSCURA_BIN)")
+    with socket.socket() as sock:
+        sock.bind(("127.0.0.1", 0))
+        port = sock.getsockname()[1]
+    proc = subprocess.Popen([binary, "serve", "--stealth", "--port", str(port)],
+                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    try:
+        for _ in range(50):
+            try:
+                socket.create_connection(("127.0.0.1", port), timeout=0.2).close()
+                break
+            except OSError:
+                if proc.poll() is not None:
+                    raise RuntimeError("obscura serve exited early")
+                time.sleep(0.1)
+        browser = p.chromium.connect_over_cdp(f"http://127.0.0.1:{port}")
+        try:
+            yield browser
+        finally:
+            with contextlib.suppress(Exception):
+                browser.close()
+    finally:
+        proc.terminate()
+        with contextlib.suppress(Exception):
+            proc.wait(timeout=5)
+
+
 def _read_via_playwright(url: str, timeout_ms: int = 25000) -> str:
     """Render a JS/Cloudflare-protected page via headless Playwright Chromium and convert to Markdown."""
     from playwright.sync_api import sync_playwright
