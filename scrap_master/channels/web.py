@@ -112,6 +112,12 @@ def _read_via_obscura(url: str) -> str:
     """Render a JS page with Obscura (lightweight Rust/V8 headless browser) and convert to Markdown.
 
     DOMContentLoaded first (the default `load` waits on every tracker and stalls); a thin result is
+    retried once with networkidle0 for pages that render late.
+    """
+    binary = find_obscura()
+    if not binary:
+        raise RuntimeError("obscura binary not found")
+    md = ""
 def _read_via_curl_cffi(url: str, timeout: int = 20) -> str:
     """Fetch with a real Chrome TLS/HTTP2 fingerprint (curl_cffi) to pass fingerprint-based bot walls."""
     from curl_cffi import requests as cffi_requests
