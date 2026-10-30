@@ -82,8 +82,6 @@ def capture(url: str, wait_ms: int = 6000, scrolls: int = 3, engine: str = "chro
             for _ in range(scrolls):
                 page.mouse.wheel(0, 4000)
                 page.wait_for_timeout(wait_ms // max(scrolls, 1))
-        finally:
-            browser.close()
     return calls
 
 
