@@ -99,6 +99,12 @@ def _is_challenge_html(html_text: str) -> bool:
     return "<title>just a moment" in sample or "/cdn-cgi/challenge-platform/" in sample
 
 
+def find_obscura() -> str:
+    """Locate the optional Obscura binary: $SCRAP_OBSCURA_BIN, ~/.scrap-master/bin, then PATH."""
+    candidates = [os.environ.get("SCRAP_OBSCURA_BIN", ""), str(home_dir() / ".scrap-master" / "bin" / "obscura")]
+    for c in candidates:
+        if c and Path(c).is_file() and os.access(c, os.X_OK):
+            return c
 def _read_via_curl_cffi(url: str, timeout: int = 20) -> str:
     """Fetch with a real Chrome TLS/HTTP2 fingerprint (curl_cffi) to pass fingerprint-based bot walls."""
     from curl_cffi import requests as cffi_requests
