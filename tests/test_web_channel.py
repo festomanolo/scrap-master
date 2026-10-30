@@ -229,3 +229,10 @@ def test_antibot_detection_has_a_fixed_scan_window():
 
 def test_obscura_tier_used_before_playwright_when_installed():
     channel = WebChannel()
+    with patch("urllib.request.urlopen", side_effect=OSError("boom")), \
+         patch("scrap_master.channels.web._read_via_direct_http", side_effect=OSError), \
+         patch("scrap_master.channels.web._read_via_curl_cffi", side_effect=OSError), \
+         patch("scrap_master.channels.web.find_obscura", return_value="/bin/obscura"), \
+         patch("scrap_master.channels.web._read_via_obscura", return_value="rendered") as obs, \
+         patch("scrap_master.channels.web._read_via_playwright") as pw:
+        assert channel.read("https://example.com") == "rendered"
