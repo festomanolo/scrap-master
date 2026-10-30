@@ -217,7 +217,13 @@ class WebChannel(Channel):
                     return md
             except Exception:
                 pass
-            # Fallback 3: Local headless Playwright Chromium browser
+            # Fallback 3: Obscura (optional, low-RAM headless browser) — skipped when not installed
+            if find_obscura():
+                try:
+                    return _read_via_obscura(url)
+                except Exception:
+                    pass
+            # Fallback 4: Local headless Playwright Chromium browser
             try:
                 md = _read_via_playwright(url)
                 if md.strip():
