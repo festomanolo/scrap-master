@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Web — any URL via Jina Reader. Always available."""
 
+import contextlib
 import os
 import shutil
 import subprocess
