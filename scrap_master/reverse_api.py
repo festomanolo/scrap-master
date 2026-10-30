@@ -41,8 +41,8 @@ def is_api_call(resource_type: str, content_type: str) -> bool:
     return resource_type in ("xhr", "fetch") or "json" in (content_type or "").lower()
 
 
-def capture(url: str, wait_ms: int = 6000, scrolls: int = 3) -> List[dict]:
-    """Load `url` in headless Chromium and return the JSON API calls it makes."""
+def capture(url: str, wait_ms: int = 6000, scrolls: int = 3, engine: str = "chromium") -> List[dict]:
+    """Load `url` in headless Chromium (or Obscura with engine=\"obscura\") and return the JSON API calls it makes."""
     from playwright.sync_api import sync_playwright
 
     from scrap_master.channels.web import _UA, launch_browser
