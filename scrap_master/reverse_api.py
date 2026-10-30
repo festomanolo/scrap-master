@@ -203,7 +203,7 @@ def generate_client(endpoints: List[dict], site: str, use_ai: bool = True) -> st
 
 def run(url: str, out_dir: Path, use_ai: bool = True, wait_ms: int = 6000, engine: str = "chromium") -> Path:
     """Capture, group, and write endpoints.json + api_client.py into out_dir."""
-    calls = capture(url, wait_ms=wait_ms)
+    calls = capture(url, wait_ms=wait_ms, engine=engine)
     endpoints = group_endpoints(calls)
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
