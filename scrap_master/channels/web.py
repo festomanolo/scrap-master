@@ -5,6 +5,7 @@ import os
 import shutil
 import subprocess
 import urllib.request
+from pathlib import Path
 
 from scrap_master.utils.url import normalize_public_http_url
 
