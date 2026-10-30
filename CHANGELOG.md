@@ -8,6 +8,7 @@ All notable changes to this project are documented in this file.
 
 - `scrap-master extract`: AI extraction into typed, validated records (JSON / JSONL / CSV), from URLs or a web search.
 - `scrap-master reverse-api`: capture a page's JSON API calls and generate a Python client (AI or built-in template).
+- Optional Obscura tier in the web channel: low-RAM headless browser tried before Playwright when the binary is at `$SCRAP_OBSCURA_BIN`, `~/.scrap-master/bin/obscura` or on `PATH`.
 
 ### Changed
 
