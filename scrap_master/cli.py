@@ -269,6 +269,8 @@ def main():
     p_ra = sub.add_parser("reverse-api", help="Capture a page's JSON API calls and generate a Python client")
     p_ra.add_argument("url", help="Page to load in a headless browser")
     p_ra.add_argument("--wait", type=int, default=6, help="Seconds to keep recording (default 6)")
+    p_ra.add_argument("--browser", choices=["chromium", "obscura"], default="chromium",
+                      help="Headless engine: Chromium (default) or Obscura (low RAM, needs the obscura binary)")
     p_ra.add_argument("--no-ai", action="store_true", help="Use the built-in client template, no LLM")
     p_ra.add_argument("-o", "--output", help="Output folder; default: new project data/ folder")
 
