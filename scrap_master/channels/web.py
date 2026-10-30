@@ -125,6 +125,13 @@ def _read_via_obscura(url: str) -> str:
             capture_output=True, text=True, timeout=timeout + 15, check=False,
         )
         if proc.returncode != 0 or _is_challenge_html(proc.stdout):
+            continue
+        md = _html_to_clean_markdown(proc.stdout[:_MAX_RESPONSE_BYTES], base_url=url)
+        if len(md) > 300:
+            return md
+    raise RuntimeError("obscura returned no usable content")
+
+
 def _read_via_curl_cffi(url: str, timeout: int = 20) -> str:
     """Fetch with a real Chrome TLS/HTTP2 fingerprint (curl_cffi) to pass fingerprint-based bot walls."""
     from curl_cffi import requests as cffi_requests
