@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """Web — any URL via Jina Reader. Always available."""
 
+import os
+import shutil
+import subprocess
 import urllib.request
 
 from scrap_master.utils.url import normalize_public_http_url
